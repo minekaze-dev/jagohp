@@ -3,7 +3,6 @@ import React, { useState, useRef } from 'react';
 import { getMatch } from '../services/geminiService';
 import { RecommendationResponse, RecommendedPhone } from '../types';
 
-// Component for rendering individual specification cards
 const SpecCard = ({ label, value, icon }: { label: string, value: string, icon: React.ReactNode }) => (
   <div className="bg-[#151515] p-2 md:p-2.5 rounded-xl flex items-center gap-2.5 border border-white/5 shadow-2xl">
     <div className="bg-black w-7 h-7 md:w-8 md:h-8 rounded-lg flex items-center justify-center shrink-0 border border-white/10">
@@ -22,12 +21,10 @@ const PhoneMatch: React.FC = () => {
   const [activeIndex, setActiveIndex] = useState<number>(0);
   const [error, setError] = useState('');
   
-  // Refs for scrolling
   const resultRef = useRef<HTMLDivElement>(null);
 
-  // Form States
   const [activities, setActivities] = useState<string[]>([]);
-  const [cameraPrio, setCameraPrio] = useState(2); // Default to "Biasa" (middle)
+  const [cameraPrio, setCameraPrio] = useState(2);
   const [budget, setBudget] = useState('3 Jutaan');
   const [extra, setExtra] = useState('');
 
@@ -56,7 +53,8 @@ const PhoneMatch: React.FC = () => {
     );
   };
 
-  const handleSearch = async () => {
+  const handleSearch = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     if (activities.length === 0) {
       alert("Pilih minimal satu aktivitas Kak!");
       return;
@@ -76,10 +74,8 @@ const PhoneMatch: React.FC = () => {
       });
       
       if (res && res.primary) {
-        // Menggabungkan semua HP ke dalam satu array untuk memudahkan penukaran (swapping)
         const combined = [res.primary, ...(res.alternatives || [])];
         setAllPhones(combined);
-        // Scroll ke hasil setelah state update
         setTimeout(() => {
           resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }, 100);
@@ -120,9 +116,8 @@ const PhoneMatch: React.FC = () => {
           </p>
         </div>
 
-        {/* Input Section - Disembunyikan jika result sudah ada */}
         {allPhones.length === 0 && !loading && (
-          <div className="bg-[#0a0a0a] border border-white/10 rounded-[2.5rem] p-6 md:p-12 shadow-2xl relative overflow-hidden group animate-in fade-in duration-500">
+          <form onSubmit={handleSearch} className="bg-[#0a0a0a] border border-white/10 rounded-[2.5rem] p-6 md:p-12 shadow-2xl relative overflow-hidden group animate-in fade-in duration-500">
             <div className="relative z-10">
               <div className="grid md:grid-cols-2 gap-10 md:gap-16 items-start">
                 
@@ -133,6 +128,7 @@ const PhoneMatch: React.FC = () => {
                       {activityOptions.map(opt => (
                         <button
                           key={opt}
+                          type="button"
                           onClick={() => toggleActivity(opt)}
                           className={`text-left p-2.5 md:p-3.5 rounded-xl border transition-all text-[9px] md:text-[10px] font-bold uppercase tracking-tight leading-tight flex items-center gap-2.5 ${
                             activities.includes(opt) 
@@ -212,7 +208,7 @@ const PhoneMatch: React.FC = () => {
 
                   <div className="pt-2 mt-auto">
                     <button
-                      onClick={handleSearch}
+                      type="submit"
                       disabled={loading}
                       className="w-full bg-yellow-400 text-black py-5 rounded-2xl font-black uppercase tracking-widest text-[11px] hover:bg-yellow-500 transition-all flex items-center justify-center gap-4 shadow-2xl shadow-yellow-400/30 active:scale-[0.98] group disabled:opacity-50 disabled:cursor-not-allowed"
                     >
@@ -222,7 +218,7 @@ const PhoneMatch: React.FC = () => {
                 </div>
               </div>
             </div>
-          </div>
+          </form>
         )}
       </div>
 
@@ -246,7 +242,6 @@ const PhoneMatch: React.FC = () => {
 
       {allPhones.length > 0 && activeRecommendation && !loading && (
         <div className="space-y-12 animate-in fade-in slide-in-from-bottom-6 duration-700 pt-10 border-t border-white/5">
-          {/* Header Action */}
           <div className="flex justify-end">
             <button 
               onClick={() => {setAllPhones([]);}}
@@ -256,7 +251,6 @@ const PhoneMatch: React.FC = () => {
             </button>
           </div>
 
-          {/* Main Selected Card */}
           <div className="bg-yellow-400 text-black p-6 md:p-8 rounded-[2rem] space-y-6 shadow-2xl shadow-yellow-400/30 relative overflow-hidden">
             <div className="absolute top-0 right-0 w-64 h-64 bg-black/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl"></div>
             
@@ -296,13 +290,11 @@ const PhoneMatch: React.FC = () => {
             </div>
           </div>
 
-          {/* Alternatives List */}
           {otherOptions.length > 0 && (
             <div className="space-y-5">
               <h3 className="text-[9px] font-black uppercase text-gray-500 tracking-[0.5em] pl-4 italic">Opsi Rekomendasi Lainnya</h3>
               <div className="grid md:grid-cols-2 gap-4">
                 {allPhones.map((phone, i) => (
-                  // Render opsi yang tidak aktif sebagai alternatif
                   i !== activeIndex && (
                     <button 
                       key={i} 

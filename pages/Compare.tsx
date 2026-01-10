@@ -68,13 +68,22 @@ const Compare: React.FC = () => {
     if (phones.length < 3) setPhones([...phones, '']);
   };
 
+  const removePhoneSlot = (index: number) => {
+    if (phones.length > 2) {
+      const next = phones.filter((_, i) => i !== index);
+      setPhones(next);
+      if (result) setResult(null);
+    }
+  };
+
   const updatePhone = (index: number, val: string) => {
     const next = [...phones];
     next[index] = val;
     setPhones(next);
   };
 
-  const handleCompare = async () => {
+  const handleCompare = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
     const activePhones = phones.filter(p => p.trim() !== '');
     if (activePhones.length < 2) {
       setError('Masukkan minimal 2 HP untuk dibandingkan.');
@@ -143,13 +152,24 @@ const Compare: React.FC = () => {
         <p className="text-gray-400 text-sm md:text-base font-medium italic">Head-to-head spesifikasi biar lo gak salah pilih Smartphone.</p>
       </div>
 
-      {/* Input Section */}
       {!result && !loading && (
-        <div className="space-y-12 animate-in fade-in duration-500">
-          <div className="grid md:grid-cols-3 gap-4">
+        <form onSubmit={handleCompare} className="space-y-12 animate-in fade-in duration-500">
+          <div className="grid md:grid-cols-3 gap-6">
             {phones.map((p, i) => (
               <div key={i} className="space-y-4">
-                <label className="text-[11px] font-black text-gray-500 uppercase tracking-widest">Smartphone {i + 1}</label>
+                <div className="flex justify-between items-center">
+                  <label className="text-[11px] font-black text-gray-500 uppercase tracking-widest">Smartphone {i + 1}</label>
+                  {i === 2 && (
+                    <button 
+                      type="button"
+                      onClick={() => removePhoneSlot(i)}
+                      className="text-red-500/50 hover:text-red-500 text-[9px] font-black uppercase tracking-widest transition-colors flex items-center gap-1 group"
+                    >
+                      <svg className="w-3 h-3 transition-transform group-hover:rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M6 18L18 6M6 6l12 12"/></svg>
+                      Hapus
+                    </button>
+                  )}
+                </div>
                 <input
                   type="text"
                   value={p}
@@ -160,25 +180,32 @@ const Compare: React.FC = () => {
               </div>
             ))}
             {phones.length < 3 && (
-              <button
-                onClick={addPhoneSlot}
-                className="h-[52px] mt-6 border-2 border-dashed border-white/10 rounded-xl text-gray-500 hover:text-white hover:border-white/20 transition-colors font-bold text-[9px] tracking-widest"
-              >
-                + Tambah HP
-              </button>
+              <div className="space-y-4">
+                <label className="text-[11px] font-black text-gray-800 uppercase tracking-widest">Smartphone 3</label>
+                <button
+                  type="button"
+                  onClick={addPhoneSlot}
+                  className="w-full h-[52px] bg-white/5 border border-white/10 rounded-xl px-4 text-xs md:text-sm text-gray-600 hover:text-white hover:border-white/30 transition-all font-bold text-left flex items-center gap-3 group"
+                >
+                  <div className="w-6 h-6 flex items-center justify-center bg-white/5 rounded-lg group-hover:bg-yellow-400 group-hover:text-black transition-all">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M12 4v16m8-8H4"/></svg>
+                  </div>
+                  <span className="uppercase tracking-widest text-[10px]">Tambah HP</span>
+                </button>
+              </div>
             )}
           </div>
 
           <div className="flex justify-center">
             <button
-              onClick={handleCompare}
+              type="submit"
               disabled={loading}
-              className="bg-yellow-400 text-black px-10 py-3 rounded-full font-black uppercase tracking-[0.15em] text-[10px] hover:bg-yellow-500 transition-all disabled:opacity-50 shadow-xl shadow-yellow-400/10"
+              className="bg-yellow-400 text-black px-10 py-3 rounded-xl font-black uppercase tracking-[0.15em] text-[10px] hover:bg-yellow-500 transition-all disabled:opacity-50 shadow-xl shadow-yellow-400/10"
             >
               Mulai Bandingkan
             </button>
           </div>
-        </div>
+        </form>
       )}
 
       {loading && (
@@ -204,7 +231,6 @@ const Compare: React.FC = () => {
             </button>
           </div>
 
-          {/* Table Data Section */}
           <div className="overflow-x-auto bg-[#0c0c0c] rounded-3xl border border-white/10 p-4 md:p-10 shadow-2xl">
             <table className="w-full">
               <thead>
@@ -218,7 +244,6 @@ const Compare: React.FC = () => {
               <tbody className="divide-y divide-white/5">
                 {result.tableData.map((row, i) => {
                   const isPriceRow = row.feature.toLowerCase().includes('harga');
-                  const isNfcRow = row.feature.toLowerCase().includes('nfc');
                   return (
                     <tr key={i} className={`transition-colors group ${isPriceRow ? 'bg-yellow-400/[0.03]' : 'hover:bg-white/[0.02]'}`}>
                       <td className={`py-6 pr-4 font-black uppercase text-[8px] tracking-[0.2em] transition-colors flex items-start gap-2.5 ${isPriceRow ? 'text-yellow-400' : 'text-gray-500 group-hover:text-gray-300'}`}>
@@ -245,7 +270,6 @@ const Compare: React.FC = () => {
             </table>
           </div>
 
-          {/* PERFORMANCE SCORES SECTION */}
           <div className="space-y-8">
             <div className="flex items-center gap-4">
                <h3 className="text-xl md:text-2xl font-black uppercase text-white italic tracking-tighter">Skor Performa AI</h3>
@@ -262,7 +286,6 @@ const Compare: React.FC = () => {
             </div>
           </div>
 
-          {/* Analysis & Summary */}
           <div className="space-y-10">
             <div className="grid gap-6">
               {parseAnalysis(result.conclusion).phonePoints.map((pointText, idx) => {

@@ -64,7 +64,7 @@ const SmartReview: React.FC = () => {
           Analisis spesifikasi secara cepat dan akurat.
         </p>
         
-        {/* Formulir Pencarian - Disembunyikan jika review sudah ada */}
+        {/* Formulir Pencarian - Menggunakan rounded-2xl dan rounded-xl agar tidak terlalu bulat (pill) */}
         {!review && !loading && (
           <form onSubmit={handleSearch} className="max-w-md mx-auto relative mt-8 animate-in fade-in duration-500">
             <input
@@ -72,12 +72,12 @@ const SmartReview: React.FC = () => {
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="Tuliskan nama/tipe Smartphone"
-              className="w-full bg-white/5 border border-white/20 rounded-full px-6 py-4 text-xs md:text-sm focus:outline-none focus:border-yellow-400 transition-colors pr-32 font-bold"
+              className="w-full bg-white/5 border border-white/20 rounded-2xl px-6 py-4 text-xs md:text-sm focus:outline-none focus:border-yellow-400 transition-colors pr-32 font-bold"
             />
             <button
               type="submit"
               disabled={loading}
-              className="absolute right-1.5 top-1.5 bottom-1.5 bg-yellow-400 text-black px-6 rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-yellow-500 disabled:opacity-50 transition-colors"
+              className="absolute right-1.5 top-1.5 bottom-1.5 bg-yellow-400 text-black px-6 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-yellow-500 disabled:opacity-50 transition-colors"
             >
               Review
             </button>
@@ -125,7 +125,7 @@ const SmartReview: React.FC = () => {
                   onClick={() => {setReview(null); setQuery('');}}
                   className="text-gray-600 hover:text-yellow-400 transition-colors text-[9px] font-black uppercase tracking-widest border-b border-gray-800 pb-1"
                 >
-                  Ubah Cari
+                  Reset
                 </button>
               </div>
               <p className="text-sm md:text-lg text-yellow-400 font-bold italic tracking-tight pt-5 mt-5 border-t border-white/5">"{review.highlight}"</p>
@@ -241,7 +241,7 @@ const SmartReview: React.FC = () => {
           {sources.length > 0 && (
             <div className="bg-[#050505] border border-white/5 rounded-3xl p-6 md:p-8 space-y-4">
               <div className="flex items-center gap-2">
-                <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
+                <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 105.656 5.656l-1.1 1.1"/></svg>
                 <h4 className="text-[9px] font-black uppercase text-gray-600 tracking-[0.3em]">Referensi Data</h4>
               </div>
               <div className="flex flex-wrap gap-3">
