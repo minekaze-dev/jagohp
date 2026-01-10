@@ -1,0 +1,211 @@
+
+import React, { useState, useEffect } from 'react';
+import { HashRouter as Router, Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom';
+import Home from './pages/Home';
+import SmartReview from './pages/SmartReview';
+import Compare from './pages/Compare';
+import PhoneMatch from './pages/PhoneMatch';
+import Blog from './pages/Blog';
+import BlogDetail from './pages/BlogDetail';
+import About from './pages/About';
+import AIChat from './pages/AIChat';
+import FAQ from './pages/FAQ';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import AdminDashboard from './pages/AdminDashboard';
+import BlogEditor from './pages/BlogEditor';
+
+const ScrollToTop = () => {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
+  }, [pathname]);
+  return null;
+};
+
+const Header: React.FC = () => {
+  const location = useLocation();
+  const isAdmin = sessionStorage.getItem('admin_token') === 'granted';
+  const isActive = (path: string) => location.pathname === path;
+
+  const handleLogout = () => {
+    if (window.confirm('Yakin ingin logout dari mode Admin?')) {
+      sessionStorage.removeItem('admin_token');
+      window.location.href = '#/';
+      window.location.reload();
+    }
+  };
+
+  const navItems = isAdmin 
+    ? [
+        { name: 'Dashboard', path: '/admin' },
+        { name: 'Blog', path: '/blog' },
+      ]
+    : [
+        { name: 'Beranda', path: '/' },
+        { name: 'Smart Review', path: '/review' },
+        { name: 'Compare', path: '/compare' },
+        { name: 'Phone Match', path: '/match' },
+        { name: 'Blog', path: '/blog' },
+      ];
+
+  return (
+    <header className="sticky top-0 z-[100] bg-gradient-to-b from-neutral-900 via-black/95 to-black backdrop-blur-md border-b border-white/10">
+      <div className="max-w-[1000px] mx-auto px-4 h-20 flex items-center justify-between relative">
+        <div className="flex-shrink-0 relative z-[110]">
+          <Link to="/" className="flex items-center group">
+            <img 
+              src="https://imgur.com/oaPHidZ.jpg" 
+              alt="JAGOHP Logo" 
+              className="h-10 md:h-11 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
+            />
+            {isAdmin && <span className="ml-2 bg-yellow-400 text-black text-[7px] font-black px-1.5 py-0.5 rounded uppercase">ADMIN</span>}
+          </Link>
+        </div>
+
+        <nav className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-8">
+          {navItems.map((item) => (
+            <Link
+              key={item.path}
+              to={item.path}
+              className={`text-[10px] font-black uppercase tracking-[0.2em] transition-all hover:text-yellow-400 ${
+                isActive(item.path) ? 'text-yellow-400' : 'text-gray-500'
+              }`}
+            >
+              {item.name}
+            </Link>
+          ))}
+        </nav>
+
+        <div className="hidden md:flex items-center gap-3">
+          <Link 
+            to="/about" 
+            className="bg-yellow-400 text-black px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-yellow-500 transition-all flex items-center gap-2 shadow-lg"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            Tentang
+          </Link>
+          {isAdmin && (
+            <button 
+              onClick={handleLogout}
+              className="bg-white/5 border border-white/10 text-gray-400 px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest hover:text-white hover:bg-red-500/10 hover:border-red-500/30 transition-all cursor-pointer"
+            >
+              Logout
+            </button>
+          )}
+        </div>
+      </div>
+    </header>
+  );
+};
+
+const BottomNavbar: React.FC = () => {
+  const location = useLocation();
+  const isAdmin = sessionStorage.getItem('admin_token') === 'granted';
+  const isActive = (path: string) => location.pathname === path;
+
+  const handleLogout = () => {
+    if (window.confirm('Yakin ingin logout dari mode Admin?')) {
+      sessionStorage.removeItem('admin_token');
+      window.location.href = '#/';
+      window.location.reload();
+    }
+  };
+
+  const userNavItems = [
+    { name: 'HOME', path: '/', icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg> },
+    { name: 'REVIEW', path: '/review', icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg> },
+    { name: 'COMPARE', path: '/compare', icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg> },
+    { name: 'MATCH', path: '/match', icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg> },
+    { name: 'BOT AI', path: '/chat', icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg> }
+  ];
+
+  const adminNavItems = [
+    { name: 'ADMIN', path: '/admin', icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg> },
+    { name: 'BLOG', path: '/blog', icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10l4 4v10a2 2 0 01-2 2zM14 4v4h4"/></svg> },
+    { name: 'TENTANG', path: '/about', icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> },
+    { name: 'LOGOUT', path: '#logout', icon: <svg className="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg> }
+  ];
+
+  const currentNav = isAdmin ? adminNavItems : userNavItems;
+
+  return (
+    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-[200] bg-black/90 backdrop-blur-2xl border-t border-white/10 px-2 pb-safe pt-2">
+      <div className="flex items-center justify-around">
+        {currentNav.map((item) => (
+          item.path === '#logout' ? (
+            <button key={item.path} onClick={handleLogout} className="flex flex-col items-center gap-1 py-2 px-3 text-gray-500">
+              {item.icon}
+              <span className="text-[8px] font-black uppercase tracking-widest">{item.name}</span>
+            </button>
+          ) : (
+            <Link key={item.path} to={item.path} className={`flex flex-col items-center gap-1 py-2 px-3 ${isActive(item.path) ? 'text-yellow-400' : 'text-gray-500'}`}>
+              {item.icon}
+              <span className="text-[8px] font-black uppercase tracking-widest">{item.name}</span>
+            </Link>
+          )
+        ))}
+      </div>
+    </nav>
+  );
+};
+
+const App: React.FC = () => {
+  const [showDonate, setShowDonate] = useState(false);
+
+  return (
+    <Router>
+      <ScrollToTop />
+      <div className="min-h-screen flex flex-col bg-black">
+        <Header />
+        <main className="flex-1">
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/review" element={<SmartReview />} />
+            <Route path="/compare" element={<Compare />} />
+            <Route path="/match" element={<PhoneMatch />} />
+            <Route path="/blog" element={<Blog />} />
+            <Route path="/blog/:slug" element={<BlogDetail />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/chat" element={<AIChat />} />
+            <Route path="/faq" element={<FAQ />} />
+            <Route path="/privacy" element={<PrivacyPolicy />} />
+            <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/admin/editor" element={<BlogEditor />} />
+            <Route path="/admin/editor/:id" element={<BlogEditor />} />
+          </Routes>
+        </main>
+        <Footer onDonateClick={() => setShowDonate(true)} />
+        <BottomNavbar />
+      </div>
+      {showDonate && <DonationModal onClose={() => setShowDonate(false)} />}
+    </Router>
+  );
+};
+
+const Footer = ({ onDonateClick }: { onDonateClick: () => void }) => (
+  <footer className="border-t border-white/10 mt-10 py-16 bg-black/40 backdrop-blur-sm mb-20 md:mb-0">
+    <div className="max-w-[900px] mx-auto px-4 text-center space-y-10">
+      <img src="https://imgur.com/oaPHidZ.jpg" className="h-16 w-auto mx-auto opacity-80" alt="" />
+      <nav className="flex flex-wrap justify-center gap-8">
+        <button onClick={onDonateClick} className="text-[10px] font-black uppercase text-gray-500 hover:text-yellow-400">Donasi</button>
+        <Link to="/faq" className="text-[10px] font-black uppercase text-gray-500 hover:text-yellow-400">FAQ</Link>
+        <Link to="/privacy" className="text-[10px] font-black uppercase text-gray-500 hover:text-yellow-400">Privacy Policy</Link>
+      </nav>
+      <p className="text-gray-600 text-[10px] uppercase font-black tracking-widest">© 2025 - 2026 JAGOHP | #1 Portal Gadget Smartphone Berbasis AI</p>
+    </div>
+  </footer>
+);
+
+const DonationModal = ({ onClose }: { onClose: () => void }) => (
+  <div className="fixed inset-0 z-[10000] flex items-center justify-center px-4">
+    <div className="absolute inset-0 bg-black/90 backdrop-blur-2xl" onClick={onClose}></div>
+    <div className="relative bg-[#0a0a0a] border border-yellow-400/30 w-full max-w-sm rounded-[2.5rem] p-10 text-center">
+      <h3 className="text-2xl font-black text-white uppercase italic">Support <span className="text-yellow-400">JAGOHP</span></h3>
+      <a href="https://saweria.co/minekaze" target="_blank" className="block mt-8 bg-yellow-400 text-black py-4 rounded-2xl font-black uppercase text-xs">Donasi via Saweria</a>
+    </div>
+  </div>
+);
+
+export default App;
