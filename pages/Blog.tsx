@@ -6,12 +6,14 @@ import { getBlogPosts, BlogPostExtended } from '../services/blogService';
 const BlogCard: React.FC<{ post: BlogPostExtended }> = ({ post }) => (
   <article className="group bg-[#0a0a0a] border border-white/5 rounded-[2rem] overflow-hidden flex flex-col md:flex-row transition-all duration-300 hover:border-yellow-400/20 shadow-2xl">
     <div className="w-full md:w-[35%] aspect-video md:aspect-auto overflow-hidden relative">
-      <img 
-        src={post.imageUrl} 
-        alt={post.title} 
-        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
-      />
-      <div className="absolute inset-0 bg-gradient-to-r from-black/20 to-transparent"></div>
+      <Link to={`/blog/${post.slug}`} className="block w-full h-full">
+        <img 
+          src={post.imageUrl} 
+          alt={post.title} 
+          className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+        />
+      </Link>
+      <div className="absolute inset-0 bg-gradient-to-r from-black/20 to-transparent pointer-events-none"></div>
     </div>
 
     <div className="flex-1 p-6 md:p-8 flex flex-col justify-between space-y-4">
@@ -84,7 +86,7 @@ const Blog: React.FC = () => {
           Blog & <span className="text-yellow-400">Berita</span>
         </h1>
         <p className="text-gray-500 text-sm md:text-base font-medium italic">
-          Informasi, wawasan dan tips  mendalam seputar dunia Smartphone.
+          Informasi, wawasan dan tips mendalam seputar dunia Smartphone.
         </p>
       </div>
 
