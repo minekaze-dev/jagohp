@@ -32,8 +32,7 @@ export const getBlogPosts = async (includeDrafts: boolean = true): Promise<BlogP
       .select(`
         *,
         authors (name),
-        categories (name),
-        comments (count)
+        categories (name)
       `)
       .order('created_at', { ascending: false });
 
@@ -61,7 +60,7 @@ export const getBlogPosts = async (includeDrafts: boolean = true): Promise<BlogP
       categories: [p.categories?.name || 'General'],
       imageUrl: p.image_url,
       views: p.views || 0,
-      comments: p.comments?.[0]?.count || 0
+      comments: 0 // Will be handled if needed
     }));
   } catch (err) {
     console.error("Fetch Blog Error:", err);
@@ -71,43 +70,59 @@ export const getBlogPosts = async (includeDrafts: boolean = true): Promise<BlogP
 
 export const getBlogPostBySlug = async (slug: string): Promise<BlogPostExtended | null> => {
   try {
-    // Gunakan .select() yang mendetail untuk memastikan semua kolom terambil
+    // 1. Coba ambil dengan join (lebih rapi)
     const { data, error } = await supabase
       .from('blog_posts')
       .select(`
-        id, created_at, title, slug, excerpt, content, image_url, status, publish_date, views,
+        *,
         authors (name),
         categories (name)
       `)
       .eq('slug', slug)
-      .maybeSingle(); // maybeSingle lebih aman daripada single() jika tidak ditemukan
+      .maybeSingle();
 
-    if (error || !data) return null;
+    if (error) {
+      console.error("Query Error detail slug:", error);
+      // 2. Fallback: ambil raw data jika join gagal karena isu skema
+      const { data: rawData, error: rawError } = await supabase
+        .from('blog_posts')
+        .select('*')
+        .eq('slug', slug)
+        .maybeSingle();
+      
+      if (rawError || !rawData) return null;
+      return mapToExtended(rawData);
+    }
 
-    // Increment views secara background
-    supabase.rpc('increment_views', { post_id: data.id }).catch(() => {});
+    if (!data) return null;
 
-    return {
-      id: data.id,
-      slug: data.slug,
-      title: data.title,
-      excerpt: data.excerpt,
-      content: data.content,
-      date: data.created_at,
-      status: data.status,
-      publishDate: data.publish_date,
-      views: data.views || 0,
-      imageUrl: data.image_url,
-      author: data.authors?.name || 'Anonim',
-      category: data.categories?.name || 'Uncategorized',
-      categories: [data.categories?.name || 'General'],
-      comments: 0 // Akan di-update via getCommentsByPostId
-    } as BlogPostExtended;
+    // Increment views (Fixed: Removed .catch as it's not a native promise method on the builder)
+    await supabase.rpc('increment_views', { post_id: data.id });
+
+    return mapToExtended(data);
   } catch (err) {
-    console.error("Error getBlogPostBySlug:", err);
+    console.error("System Error getBlogPostBySlug:", err);
     return null;
   }
 };
+
+// Helper mapper to avoid redundancy
+const mapToExtended = (data: any): BlogPostExtended => ({
+  id: data.id,
+  slug: data.slug,
+  title: data.title,
+  excerpt: data.excerpt,
+  content: data.content,
+  date: data.created_at,
+  status: data.status,
+  publishDate: data.publish_date,
+  views: data.views || 0,
+  imageUrl: data.image_url,
+  author: data.authors?.name || 'Admin JAGOHP',
+  category: data.categories?.name || 'Berita Gadget',
+  categories: [data.categories?.name || 'Tech'],
+  comments: 0
+});
 
 export const saveBlogPost = async (post: any) => {
   const payload = {

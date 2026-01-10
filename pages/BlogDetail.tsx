@@ -30,32 +30,32 @@ const BlogDetail: React.FC = () => {
     setGuestId(storedId);
 
     const fetchData = async () => {
-      if (!slug) return;
+      // Pastikan slug ada dan bersih dari whitespace
+      const targetSlug = slug?.trim();
+      if (!targetSlug) return;
       
       setLoading(true);
-      // Reset scroll posisi ke paling atas secara instan
       window.scrollTo(0, 0);
       
       try {
-        const data = await getBlogPostBySlug(slug);
+        const data = await getBlogPostBySlug(targetSlug);
         if (data) {
           setPost(data);
           const comms = await getCommentsByPostId(data.id);
           setComments(comms);
         } else {
-          console.error("Artikel tidak ditemukan untuk slug:", slug);
-          navigate('/blog');
+          console.error("Artikel tidak ditemukan untuk slug:", targetSlug);
+          setPost(null);
         }
       } catch (err) {
         console.error("Gagal memuat detail artikel:", err);
-        navigate('/blog');
       } finally {
         setLoading(false);
       }
     };
     
     fetchData();
-  }, [slug, navigate]);
+  }, [slug]);
 
   useEffect(() => {
     let timer: any;
@@ -109,23 +109,33 @@ const BlogDetail: React.FC = () => {
   if (loading) return (
     <div className="min-h-screen py-40 text-center bg-black flex flex-col items-center justify-center">
       <div className="w-16 h-16 border-4 border-yellow-400 border-t-transparent rounded-full animate-spin mb-6"></div>
-      <p className="text-gray-500 font-black uppercase tracking-[0.4em] italic text-xs">Menyusun Berita Cloud...</p>
+      <p className="text-gray-500 font-black uppercase tracking-[0.4em] italic text-xs">Menyusun Berita Terbaru...</p>
     </div>
   );
 
   if (!post) return (
-    <div className="min-h-screen py-40 text-center bg-black">
-      <p className="text-gray-500 font-black uppercase tracking-widest italic text-xs">Artikel tidak ditemukan.</p>
-      <Link to="/blog" className="mt-10 inline-block text-yellow-400 font-black uppercase tracking-widest border-b border-yellow-400 pb-1">Kembali ke Blog</Link>
+    <div className="min-h-screen py-40 text-center bg-black flex flex-col items-center justify-center px-4">
+      <div className="bg-[#0a0a0a] border border-white/10 rounded-[2.5rem] p-12 max-w-md w-full space-y-6">
+        <div className="w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center mx-auto">
+          <svg className="w-10 h-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+        </div>
+        <div className="space-y-2">
+          <h2 className="text-xl font-black text-white uppercase italic tracking-tighter">Artikel Tidak Ditemukan</h2>
+          <p className="text-gray-500 text-xs font-medium italic">Maaf Kak, artikel dengan alamat ini tidak ada di database kami atau telah dihapus.</p>
+        </div>
+        <Link to="/blog" className="block w-full bg-yellow-400 text-black py-4 rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-lg shadow-yellow-400/20 active:scale-95 transition-all">
+          Kembali ke Blog Utama
+        </Link>
+      </div>
     </div>
   );
 
   return (
     <div className="min-h-screen bg-black text-white selection:bg-yellow-400/30">
       <div className="max-w-[800px] mx-auto px-4 py-16 space-y-12 pb-32">
-        <Link to="/blog" className="inline-flex items-center gap-2 text-gray-500 hover:text-yellow-400 transition-colors text-[10px] font-black uppercase tracking-widest">
-          <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M15 19l-7-7 7-7"/></svg>
-          Kembali ke Index Berita
+        <Link to="/blog" className="inline-flex items-center gap-2 text-gray-500 hover:text-yellow-400 transition-colors text-[10px] font-black uppercase tracking-widest group">
+          <svg className="w-4 h-4 transition-transform group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M15 19l-7-7 7-7"/></svg>
+          Kembali ke Halaman Blog
         </Link>
 
         <article className="space-y-10 animate-in fade-in duration-700 slide-in-from-bottom-4">
@@ -138,7 +148,7 @@ const BlogDetail: React.FC = () => {
                  {new Date(post.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
               </span>
             </div>
-            <h1 className="text-3xl md:text-5xl font-black text-white italic uppercase tracking-tighter leading-none">{post.title}</h1>
+            <h1 className="text-3xl md:text-5xl font-black text-white italic uppercase tracking-tighter leading-[0.9]">{post.title}</h1>
             <p className="text-gray-500 italic text-sm md:text-lg font-medium border-l-4 border-yellow-400/20 pl-6 leading-relaxed">"{post.excerpt}"</p>
           </div>
 
@@ -150,7 +160,6 @@ const BlogDetail: React.FC = () => {
             )}
           </div>
 
-          {/* Render Isi Berita Utama - DITINGKATKAN */}
           <div 
             className="text-gray-300 text-base md:text-lg leading-relaxed prose prose-invert max-w-none 
             prose-h1:text-white prose-h1:text-3xl prose-h1:font-black prose-h1:italic prose-h1:uppercase 
@@ -166,13 +175,13 @@ const BlogDetail: React.FC = () => {
              </p>
              <div className="flex gap-4 text-gray-600 text-[10px] font-black uppercase tracking-widest">
                 <span>{post.views} Dilihat</span>
-                <span>{comments.length} Diskusi</span>
+                <span>{comments.length} Komentar</span>
              </div>
           </div>
 
           <div className="pt-20 space-y-12">
              <div className="flex items-center gap-4">
-               <h3 className="text-xl md:text-2xl font-black text-white italic uppercase tracking-tighter">Diskusi Komunitas</h3>
+               <h3 className="text-xl md:text-2xl font-black text-white italic uppercase tracking-tighter">Komentar</h3>
                <div className="h-[1px] flex-1 bg-white/5"></div>
              </div>
 
@@ -182,13 +191,13 @@ const BlogDetail: React.FC = () => {
                     type="text" 
                     value={newAuthor}
                     onChange={(e) => setNewAuthor(e.target.value)}
-                    placeholder="Nama / Nickname Kamu" 
+                    placeholder="Tulis nama lo..." 
                     className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs font-bold text-white focus:border-yellow-400 outline-none transition-all"
                   />
                   <textarea 
                     value={newContent}
                     onChange={(e) => setNewContent(e.target.value)}
-                    placeholder="Tuliskan pendapat atau pertanyaanmu di sini..." 
+                    placeholder="Tulis komentar lo disini..." 
                     className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 text-xs font-medium italic text-gray-300 h-32 focus:border-yellow-400 outline-none resize-none transition-all"
                   />
                 </div>
