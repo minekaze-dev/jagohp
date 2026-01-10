@@ -30,13 +30,11 @@ const BlogDetail: React.FC = () => {
     setGuestId(storedId);
 
     const fetchData = async () => {
-      if (!slug) {
-        navigate('/blog');
-        return;
-      }
+      if (!slug) return;
       
       setLoading(true);
-      window.scrollTo({ top: 0, behavior: 'instant' });
+      // Reset scroll posisi ke paling atas secara instan
+      window.scrollTo(0, 0);
       
       try {
         const data = await getBlogPostBySlug(slug);
@@ -45,11 +43,11 @@ const BlogDetail: React.FC = () => {
           const comms = await getCommentsByPostId(data.id);
           setComments(comms);
         } else {
-          // Jika data tidak ditemukan, kembali ke halaman blog utama
+          console.error("Artikel tidak ditemukan untuk slug:", slug);
           navigate('/blog');
         }
       } catch (err) {
-        console.error("Error loading blog detail:", err);
+        console.error("Gagal memuat detail artikel:", err);
         navigate('/blog');
       } finally {
         setLoading(false);
@@ -115,7 +113,12 @@ const BlogDetail: React.FC = () => {
     </div>
   );
 
-  if (!post) return null;
+  if (!post) return (
+    <div className="min-h-screen py-40 text-center bg-black">
+      <p className="text-gray-500 font-black uppercase tracking-widest italic text-xs">Artikel tidak ditemukan.</p>
+      <Link to="/blog" className="mt-10 inline-block text-yellow-400 font-black uppercase tracking-widest border-b border-yellow-400 pb-1">Kembali ke Blog</Link>
+    </div>
+  );
 
   return (
     <div className="min-h-screen bg-black text-white selection:bg-yellow-400/30">
@@ -125,7 +128,7 @@ const BlogDetail: React.FC = () => {
           Kembali ke Index Berita
         </Link>
 
-        <article className="space-y-10 animate-in fade-in duration-700">
+        <article className="space-y-10 animate-in fade-in duration-700 slide-in-from-bottom-4">
           <div className="space-y-6">
             <div className="flex flex-wrap gap-2">
               <span className="bg-yellow-400 text-black px-4 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest">
@@ -147,13 +150,13 @@ const BlogDetail: React.FC = () => {
             )}
           </div>
 
-          {/* Render Isi Berita Utama */}
+          {/* Render Isi Berita Utama - DITINGKATKAN */}
           <div 
             className="text-gray-300 text-base md:text-lg leading-relaxed prose prose-invert max-w-none 
             prose-h1:text-white prose-h1:text-3xl prose-h1:font-black prose-h1:italic prose-h1:uppercase 
             prose-p:mb-6 prose-p:italic prose-p:font-medium prose-p:text-justify
             prose-img:rounded-3xl prose-img:shadow-2xl prose-img:my-10 prose-img:border prose-img:border-white/5
-            prose-ul:italic prose-ol:italic prose-li:mb-2"
+            prose-ul:italic prose-ol:italic prose-li:mb-2 prose-strong:text-yellow-400"
             dangerouslySetInnerHTML={{ __html: post.content || '' }}
           />
 

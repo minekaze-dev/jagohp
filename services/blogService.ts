@@ -43,7 +43,6 @@ export const getBlogPosts = async (includeDrafts: boolean = true): Promise<BlogP
     }
 
     const { data, error } = await query;
-
     if (error) throw error;
 
     return (data || []).map(p => ({
@@ -66,7 +65,47 @@ export const getBlogPosts = async (includeDrafts: boolean = true): Promise<BlogP
     }));
   } catch (err) {
     console.error("Fetch Blog Error:", err);
-    return []; // Return empty array instead of crashing
+    return [];
+  }
+};
+
+export const getBlogPostBySlug = async (slug: string): Promise<BlogPostExtended | null> => {
+  try {
+    // Gunakan .select() yang mendetail untuk memastikan semua kolom terambil
+    const { data, error } = await supabase
+      .from('blog_posts')
+      .select(`
+        id, created_at, title, slug, excerpt, content, image_url, status, publish_date, views,
+        authors (name),
+        categories (name)
+      `)
+      .eq('slug', slug)
+      .maybeSingle(); // maybeSingle lebih aman daripada single() jika tidak ditemukan
+
+    if (error || !data) return null;
+
+    // Increment views secara background
+    supabase.rpc('increment_views', { post_id: data.id }).catch(() => {});
+
+    return {
+      id: data.id,
+      slug: data.slug,
+      title: data.title,
+      excerpt: data.excerpt,
+      content: data.content,
+      date: data.created_at,
+      status: data.status,
+      publishDate: data.publish_date,
+      views: data.views || 0,
+      imageUrl: data.image_url,
+      author: data.authors?.name || 'Anonim',
+      category: data.categories?.name || 'Uncategorized',
+      categories: [data.categories?.name || 'General'],
+      comments: 0 // Akan di-update via getCommentsByPostId
+    } as BlogPostExtended;
+  } catch (err) {
+    console.error("Error getBlogPostBySlug:", err);
+    return null;
   }
 };
 
@@ -92,31 +131,6 @@ export const saveBlogPost = async (post: any) => {
 
 export const deleteBlogPost = async (id: string) => {
   return await supabase.from('blog_posts').delete().eq('id', id);
-};
-
-export const getBlogPostBySlug = async (slug: string): Promise<BlogPostExtended | null> => {
-  try {
-    const { data, error } = await supabase
-      .from('blog_posts')
-      .select(`*, authors (name), categories (name)`)
-      .eq('slug', slug)
-      .single();
-
-    if (error || !data) return null;
-
-    supabase.rpc('increment_views', { post_id: data.id }).catch(() => {});
-
-    return {
-      ...data,
-      author: data.authors?.name,
-      category: data.categories?.name,
-      categories: [data.categories?.name],
-      imageUrl: data.image_url,
-      publishDate: data.publish_date
-    } as BlogPostExtended;
-  } catch {
-    return null;
-  }
 };
 
 export const getCategories = async () => {
