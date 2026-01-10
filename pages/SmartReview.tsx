@@ -110,6 +110,11 @@ const SmartReview: React.FC = () => {
                         <div className="w-1.5 h-1.5 bg-yellow-400 rounded-full animate-pulse"></div>
                         <p className="text-[10px] md:text-xs text-gray-500 font-bold uppercase tracking-[0.2em]">Rilis: {review.specs.releaseDate}</p>
                      </div>
+                     <div className="h-3 w-[1px] bg-white/10"></div>
+                     <div className="flex items-center gap-2">
+                        <svg className="w-3 h-3 text-yellow-400" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 14h-2v-2h2v2zm0-4h-2V7h2v5z"/></svg>
+                        <p className="text-[10px] md:text-xs text-yellow-400 font-black uppercase tracking-[0.2em]">{review.specs.price}</p>
+                     </div>
                      <div className="h-3 w-[1px] bg-white/10 hidden sm:block"></div>
                      <span className={`text-[8px] md:text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-md border ${getStatusColor(review.specs.availabilityStatus)}`}>
                         {review.specs.availabilityStatus}

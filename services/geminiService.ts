@@ -127,7 +127,9 @@ export const getSmartReview = async (phoneName: string): Promise<{review: PhoneR
     model: 'gemini-3-flash-preview',
     contents: `${REAL_WORLD_DATA_INSTRUCTION}
     Berikan review profesional untuk smartphone: ${phoneName}. 
-    Berikan ulasan naratif per spek. Tambahkan analisis gaming (ML, Genshin, PUBG, Roblox).`,
+    Berikan ulasan naratif per spek. Tambahkan analisis gaming (ML, Genshin, PUBG, Roblox).
+    
+    PENTING: Sertakan 'price' (Harga Rilis/Terbaru di Indonesia) di dalam objek specs.`,
     config: {
       tools: [{googleSearch: {}}],
       responseMimeType: "application/json",
@@ -158,8 +160,9 @@ export const getSmartReview = async (phoneName: string): Promise<{review: PhoneR
               releaseDate: { type: Type.STRING },
               releaseReview: { type: Type.STRING },
               availabilityStatus: { type: Type.STRING },
+              price: { type: Type.STRING, description: "Harga rilis atau terbaru di Indonesia" },
             },
-            required: ["processor", "processorReview", "ram", "ramReview", "storage", "storageReview", "battery", "batteryReview", "screen", "screenReview", "cameraSummary", "cameraReview", "network", "networkReview", "connectivity", "connectivityReview", "releaseDate", "releaseReview", "availabilityStatus"]
+            required: ["processor", "processorReview", "ram", "ramReview", "storage", "storageReview", "battery", "batteryReview", "screen", "screenReview", "cameraSummary", "cameraReview", "network", "networkReview", "connectivity", "connectivityReview", "releaseDate", "releaseReview", "availabilityStatus", "price"]
           },
           performance: {
             type: Type.OBJECT,

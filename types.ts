@@ -22,6 +22,7 @@ export interface PhoneReview {
     releaseDate: string;
     releaseReview: string;
     availabilityStatus: string;
+    price: string;
   };
   performance: {
     antutu: string;

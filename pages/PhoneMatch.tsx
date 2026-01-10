@@ -18,8 +18,8 @@ const SpecCard = ({ label, value, icon }: { label: string, value: string, icon: 
 
 const PhoneMatch: React.FC = () => {
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<RecommendationResponse | null>(null);
-  const [activeRecommendation, setActiveRecommendation] = useState<RecommendedPhone | null>(null);
+  const [allPhones, setAllPhones] = useState<RecommendedPhone[]>([]);
+  const [activeIndex, setActiveIndex] = useState<number>(0);
   const [error, setError] = useState('');
   
   // Refs for scrolling
@@ -63,7 +63,8 @@ const PhoneMatch: React.FC = () => {
     }
 
     setLoading(true);
-    setResult(null);
+    setAllPhones([]);
+    setActiveIndex(0);
     setError('');
     
     try {
@@ -75,8 +76,9 @@ const PhoneMatch: React.FC = () => {
       });
       
       if (res && res.primary) {
-        setResult(res);
-        setActiveRecommendation(res.primary);
+        // Menggabungkan semua HP ke dalam satu array untuk memudahkan penukaran (swapping)
+        const combined = [res.primary, ...(res.alternatives || [])];
+        setAllPhones(combined);
         // Scroll ke hasil setelah state update
         setTimeout(() => {
           resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -93,8 +95,8 @@ const PhoneMatch: React.FC = () => {
   };
 
   const reset = () => {
-    setResult(null);
-    setActiveRecommendation(null);
+    setAllPhones([]);
+    setActiveIndex(0);
     setActivities([]);
     setCameraPrio(2);
     setBudget('3 Jutaan');
@@ -102,6 +104,9 @@ const PhoneMatch: React.FC = () => {
     setError('');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
+
+  const activeRecommendation = allPhones[activeIndex];
+  const otherOptions = allPhones.filter((_, idx) => idx !== activeIndex);
 
   return (
     <div className="max-w-[1000px] mx-auto px-4 pt-16 pb-10 md:py-16">
@@ -116,7 +121,7 @@ const PhoneMatch: React.FC = () => {
         </div>
 
         {/* Input Section - Disembunyikan jika result sudah ada */}
-        {!result && !loading && (
+        {allPhones.length === 0 && !loading && (
           <div className="bg-[#0a0a0a] border border-white/10 rounded-[2.5rem] p-6 md:p-12 shadow-2xl relative overflow-hidden group animate-in fade-in duration-500">
             <div className="relative z-10">
               <div className="grid md:grid-cols-2 gap-10 md:gap-16 items-start">
@@ -239,12 +244,12 @@ const PhoneMatch: React.FC = () => {
         </div>
       )}
 
-      {result && activeRecommendation && !loading && (
+      {allPhones.length > 0 && activeRecommendation && !loading && (
         <div className="space-y-12 animate-in fade-in slide-in-from-bottom-6 duration-700 pt-10 border-t border-white/5">
           {/* Header Action */}
           <div className="flex justify-end">
             <button 
-              onClick={() => {setResult(null);}}
+              onClick={() => {setAllPhones([]);}}
               className="text-gray-600 hover:text-yellow-400 transition-colors text-[9px] font-black uppercase tracking-widest border-b border-gray-800 pb-1"
             >
               Ubah Preferensi
@@ -257,8 +262,10 @@ const PhoneMatch: React.FC = () => {
             
             <div className="relative z-10 space-y-2">
               <div className="flex justify-between items-start">
-                <span className="text-[8px] font-black uppercase tracking-[0.4em] opacity-40">Smartphone Pilihan Utama</span>
-                <span className="bg-black text-white text-[7px] px-2.5 py-1 rounded-full font-black tracking-widest uppercase shadow-lg">BEST MATCH</span>
+                <span className="text-[8px] font-black uppercase tracking-[0.4em] opacity-40">Pilihan Aktif</span>
+                <span className="bg-black text-white text-[7px] px-2.5 py-1 rounded-full font-black tracking-widest uppercase shadow-lg">
+                  {activeIndex === 0 ? 'BEST MATCH' : 'ALTERNATE VIEW'}
+                </span>
               </div>
               <h2 className="text-2xl md:text-3xl font-black tracking-tighter uppercase italic leading-[0.9]">{activeRecommendation.name}</h2>
               <p className="text-[10px] md:text-[13px] leading-tight font-black italic pt-1.5 border-t border-black/10">"{activeRecommendation.reason}"</p>
@@ -290,30 +297,35 @@ const PhoneMatch: React.FC = () => {
           </div>
 
           {/* Alternatives List */}
-          {(result.alternatives && result.alternatives.length > 0) && (
+          {otherOptions.length > 0 && (
             <div className="space-y-5">
-              <h3 className="text-[9px] font-black uppercase text-gray-500 tracking-[0.5em] pl-4 italic">Opsi Alternatif Menarik</h3>
+              <h3 className="text-[9px] font-black uppercase text-gray-500 tracking-[0.5em] pl-4 italic">Opsi Rekomendasi Lainnya</h3>
               <div className="grid md:grid-cols-2 gap-4">
-                {result.alternatives.map((alt, i) => (
-                  <button 
-                    key={i} 
-                    onClick={() => {
-                      setActiveRecommendation(alt);
-                      resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    }}
-                    className="p-6 text-left rounded-2xl border border-white/5 bg-white/5 hover:bg-white/10 hover:border-yellow-400/50 transition-all group space-y-4 shadow-2xl backdrop-blur-sm"
-                  >
-                    <div className="flex justify-between items-center">
-                      <span className="text-[8px] font-black text-gray-600 uppercase tracking-widest border-l-2 border-yellow-400 pl-2">Alternatif</span>
-                      <div className="bg-yellow-400/10 text-yellow-400 text-[7px] font-black px-2 py-0.5 rounded-full uppercase tracking-tighter opacity-0 group-hover:opacity-100 transition-opacity">
-                        Detail
+                {allPhones.map((phone, i) => (
+                  // Render opsi yang tidak aktif sebagai alternatif
+                  i !== activeIndex && (
+                    <button 
+                      key={i} 
+                      onClick={() => {
+                        setActiveIndex(i);
+                        resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                      }}
+                      className="p-6 text-left rounded-2xl border border-white/5 bg-white/5 hover:bg-white/10 hover:border-yellow-400/50 transition-all group space-y-4 shadow-2xl backdrop-blur-sm"
+                    >
+                      <div className="flex justify-between items-center">
+                        <span className={`text-[8px] font-black uppercase tracking-widest border-l-2 pl-2 ${i === 0 ? 'text-yellow-400 border-yellow-400' : 'text-gray-600 border-white/20'}`}>
+                          {i === 0 ? 'Pilihan Utama' : 'Alternatif'}
+                        </span>
+                        <div className="bg-yellow-400/10 text-yellow-400 text-[7px] font-black px-2 py-0.5 rounded-full uppercase tracking-tighter opacity-0 group-hover:opacity-100 transition-opacity">
+                          Klik Detail
+                        </div>
                       </div>
-                    </div>
-                    <div className="space-y-2">
-                      <h4 className="text-lg md:text-xl font-black text-white uppercase italic tracking-tighter group-hover:text-yellow-400 transition-colors leading-none">{alt.name}</h4>
-                      <p className="text-[10px] md:text-[11px] text-gray-500 leading-relaxed line-clamp-2 italic font-medium">"{alt.reason}"</p>
-                    </div>
-                  </button>
+                      <div className="space-y-2">
+                        <h4 className="text-lg md:text-xl font-black text-white uppercase italic tracking-tighter group-hover:text-yellow-400 transition-colors leading-none">{phone.name}</h4>
+                        <p className="text-[10px] md:text-[11px] text-gray-500 leading-relaxed line-clamp-2 italic font-medium">"{phone.reason}"</p>
+                      </div>
+                    </button>
+                  )
                 ))}
               </div>
             </div>
