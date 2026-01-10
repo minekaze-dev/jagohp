@@ -48,7 +48,7 @@ const FAQ: React.FC = () => {
       <div className="bg-yellow-400/5 border border-yellow-400/10 rounded-3xl p-8 text-center space-y-4">
         <p className="text-[10px] font-black text-yellow-400 uppercase tracking-[0.3em]">Punya pertanyaan lain?</p>
         <p className="text-gray-400 text-xs font-medium italic">Kirimkan pertanyaan lo langsung ke tim kami melalui email di bawah.</p>
-        <a href="mailto:support@jagohp.com" className="inline-block text-white text-xs font-black uppercase border-b border-white hover:text-yellow-400 hover:border-yellow-400 transition-all pb-1">support@jagohp.com</a>
+        <a href="mailto:timjagohp@gmail.com" className="inline-block text-white text-xs font-black uppercase border-b border-white hover:text-yellow-400 hover:border-yellow-400 transition-all pb-1">timjagohp@gmail.com</a>
       </div>
     </div>
   );
