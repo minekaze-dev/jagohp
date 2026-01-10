@@ -149,7 +149,7 @@ const Compare: React.FC = () => {
     <div className="max-w-[950px] mx-auto px-4 py-16 space-y-12 pb-32">
       <div className="text-center space-y-4">
         <h1 className="text-2xl md:text-4xl font-black uppercase tracking-tighter italic"><span className="text-yellow-400">Com</span>pare</h1>
-        <p className="text-gray-400 text-sm md:text-base font-medium italic">Head-to-head spesifikasi biar lo gak salah pilih Smartphone.</p>
+        <p className="text-gray-400 text-sm md:text-base font-medium italic">Head-to-head spesifikasi biar gak salah pilih Smartphone.</p>
       </div>
 
       {!result && !loading && (
@@ -174,23 +174,22 @@ const Compare: React.FC = () => {
                   type="text"
                   value={p}
                   onChange={(e) => updatePhone(i, e.target.value)}
-                  placeholder="Nama/tipe Smartphone"
+                  placeholder="Tulis nama/tipe Smartphone"
                   className="w-full bg-white/5 border border-white/20 rounded-xl px-4 py-3.5 text-xs md:text-sm focus:outline-none focus:border-yellow-400 transition-colors font-bold"
                 />
               </div>
             ))}
             {phones.length < 3 && (
-              <div className="space-y-4">
-                <label className="text-[11px] font-black text-gray-800 uppercase tracking-widest">Smartphone 3</label>
+              <div className="space-y-4 flex flex-col items-center justify-center h-[100px]">
                 <button
                   type="button"
                   onClick={addPhoneSlot}
-                  className="w-full h-[52px] bg-white/5 border border-white/10 rounded-xl px-4 text-xs md:text-sm text-gray-600 hover:text-white hover:border-white/30 transition-all font-bold text-left flex items-center gap-3 group"
+                  className="text-gray-600 hover:text-yellow-400 transition-all font-black flex items-center gap-3 group"
                 >
-                  <div className="w-6 h-6 flex items-center justify-center bg-white/5 rounded-lg group-hover:bg-yellow-400 group-hover:text-black transition-all">
+                  <div className="w-7 h-7 flex items-center justify-center bg-white/5 rounded-lg group-hover:bg-yellow-400 group-hover:text-black transition-all shadow-lg">
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M12 4v16m8-8H4"/></svg>
                   </div>
-                  <span className="uppercase tracking-widest text-[10px]">Tambah HP</span>
+                  <span className="uppercase tracking-[0.2em] text-[10px]">Tambah HP</span>
                 </button>
               </div>
             )}

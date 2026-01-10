@@ -52,11 +52,11 @@ const NewsCard: React.FC<{ item: BlogPostExtended }> = ({ item }) => {
           <p className="text-gray-600 text-[11px] leading-relaxed italic line-clamp-1">{item.excerpt}</p>
         </div>
 
-        <div className="pt-4 flex items-center justify-between">
+        <div className="pt-4 flex flex-col xs:flex-row items-start xs:items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <Link 
               to={`/blog/${item.slug}`} 
-              className="bg-yellow-400 text-black px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-yellow-500 transition-all active:scale-95 shadow-lg shadow-yellow-400/10"
+              className="bg-yellow-400 text-black px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-yellow-500 transition-all active:scale-95 shadow-lg shadow-yellow-400/10 whitespace-nowrap"
             >
               Baca Selengkapnya
             </Link>
@@ -96,9 +96,9 @@ const NewsCard: React.FC<{ item: BlogPostExtended }> = ({ item }) => {
             </div>
           </div>
 
-          <div className="flex gap-3 text-gray-700 text-[9px] font-black uppercase tracking-widest">
-            <span>{item.views} Dilihat</span>
-            <span>{item.comments} Komentar</span>
+          <div className="flex gap-4 text-gray-700 text-[8px] md:text-[9px] font-black uppercase tracking-widest border-t xs:border-t-0 border-white/5 pt-3 xs:pt-0 w-full xs:w-auto">
+            <span className="flex items-center gap-1.5"><svg className="w-3 h-3 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg> {item.views} <span className="hidden xs:inline">Dilihat</span></span>
+            <span className="flex items-center gap-1.5"><svg className="w-3 h-3 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg> {item.comments} <span className="hidden xs:inline">Komentar</span></span>
           </div>
         </div>
       </div>

@@ -112,7 +112,7 @@ const PhoneMatch: React.FC = () => {
             <span className="text-yellow-400">Phone</span> Match
           </h1>
           <p className="text-gray-400 text-sm md:text-base font-medium italic">
-            Cari Smartphone terbaik sesuai kebutuhan lo.
+            Cari Smartphone terbaik sesuai kebutuhan dan budget.
           </p>
         </div>
 

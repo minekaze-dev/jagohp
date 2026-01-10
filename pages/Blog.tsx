@@ -68,9 +68,9 @@ const BlogCard: React.FC<{ post: BlogPostExtended }> = ({ post }) => {
           </div>
         </div>
 
-        <div className="pt-6 border-t border-white/5 flex items-center justify-between relative">
+        <div className="pt-6 border-t border-white/5 flex flex-col xs:flex-row items-start xs:items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <Link to={`/blog/${post.slug}`} className="bg-transparent border border-white/10 text-white hover:bg-yellow-400 hover:text-black hover:border-yellow-400 px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all active:scale-95">
+            <Link to={`/blog/${post.slug}`} className="bg-transparent border border-white/10 text-white hover:bg-yellow-400 hover:text-black hover:border-yellow-400 px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 whitespace-nowrap">
               Baca Selengkapnya
             </Link>
             
@@ -85,7 +85,7 @@ const BlogCard: React.FC<{ post: BlogPostExtended }> = ({ post }) => {
               </button>
 
               {showShare && (
-                <div className="absolute bottom-full mb-3 left-0 md:left-auto md:right-0 bg-neutral-900/95 backdrop-blur-xl border border-white/10 p-2 rounded-2xl flex gap-2 shadow-2xl animate-in fade-in slide-in-from-bottom-2 duration-200 z-50">
+                <div className="absolute bottom-full mb-3 left-0 bg-neutral-900/95 backdrop-blur-xl border border-white/10 p-2 rounded-2xl flex gap-2 shadow-2xl animate-in fade-in slide-in-from-bottom-2 duration-200 z-50">
                   <a 
                     href={`https://wa.me/?text=${shareText}${shareUrl}`}
                     target="_blank"
@@ -110,7 +110,7 @@ const BlogCard: React.FC<{ post: BlogPostExtended }> = ({ post }) => {
             </div>
           </div>
 
-          <div className="flex items-center gap-4 text-gray-600">
+          <div className="flex items-center gap-4 text-gray-600 border-t xs:border-t-0 border-white/5 pt-3 xs:pt-0 w-full xs:w-auto">
             <div className="flex items-center gap-1.5">
               <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
