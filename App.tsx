@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { HashRouter as Router, Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom';
 import Home from './pages/Home';
@@ -57,7 +58,7 @@ const Header: React.FC = () => {
             <img 
               src="https://imgur.com/oaPHidZ.jpg" 
               alt="JAGOHP Logo" 
-              className="h-9 md:h-10 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
+              className="h-8 md:h-10 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
             />
             {isAdmin && <span className="ml-2 bg-yellow-400 text-black text-[7px] font-black px-1.5 py-0.5 rounded uppercase">ADMIN</span>}
           </Link>
@@ -78,22 +79,22 @@ const Header: React.FC = () => {
           ))}
         </nav>
 
-        {/* Tentang ke Kanan */}
-        <div className="hidden md:flex items-center gap-2 relative z-[110]">
+        {/* Tentang ke Kanan (Muncul di Mobile & Desktop) */}
+        <div className="flex items-center gap-2 relative z-[110]">
           <Link 
             to="/about" 
-            className="bg-yellow-400 text-black px-4 py-2.5 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-yellow-500 transition-all flex items-center gap-2 shadow-lg shadow-yellow-400/20"
+            className="bg-yellow-400 text-black px-3 py-2 md:px-4 md:py-2.5 rounded-xl text-[8px] md:text-[9px] font-black uppercase tracking-widest hover:bg-yellow-500 transition-all flex items-center gap-2 shadow-lg shadow-yellow-400/20"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-3.5 h-3.5 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            Tentang
+            <span className="inline">Tentang</span>
           </Link>
 
           {isAdmin && (
             <button 
               onClick={handleLogout}
-              className="bg-red-500/10 border border-red-500/30 text-red-500 px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-red-500 hover:text-white transition-all cursor-pointer"
+              className="hidden md:flex bg-red-500/10 border border-red-500/30 text-red-500 px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-red-500 hover:text-white transition-all cursor-pointer"
             >
               Logout
             </button>

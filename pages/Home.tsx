@@ -80,7 +80,11 @@ const Home: React.FC = () => {
             className="group relative overflow-hidden rounded-3xl bg-[#0a0a0a] border border-white/5 hover:border-yellow-400/30 transition-all duration-300 flex flex-col shadow-2xl"
           >
             <div className="aspect-[16/10] overflow-hidden relative">
-              <img src={feature.image} alt="" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+              <img 
+                src={feature.image} 
+                alt="" 
+                className="w-full h-full object-cover object-top transition-transform duration-700 group-hover:scale-110" 
+              />
               <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
               <div className="absolute bottom-4 left-4">
                 <span className="bg-yellow-400 text-black text-[9px] font-black px-3 py-1 rounded-full uppercase">{feature.accent}</span>
