@@ -17,16 +17,9 @@ const BlogCard: React.FC<{ post: BlogPostExtended }> = ({ post }) => (
     <div className="flex-1 p-6 md:p-8 flex flex-col justify-between space-y-4">
       <div className="space-y-4">
         <div className="flex flex-wrap gap-2">
-          {post.categories.map((cat, idx) => (
-            <span 
-              key={idx} 
-              className={`text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-lg ${
-                idx === 0 ? 'bg-yellow-400 text-black' : 'bg-white/5 text-gray-400 border border-white/10'
-              }`}
-            >
-              {cat}
-            </span>
-          ))}
+          <span className="text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-lg bg-yellow-400 text-black">
+            {post.category}
+          </span>
         </div>
 
         <div className="space-y-2">
@@ -46,11 +39,6 @@ const BlogCard: React.FC<{ post: BlogPostExtended }> = ({ post }) => (
           <Link to={`/blog/${post.slug}`} className="bg-transparent border border-white/10 text-white hover:bg-yellow-400 hover:text-black hover:border-yellow-400 px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all active:scale-95">
             Baca Selengkapnya
           </Link>
-          <button className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:text-yellow-400 transition-colors">
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-            </svg>
-          </button>
         </div>
 
         <div className="flex items-center gap-4 text-gray-600">
@@ -75,9 +63,15 @@ const BlogCard: React.FC<{ post: BlogPostExtended }> = ({ post }) => (
 
 const Blog: React.FC = () => {
   const [posts, setPosts] = useState<BlogPostExtended[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setPosts(getBlogPosts(false));
+    const fetchPosts = async () => {
+      const data = await getBlogPosts(false);
+      setPosts(data);
+      setLoading(false);
+    };
+    fetchPosts();
   }, []);
 
   return (
@@ -90,27 +84,23 @@ const Blog: React.FC = () => {
           Blog & <span className="text-yellow-400">Berita</span>
         </h1>
         <p className="text-gray-500 text-sm md:text-base font-medium italic">
-          Informasi, tips, dan review mendalam seputar dunia Smartphone.
+          Informasi teknologi terupdate yang tersimpan di Cloud.
         </p>
       </div>
 
-      <div className="grid gap-8">
-        {posts.length > 0 ? (
-          posts.map(post => <BlogCard key={post.id} post={post} />)
-        ) : (
-          <div className="py-20 text-center">
-            <p className="text-gray-600 font-black uppercase tracking-widest italic">Belum ada berita yang dipublish.</p>
-          </div>
-        )}
-      </div>
-      
-      {posts.length > 0 && (
-        <div className="pt-12 flex justify-center">
-          <button className="group relative overflow-hidden bg-white/5 border border-white/10 px-10 py-4 rounded-2xl text-[11px] font-black uppercase tracking-[0.3em] hover:bg-yellow-400 hover:text-black transition-all duration-500">
-            <span className="relative z-10 flex items-center gap-3">
-              Muat Artikel Lainnya <span>↓</span>
-            </span>
-          </button>
+      {loading ? (
+        <div className="py-20 text-center animate-pulse">
+          <p className="text-gray-600 font-black uppercase tracking-widest italic">Menarik berita terbaru...</p>
+        </div>
+      ) : (
+        <div className="grid gap-8">
+          {posts.length > 0 ? (
+            posts.map(post => <BlogCard key={post.id} post={post} />)
+          ) : (
+            <div className="py-20 text-center">
+              <p className="text-gray-600 font-black uppercase tracking-widest italic">Belum ada berita dipublikasikan.</p>
+            </div>
+          )}
         </div>
       )}
     </div>

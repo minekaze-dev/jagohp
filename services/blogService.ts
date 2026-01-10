@@ -1,17 +1,21 @@
 
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.7';
 import { BlogPost, BlogComment } from "../types";
+
+const SUPABASE_URL = 'https://jgxdvxczmcpcazdhyqbi.supabase.co';
+// Anon key yang diberikan oleh user
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpneGR2eGN6bWNwY2F6ZGh5cWJpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgwMTg3NTAsImV4cCI6MjA4MzU5NDc1MH0.xDWITn4cJXAgij9-32lT4hNZ2poRAFoFyPhhlCrs8EY';
+
+export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 export interface BlogPostExtended extends BlogPost {
   categories: string[];
   imageUrl: string;
   views: number;
   comments: number;
+  category_id?: string;
+  author_id?: string;
 }
-
-const STORAGE_KEY = 'jagohp_blog_posts';
-const CATEGORY_KEY = 'jagohp_blog_categories';
-const AUTHOR_KEY = 'jagohp_blog_authors';
-const COMMENT_KEY = 'jagohp_blog_comments';
 
 export const generateSlug = (title: string): string => {
   return title
@@ -22,162 +26,167 @@ export const generateSlug = (title: string): string => {
     .replace(/^-+|-+$/g, '');
 };
 
-const INITIAL_POSTS: BlogPostExtended[] = [
-  {
-    id: '1',
-    slug: '10-game-android-terpopuler-sepanjang-2025',
-    title: '10 Game Android Terpopuler Sepanjang 2025',
-    author: 'Tim JAGOHP',
-    excerpt: 'Tahun 2025 menjadi musim yang luar biasa bagi dunia mobile gaming.',
-    content: '<h1>Mobile Gaming di 2025</h1><p>Tahun 2025 menjadi musim yang luar biasa bagi dunia mobile gaming. Game-game Android menunjukkan pertumbuhan besar dalam jumlah unduhan, keterlibatan pemain, dan pendapatan dari pembelian dalam aplikasi.</p><h2>Trend Utama</h2><ul><li>Graphics setara konsol</li><li>Integrasi AI dalam gameplay</li><li>Esports mobile semakin masif</li></ul>',
-    date: new Date().toISOString(),
-    publishDate: new Date().toISOString().split('T')[0],
-    status: 'published',
-    categories: ['Gaming'],
-    category: 'Gaming',
-    imageUrl: 'https://imgur.com/3Uf7swJ.jpg',
-    views: 1240,
-    comments: 0
-  }
-];
-
-const INITIAL_CATEGORIES = ['Gaming', 'Tech', 'News', 'Review', 'Tips'];
-const INITIAL_AUTHORS = ['Tim JAGOHP', 'Admin'];
-
-export const getBlogPosts = (includeDrafts: boolean = true): BlogPostExtended[] => {
+/**
+ * Mengambil semua post
+ * @param includeDrafts Jika true, akan mengambil semua data (untuk admin)
+ */
+export const getBlogPosts = async (includeDrafts: boolean = true): Promise<BlogPostExtended[]> => {
   try {
-    const data = localStorage.getItem(STORAGE_KEY);
-    let posts: BlogPostExtended[] = data ? JSON.parse(data) : INITIAL_POSTS;
-    
-    if (!data) {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(INITIAL_POSTS));
-    }
+    let query = supabase
+      .from('blog_posts')
+      .select(`
+        *,
+        authors (name),
+        categories (name),
+        comments (count)
+      `)
+      .order('created_at', { ascending: false });
 
-    const allComments = getAllComments();
-    posts = posts.map(p => ({
-      ...p,
-      author: p.author || 'Tim JAGOHP',
-      comments: allComments.filter(c => c.postId === p.id).length
-    }));
-
+    // Jika bukan admin, hanya ambil yang 'published'
     if (!includeDrafts) {
-      const now = new Date();
-      return posts.filter(post => {
-        const pubDate = new Date(post.publishDate);
-        return post.status === 'published' && pubDate <= now;
-      });
+      const today = new Date().toISOString().split('T')[0];
+      query = query.eq('status', 'published').lte('publish_date', today);
     }
 
-    return posts;
-  } catch (e) {
-    console.error("Storage error:", e);
-    return INITIAL_POSTS;
-  }
-};
+    const { data, error } = await query;
 
-export const saveBlogPost = (post: BlogPostExtended) => {
-  const posts = getBlogPosts();
-  const index = posts.findIndex(p => p.id === post.id);
-  if (index > -1) {
-    posts[index] = post;
-  } else {
-    posts.unshift(post);
-  }
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(posts));
-};
-
-export const deleteBlogPost = (id: string) => {
-  const posts = getBlogPosts().filter(p => p.id !== id);
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(posts));
-  
-  const comments = getAllComments().filter(c => c.postId !== id);
-  localStorage.setItem(COMMENT_KEY, JSON.stringify(comments));
-};
-
-export const getBlogPostById = (id: string): BlogPostExtended | undefined => {
-  return getBlogPosts().find(p => p.id === id);
-};
-
-export const getBlogPostBySlug = (slug: string): BlogPostExtended | undefined => {
-  return getBlogPosts().find(p => p.slug === slug);
-};
-
-export const getCategories = (): string[] => {
-  try {
-    const data = localStorage.getItem(CATEGORY_KEY);
-    if (!data) {
-      localStorage.setItem(CATEGORY_KEY, JSON.stringify(INITIAL_CATEGORIES));
-      return INITIAL_CATEGORIES;
+    if (error) {
+      console.error("Supabase Error:", error);
+      return [];
     }
-    return JSON.parse(data);
-  } catch (e) {
-    return INITIAL_CATEGORIES;
-  }
-};
 
-export const saveCategory = (oldName: string | null, newName: string) => {
-  let cats = getCategories();
-  if (oldName) {
-    cats = cats.map(c => c === oldName ? newName : c);
-  } else if (!cats.includes(newName)) {
-    cats.push(newName);
-  }
-  localStorage.setItem(CATEGORY_KEY, JSON.stringify(cats));
-};
-
-export const deleteCategory = (name: string) => {
-  const cats = getCategories().filter(c => c !== name);
-  localStorage.setItem(CATEGORY_KEY, JSON.stringify(cats));
-};
-
-export const getAuthors = (): string[] => {
-  try {
-    const data = localStorage.getItem(AUTHOR_KEY);
-    if (!data) {
-      localStorage.setItem(AUTHOR_KEY, JSON.stringify(INITIAL_AUTHORS));
-      return INITIAL_AUTHORS;
-    }
-    return JSON.parse(data);
-  } catch (e) {
-    return INITIAL_AUTHORS;
-  }
-};
-
-export const saveAuthor = (oldName: string | null, newName: string) => {
-  let authors = getAuthors();
-  if (oldName) {
-    authors = authors.map(a => a === oldName ? newName : a);
-  } else if (!authors.includes(newName)) {
-    authors.push(newName);
-  }
-  localStorage.setItem(AUTHOR_KEY, JSON.stringify(authors));
-};
-
-export const deleteAuthor = (name: string) => {
-  const authors = getAuthors().filter(a => a !== name);
-  localStorage.setItem(AUTHOR_KEY, JSON.stringify(authors));
-};
-
-export const getAllComments = (): BlogComment[] => {
-  try {
-    const data = localStorage.getItem(COMMENT_KEY);
-    return data ? JSON.parse(data) : [];
-  } catch (e) {
+    return (data || []).map(p => ({
+      id: p.id,
+      slug: p.slug,
+      title: p.title,
+      author: p.authors?.name || 'Anonim',
+      author_id: p.author_id,
+      excerpt: p.excerpt,
+      content: p.content,
+      date: p.created_at,
+      publishDate: p.publish_date,
+      status: p.status,
+      category: p.categories?.name || 'Uncategorized',
+      category_id: p.category_id,
+      categories: [p.categories?.name || 'General'],
+      imageUrl: p.image_url,
+      views: p.views || 0,
+      comments: p.comments?.[0]?.count || 0
+    }));
+  } catch (err) {
+    console.error("Critical Blog Fetch Error:", err);
     return [];
   }
 };
 
-export const getCommentsByPostId = (postId: string): BlogComment[] => {
-  return getAllComments().filter(c => c.postId === postId);
+/**
+ * Simpan atau Update Post
+ */
+export const saveBlogPost = async (post: any) => {
+  const payload = {
+    slug: post.slug,
+    title: post.title,
+    excerpt: post.excerpt,
+    content: post.content,
+    image_url: post.imageUrl,
+    author_id: post.author_id,
+    category_id: post.category_id,
+    status: post.status,
+    publish_date: post.publishDate
+  };
+
+  // Cek apakah ID adalah UUID Supabase yang valid (biasanya > 30 karakter)
+  if (post.id && post.id.length > 20) {
+    return await supabase.from('blog_posts').update(payload).eq('id', post.id);
+  } else {
+    return await supabase.from('blog_posts').insert([payload]);
+  }
 };
 
-export const saveComment = (comment: BlogComment) => {
-  const comments = getAllComments();
-  comments.unshift(comment);
-  localStorage.setItem(COMMENT_KEY, JSON.stringify(comments));
+export const deleteBlogPost = async (id: string) => {
+  return await supabase.from('blog_posts').delete().eq('id', id);
 };
 
-export const deleteComment = (id: string) => {
-  const comments = getAllComments().filter(c => c.id !== id);
-  localStorage.setItem(COMMENT_KEY, JSON.stringify(comments));
+export const getBlogPostBySlug = async (slug: string): Promise<BlogPostExtended | null> => {
+  const { data, error } = await supabase
+    .from('blog_posts')
+    .select(`
+      *,
+      authors (name),
+      categories (name)
+    `)
+    .eq('slug', slug)
+    .single();
+
+  if (error || !data) return null;
+
+  // Increment views secara asinkron tanpa menunggu
+  supabase.rpc('increment_views', { post_id: data.id }).catch(() => {
+    // Fallback jika RPC tidak tersedia
+    supabase.from('blog_posts').update({ views: (data.views || 0) + 1 }).eq('id', data.id).then();
+  });
+
+  return {
+    ...data,
+    author: data.authors?.name,
+    category: data.categories?.name,
+    categories: [data.categories?.name],
+    imageUrl: data.image_url,
+    publishDate: data.publish_date
+  } as BlogPostExtended;
+};
+
+// --- Manajemen Kategori ---
+export const getCategories = async (): Promise<{id: string, name: string}[]> => {
+  const { data } = await supabase.from('categories').select('*').order('name');
+  return data || [];
+};
+
+export const saveCategory = async (name: string) => {
+  return await supabase.from('categories').insert([{ name }]);
+};
+
+export const deleteCategory = async (id: string) => {
+  return await supabase.from('categories').delete().eq('id', id);
+};
+
+// --- Manajemen Author ---
+export const getAuthors = async (): Promise<{id: string, name: string}[]> => {
+  const { data } = await supabase.from('authors').select('*').order('name');
+  return data || [];
+};
+
+export const saveAuthor = async (name: string) => {
+  return await supabase.from('authors').insert([{ name }]);
+};
+
+// --- Manajemen Komentar ---
+export const getCommentsByPostId = async (postId: string): Promise<BlogComment[]> => {
+  const { data } = await supabase
+    .from('comments')
+    .select('*')
+    .eq('post_id', postId)
+    .order('created_at', { ascending: false });
+
+  return (data || []).map(c => ({
+    id: c.id,
+    postId: c.post_id,
+    author: c.author_name,
+    authorId: c.author_id,
+    content: c.content,
+    date: c.created_at
+  }));
+};
+
+export const saveComment = async (comment: any) => {
+  return await supabase.from('comments').insert([{
+    post_id: comment.postId,
+    author_name: comment.author,
+    author_id: comment.authorId,
+    content: comment.content
+  }]);
+};
+
+export const deleteComment = async (id: string) => {
+  return await supabase.from('comments').delete().eq('id', id);
 };
