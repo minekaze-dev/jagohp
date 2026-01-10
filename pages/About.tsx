@@ -7,7 +7,7 @@ const About: React.FC = () => {
       <section className="text-center space-y-6">
         <h1 className="text-5xl font-bold tracking-tight">Cerdas Memilih <br /> <span className="text-yellow-400">Gadget Masa Depan.</span></h1>
         <p className="text-gray-400 text-lg max-w-2xl mx-auto leading-relaxed">
-          JAGOHP lahir dari keinginan untuk menyederhanakan proses pemilihan gadget yang semakin kompleks. Kami percaya teknologi harus membantu, bukan membingungkan apalagi jika sampai disalahgunakan.
+          JAGOHP lahir dari keinginan untuk menyederhanakan proses pemilihan gadget yang semakin kompleks. Kami percaya teknologi harus membantu, bukan membingungkan apalagi disalahgunakan.
         </p>
       </section>
 
