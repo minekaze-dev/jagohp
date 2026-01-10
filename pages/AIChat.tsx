@@ -13,7 +13,7 @@ interface Message {
 const AIChat: React.FC = () => {
   const navigate = useNavigate();
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'model', content: 'Halo Kak! Saya adalah JAGOBOT AI. Tulis aja yang mau ditanyain soal Smartphone terbaru ya.' }
+    { role: 'model', content: 'Halo Kak! Saya adalah JAGOBOT AI. Tulis aja yang mau ditanyain ya.' }
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);

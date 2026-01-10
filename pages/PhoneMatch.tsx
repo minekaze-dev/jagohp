@@ -216,7 +216,7 @@ const PhoneMatch: React.FC = () => {
                     disabled={loading}
                     className="w-full bg-yellow-400 text-black py-5 rounded-2xl font-black uppercase tracking-widest text-[11px] hover:bg-yellow-500 transition-all flex items-center justify-center gap-4 shadow-2xl shadow-yellow-400/30 active:scale-[0.98] group disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {loading ? 'Sedang Memproses...' : 'Mulai Pencarian 🚀'}
+                    {loading ? 'Sedang Memproses...' : 'Mulai Pencarian'}
                   </button>
                 </div>
               </div>

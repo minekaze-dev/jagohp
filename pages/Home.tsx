@@ -20,21 +20,21 @@ const Home: React.FC = () => {
       description: 'Analisis mendalam Smartphone berbasis AI.',
       path: '/review',
       image: 'https://imgur.com/9BTOC0H.jpg',
-      accent: 'Review Cepat & Akurat'
+      accent: 'Mengulas secara cepat & akurat'
     },
     {
       title: 'Compare',
       description: 'Bandingkan spesifikasi Smartphone secara instan.',
       path: '/compare',
       image: 'https://imgur.com/eHrM8Pd.jpg',
-      accent: 'Cek Perbedaan Spek'
+      accent: 'Cek perbedaan spesifikasi'
     },
     {
       title: 'Phone Match',
       description: 'Cari Smartphone yang sesuai kebutuhan.',
       path: '/match',
       image: 'https://imgur.com/IATbhwQ.jpg',
-      accent: 'Cari HP Tercocok'
+      accent: 'Mencari yang sesuai kebutuhan'
     }
   ];
 
@@ -42,17 +42,17 @@ const Home: React.FC = () => {
     <div className="max-w-[900px] mx-auto px-4 pt-4 space-y-12 pb-20">
       <section className="text-center space-y-4 pt-4">
         <h1 className="text-2xl md:text-4xl font-black tracking-tighter uppercase italic">
-          Portal Gadget <span className="text-yellow-400">Smartphone Berbasis AI</span>
+          #1 Portal Gadget <span className="text-yellow-400">Smartphone Berbasis AI</span>
         </h1>
         <p className="text-gray-400 text-lg md:text-base max-w-2xl mx-auto leading-relaxed italic">
-          Dapatkan review objektif dan rekomendasi Smartphone terbaik dari Cloud.
+          Dapatkan review objektif dan rekomendasi Smartphone terbaik disini.
         </p>
       </section>
 
       <section className="animate-in fade-in zoom-in duration-500 w-full">
         <Link 
           to="/chat" 
-          className="group relative flex items-center justify-between w-full bg-yellow-400 text-black px-6 py-4 rounded-[1.5rem] hover:bg-yellow-500 transition-all duration-300 shadow-2xl shadow-yellow-400/20"
+          className="group relative flex items-center justify-between w-full bg-yellow-400 text-black px-6 py-2 rounded-[1.5rem] hover:bg-yellow-500 transition-all duration-300 shadow-2xl shadow-yellow-400/20"
         >
           <div className="flex items-center gap-4">
             <div className="bg-black/10 p-2 rounded-full">
@@ -60,10 +60,10 @@ const Home: React.FC = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
               </svg>
             </div>
-            <span className="text-base font-black tracking-tight italic">Tanya JAGOBOT AI soal HP terbaru Kak!</span>
+            <span className="text-base font-black tracking-tight italic">Cari HP apa Kak? Tanya dulu aja sini</span>
           </div>
           <div className="hidden md:flex items-center gap-2 text-[10px] font-black uppercase tracking-widest opacity-60">
-            DUKUNGAN CHAT <span>→</span>
+            DUKUNGAN CHAT 24/7<span>→</span>
           </div>
         </Link>
       </section>

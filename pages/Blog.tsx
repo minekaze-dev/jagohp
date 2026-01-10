@@ -84,7 +84,7 @@ const Blog: React.FC = () => {
           Blog & <span className="text-yellow-400">Berita</span>
         </h1>
         <p className="text-gray-500 text-sm md:text-base font-medium italic">
-          Informasi teknologi terupdate yang tersimpan di Cloud.
+          Informasi, wawasan dan tips  mendalam seputar dunia Smartphone.
         </p>
       </div>
 
@@ -98,7 +98,7 @@ const Blog: React.FC = () => {
             posts.map(post => <BlogCard key={post.id} post={post} />)
           ) : (
             <div className="py-20 text-center">
-              <p className="text-gray-600 font-black uppercase tracking-widest italic">Belum ada berita dipublikasikan.</p>
+              <p className="text-gray-600 text-[10px] md:text-xs font-black uppercase tracking-widest italic">Belum ada berita dipublikasikan.</p>
             </div>
           )}
         </div>

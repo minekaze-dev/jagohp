@@ -88,7 +88,7 @@ const SmartReview: React.FC = () => {
             <div className="w-24 h-24 border-2 border-yellow-400/20 rounded-full animate-ping absolute inset-0" />
             <img src="https://imgur.com/oaPHidZ.jpg" className="w-20 h-20 object-contain relative z-10 animate-pulse" alt="JAGOHP Loading" />
           </div>
-          <p className="text-gray-500 text-[10px] font-black tracking-[0.4em]">Mohon Tunggu, AI sedang melakukan penelusuran data terbaru...</p>
+          <p className="text-gray-500 text-[10px] font-black tracking-[0.4em]">Mohon Tunggu, AI sedang menganalisanya...</p>
         </div>
       )}
 
@@ -102,7 +102,7 @@ const SmartReview: React.FC = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
                 </svg>
              </div>
-             <p className="text-gray-700 text-[10px] md:text-xs font-black uppercase tracking-[0.5em] italic text-center px-4">Cari spek detail atau bocoran flagship 2026 di sini.</p>
+             <p className="text-gray-700 text-[10px] md:text-xs font-black uppercase tracking-[0.5em] italic text-center px-4">Hasil review akan muncul disini.</p>
           </div>
         </div>
       )}
