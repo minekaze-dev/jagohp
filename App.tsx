@@ -192,7 +192,7 @@ const App: React.FC = () => {
 const Footer = ({ onDonateClick }: { onDonateClick: () => void }) => (
   <footer className="border-t border-white/10 mt-10 py-16 bg-black/40 backdrop-blur-sm mb-20 md:mb-0">
     <div className="max-w-[900px] mx-auto px-4 text-center space-y-10">
-      <img src="https://imgur.com/oaPHidZ.jpg" className="h-16 w-auto mx-auto opacity-80" alt="" />
+      <img src="https://imgur.com/oaPHidZ.jpg" className="h-12 w-auto mx-auto opacity-80" alt="" />
       <nav className="flex flex-wrap justify-center gap-8">
         <button onClick={onDonateClick} className="text-[10px] font-black uppercase text-gray-500 hover:text-yellow-400">Donasi</button>
         <Link to="/faq" className="text-[10px] font-black uppercase text-gray-500 hover:text-yellow-400">FAQ</Link>
