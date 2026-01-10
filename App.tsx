@@ -11,6 +11,7 @@ import About from './pages/About';
 import AIChat from './pages/AIChat';
 import FAQ from './pages/FAQ';
 import PrivacyPolicy from './pages/PrivacyPolicy';
+import TermsCondition from './pages/TermsCondition';
 import AdminDashboard from './pages/AdminDashboard';
 import BlogEditor from './pages/BlogEditor';
 
@@ -38,7 +39,6 @@ const Header: React.FC = () => {
   const navItems = isAdmin 
     ? [
         { name: 'Dashboard', path: '/admin' },
-        { name: 'Blog', path: '/blog' },
       ]
     : [
         { name: 'Beranda', path: '/' },
@@ -50,24 +50,26 @@ const Header: React.FC = () => {
 
   return (
     <header className="sticky top-0 z-[100] bg-gradient-to-b from-neutral-900 via-black/95 to-black backdrop-blur-md border-b border-white/10">
-      <div className="max-w-[1000px] mx-auto px-4 h-20 flex items-center justify-between relative">
+      <div className="max-w-[900px] mx-auto px-4 h-20 flex items-center justify-between relative">
+        {/* Logo ke Kiri */}
         <div className="flex-shrink-0 relative z-[110]">
           <Link to="/" className="flex items-center group">
             <img 
               src="https://imgur.com/oaPHidZ.jpg" 
               alt="JAGOHP Logo" 
-              className="h-10 md:h-11 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
+              className="h-9 md:h-10 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
             />
             {isAdmin && <span className="ml-2 bg-yellow-400 text-black text-[7px] font-black px-1.5 py-0.5 rounded uppercase">ADMIN</span>}
           </Link>
         </div>
 
-        <nav className="hidden md:flex absolute left-1/2 -translate-x-1/2 items-center gap-8">
+        {/* Menu Navigasi Presisi di Tengah */}
+        <nav className="hidden lg:flex absolute left-1/2 -translate-x-1/2 items-center gap-7">
           {navItems.map((item) => (
             <Link
               key={item.path}
               to={item.path}
-              className={`text-[10px] font-black uppercase tracking-[0.2em] transition-all hover:text-yellow-400 ${
+              className={`text-[9px] font-black uppercase tracking-[0.2em] transition-all hover:text-yellow-400 ${
                 isActive(item.path) ? 'text-yellow-400' : 'text-gray-500'
               }`}
             >
@@ -76,20 +78,22 @@ const Header: React.FC = () => {
           ))}
         </nav>
 
-        <div className="hidden md:flex items-center gap-3">
+        {/* Tentang ke Kanan */}
+        <div className="hidden md:flex items-center gap-2 relative z-[110]">
           <Link 
             to="/about" 
-            className="bg-yellow-400 text-black px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-yellow-500 transition-all flex items-center gap-2 shadow-lg"
+            className="bg-yellow-400 text-black px-4 py-2.5 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-yellow-500 transition-all flex items-center gap-2 shadow-lg shadow-yellow-400/20"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             Tentang
           </Link>
+
           {isAdmin && (
             <button 
               onClick={handleLogout}
-              className="bg-white/5 border border-white/10 text-gray-400 px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest hover:text-white hover:bg-red-500/10 hover:border-red-500/30 transition-all cursor-pointer"
+              className="bg-red-500/10 border border-red-500/30 text-red-500 px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-red-500 hover:text-white transition-all cursor-pointer"
             >
               Logout
             </button>
@@ -171,6 +175,7 @@ const App: React.FC = () => {
             <Route path="/chat" element={<AIChat />} />
             <Route path="/faq" element={<FAQ />} />
             <Route path="/privacy" element={<PrivacyPolicy />} />
+            <Route path="/terms" element={<TermsCondition />} />
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/admin/editor" element={<BlogEditor />} />
             <Route path="/admin/editor/:id" element={<BlogEditor />} />
@@ -192,6 +197,7 @@ const Footer = ({ onDonateClick }: { onDonateClick: () => void }) => (
         <button onClick={onDonateClick} className="text-[10px] font-black uppercase text-gray-500 hover:text-yellow-400">Donasi</button>
         <Link to="/faq" className="text-[10px] font-black uppercase text-gray-500 hover:text-yellow-400">FAQ</Link>
         <Link to="/privacy" className="text-[10px] font-black uppercase text-gray-500 hover:text-yellow-400">Privacy Policy</Link>
+        <Link to="/terms" className="text-[10px] font-black uppercase text-gray-500 hover:text-yellow-400">Terms & Condition</Link>
       </nav>
       <p className="text-gray-600 text-[10px] uppercase font-black tracking-widest">© 2025 - 2026 JAGOHP | #1 Portal Gadget Smartphone Berbasis AI</p>
     </div>

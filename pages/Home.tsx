@@ -39,7 +39,7 @@ const Home: React.FC = () => {
   ];
 
   return (
-    <div className="max-w-[900px] mx-auto px-4 pt-4 space-y-12 pb-20">
+    <div className="max-w-[900px] mx-auto px-4 pt-4 space-y-10 pb-20">
       <section className="text-center space-y-4 pt-4">
         <h1 className="text-2xl md:text-4xl font-black tracking-tighter uppercase italic">
           #1 Portal Gadget <span className="text-yellow-400">Smartphone Berbasis AI</span>
@@ -49,23 +49,27 @@ const Home: React.FC = () => {
         </p>
       </section>
 
+      {/* Hero Action Buttons Section */}
       <section className="animate-in fade-in zoom-in duration-500 w-full">
-        <Link 
-          to="/chat" 
-          className="group relative flex items-center justify-between w-full bg-yellow-400 text-black px-6 py-2 rounded-[1.5rem] hover:bg-yellow-500 transition-all duration-300 shadow-2xl shadow-yellow-400/20"
-        >
-          <div className="flex items-center gap-4">
-            <div className="bg-black/10 p-2 rounded-full">
+        <div className="w-full">
+          {/* Tombol Chatbot (Lebar Penuh) */}
+          <Link 
+            to="/chat" 
+            className="w-full group relative flex items-center justify-between bg-yellow-400 text-black px-6 py-1 rounded-[2.5rem] hover:bg-yellow-500 transition-all duration-300 shadow-2xl shadow-yellow-400/10"
+          >
+            <div className="flex items-center gap-4">
+              <div className="bg-black/10 p-2.5 rounded-full">
               <svg className="w-5 h-5 md:w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
               </svg>
+              </div>
+              <span className="text-sm md:text-lg font-black tracking-tight italic">Cari HP apa Kak? Tanya dulu aja sini</span>
             </div>
-            <span className="text-base font-black tracking-tight italic">Cari HP apa Kak? Tanya dulu aja sini</span>
-          </div>
-          <div className="hidden md:flex items-center gap-2 text-[10px] font-black uppercase tracking-widest opacity-60">
-            DUKUNGAN CHAT 24/7<span>→</span>
-          </div>
-        </Link>
+            <div className="hidden lg:flex items-center gap-2 text-[10px] font-black uppercase tracking-widest opacity-60">
+              DUKUNGAN CHAT 24/7<span>→</span>
+            </div>
+          </Link>
+        </div>
       </section>
 
       <section className="grid md:grid-cols-3 gap-6">
@@ -91,7 +95,7 @@ const Home: React.FC = () => {
       </section>
 
       {newsItems.length > 0 && (
-        <section className="space-y-8 pt-8">
+        <section className="space-y-8 pt-0">
           <div className="flex items-end justify-between border-b border-white/5 pb-2">
             <h2 className="text-2xl font-black uppercase italic tracking-tighter">Berita Gadget <span className="text-yellow-400">Terbaru</span></h2>
             <Link to="/blog" className="text-gray-500 text-[10px] font-black uppercase hover:text-white border-b border-gray-800 pb-1">Lihat Semua</Link>
