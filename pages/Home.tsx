@@ -55,7 +55,7 @@ const Home: React.FC = () => {
           {/* Tombol Chatbot (Lebar Penuh) */}
           <Link 
             to="/chat" 
-            className="w-full group relative flex items-center justify-between bg-yellow-400 text-black px-6 py-1 rounded-[2.5rem] hover:bg-yellow-500 transition-all duration-300 shadow-2xl shadow-yellow-400/10"
+            className="w-full group relative flex items-center justify-between bg-yellow-400 text-black px-6 py-0.5 rounded-[2.5rem] hover:bg-yellow-500 transition-all duration-300 shadow-2xl shadow-yellow-400/10"
           >
             <div className="flex items-center gap-4">
               <div className="bg-black/10 p-2.5 rounded-full">
