@@ -63,7 +63,7 @@ const Home: React.FC = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
               </svg>
               </div>
-              <span className="text-sm md:text-base font-black tracking-tight italic">Cari HP apa Kak? Tanya dulu aja sini</span>
+              <span className="text-sm md:text-sm font-black tracking-tight italic">Cari HP apa Kak? Tanya dulu aja sini</span>
             </div>
             <div className="hidden lg:flex items-center gap-2 text-[10px] font-black uppercase tracking-widest opacity-60">
               DUKUNGAN CHAT 24/7<span>→</span>
