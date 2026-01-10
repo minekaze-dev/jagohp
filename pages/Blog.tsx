@@ -26,11 +26,11 @@ const BlogCard: React.FC<{ post: BlogPostExtended }> = ({ post }) => (
 
         <div className="space-y-2">
           <Link to={`/blog/${post.slug}`}>
-            <h2 className="text-xl md:text-2xl font-black text-white uppercase italic tracking-tighter leading-tight group-hover:text-yellow-400 transition-colors">
+            <h2 className="text-lg md:text-xl font-black text-white uppercase italic tracking-tighter leading-tight group-hover:text-yellow-400 transition-colors">
               {post.title}
             </h2>
           </Link>
-          <p className="text-gray-500 text-xs md:text-sm leading-relaxed line-clamp-2 md:line-clamp-3 italic font-medium">
+          <p className="text-gray-500 text-[11px] md:text-xs leading-relaxed line-clamp-2 md:line-clamp-3 italic font-medium">
             {post.excerpt}
           </p>
         </div>

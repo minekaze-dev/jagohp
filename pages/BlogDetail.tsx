@@ -148,8 +148,8 @@ const BlogDetail: React.FC = () => {
                  {new Date(post.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
               </span>
             </div>
-            <h1 className="text-3xl md:text-5xl font-black text-white italic uppercase tracking-tighter leading-[0.9]">{post.title}</h1>
-            <p className="text-gray-500 italic text-sm md:text-lg font-medium border-l-4 border-yellow-400/20 pl-6 leading-relaxed">"{post.excerpt}"</p>
+            <h1 className="text-2xl md:text-4xl font-black text-white italic uppercase tracking-tighter leading-[0.9]">{post.title}</h1>
+            <p className="text-gray-500 italic text-[13px] md:text-base font-medium border-l-4 border-yellow-400/20 pl-6 leading-relaxed">"{post.excerpt}"</p>
           </div>
 
           <div className="relative aspect-video rounded-[2.5rem] overflow-hidden shadow-2xl border border-white/10 bg-neutral-900">
@@ -161,8 +161,8 @@ const BlogDetail: React.FC = () => {
           </div>
 
           <div 
-            className="text-gray-300 text-base md:text-lg leading-relaxed prose prose-invert max-w-none 
-            prose-h1:text-white prose-h1:text-3xl prose-h1:font-black prose-h1:italic prose-h1:uppercase 
+            className="text-gray-300 text-sm md:text-base leading-relaxed prose prose-invert max-w-none 
+            prose-h1:text-white prose-h1:text-2xl prose-h1:font-black prose-h1:italic prose-h1:uppercase 
             prose-p:mb-6 prose-p:italic prose-p:font-medium prose-p:text-justify
             prose-img:rounded-3xl prose-img:shadow-2xl prose-img:my-10 prose-img:border prose-img:border-white/5
             prose-ul:italic prose-ol:italic prose-li:mb-2 prose-strong:text-yellow-400"
@@ -170,7 +170,7 @@ const BlogDetail: React.FC = () => {
           />
 
           <div className="py-6 border-t border-white/5 flex items-center justify-between">
-             <p className="text-[#a5c4e0] font-black italic text-sm md:text-base uppercase tracking-tight opacity-80">
+             <p className="text-[#a5c4e0] font-black italic text-xs md:text-sm uppercase tracking-tight opacity-80">
                 Oleh <span className="text-white/90">{post.author}</span>
              </p>
              <div className="flex gap-4 text-gray-600 text-[10px] font-black uppercase tracking-widest">
