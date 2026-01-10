@@ -27,24 +27,27 @@ export const generateSlug = (title: string): string => {
 
 /**
  * Fungsi untuk mengunggah gambar ke Supabase Storage
- * Pastikan bucket bernama 'images' sudah dibuat di dashboard Supabase
+ * Menggunakan bucket 'IMAGES' (Huruf Besar) sesuai konfigurasi di Dashboard Supabase user
  */
 export const uploadImage = async (file: File): Promise<string> => {
   const fileExt = file.name.split('.').pop();
   const fileName = `${Math.random().toString(36).substring(2)}_${Date.now()}.${fileExt}`;
-  const filePath = `uploads/${fileName}`;
+  
+  // Menggunakan path langsung tanpa folder 'uploads/' agar lebih aman jika policy user terbatas
+  // Jika Anda ingin tetap pakai folder, pastikan policy di Supabase mengizinkan path 'uploads/*'
+  const filePath = `${fileName}`; 
 
   const { error: uploadError } = await supabase.storage
-    .from('images')
+    .from('IMAGES') // Menyamakan dengan screenshot user (case-sensitive)
     .upload(filePath, file);
 
   if (uploadError) {
-    console.error("Upload Error:", uploadError);
+    console.error("Upload Error detail:", uploadError);
     throw uploadError;
   }
 
   const { data: { publicUrl } } = supabase.storage
-    .from('images')
+    .from('IMAGES')
     .getPublicUrl(filePath);
 
   return publicUrl;
@@ -85,7 +88,7 @@ export const getBlogPosts = async (includeDrafts: boolean = true): Promise<BlogP
       categories: [p.categories?.name || 'General'],
       imageUrl: p.image_url,
       views: p.views || 0,
-      comments: 0 // Will be handled if needed
+      comments: 0
     }));
   } catch (err) {
     console.error("Fetch Blog Error:", err);
@@ -107,14 +110,7 @@ export const getBlogPostBySlug = async (slug: string): Promise<BlogPostExtended 
 
     if (error) {
       console.error("Query Error detail slug:", error);
-      const { data: rawData, error: rawError } = await supabase
-        .from('blog_posts')
-        .select('*')
-        .eq('slug', slug)
-        .maybeSingle();
-      
-      if (rawError || !rawData) return null;
-      return mapToExtended(rawData);
+      return null;
     }
 
     if (!data) return null;
