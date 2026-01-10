@@ -3,18 +3,22 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { 
   saveBlogPost, BlogPostExtended, 
-  getCategories, generateSlug, getAuthors, supabase 
+  getCategories, generateSlug, getAuthors, supabase,
+  uploadImage
 } from '../services/blogService';
 
 const BlogEditor: React.FC = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const editorRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const thumbInputRef = useRef<HTMLInputElement>(null);
 
   const [categories, setCategories] = useState<{id: string, name: string}[]>([]);
   const [authors, setAuthors] = useState<{id: string, name: string}[]>([]);
   const [loading, setLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
 
   const [formData, setFormData] = useState({
     id: id || '',
@@ -94,14 +98,44 @@ const BlogEditor: React.FC = () => {
     updateContent();
   };
 
-  const insertImage = () => {
-    const url = prompt("Masukkan URL Gambar:");
-    if (!url) return;
-    const width = prompt("Lebar gambar (contoh: 100%, 400px, atau auto):", "100%");
-    const height = prompt("Tinggi gambar (contoh: auto, 300px):", "auto");
-    
-    const imgHtml = `<img src="${url}" style="width: ${width || '100%'}; height: ${height || 'auto'}; border-radius: 1.5rem; margin: 1.5rem 0; display: block;" alt="Blog Image" />`;
-    execCommand('insertHTML', imgHtml);
+  // Trigger file selection for body image
+  const handleInsertImageClick = () => {
+    if (fileInputRef.current) fileInputRef.current.click();
+  };
+
+  // Handle file selection and upload for body content
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    try {
+      const publicUrl = await uploadImage(file);
+      const imgHtml = `<img src="${publicUrl}" style="width: 100%; height: auto; border-radius: 1.5rem; margin: 1.5rem 0; display: block;" alt="Uploaded Image" />`;
+      execCommand('insertHTML', imgHtml);
+    } catch (err) {
+      alert("Gagal mengunggah gambar: Pastikan bucket 'images' tersedia di Supabase.");
+    } finally {
+      setIsUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
+  // Handle upload for main thumbnail
+  const handleThumbUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    try {
+      const publicUrl = await uploadImage(file);
+      setFormData(prev => ({ ...prev, imageUrl: publicUrl }));
+    } catch (err) {
+      alert("Gagal mengunggah thumbnail.");
+    } finally {
+      setIsUploading(false);
+      if (thumbInputRef.current) thumbInputRef.current.value = '';
+    }
   };
 
   const handleSave = async (statusOverride?: 'draft' | 'published') => {
@@ -116,10 +150,14 @@ const BlogEditor: React.FC = () => {
     setIsSaving(false);
   };
 
-  if (loading) return <div className="py-40 text-center animate-pulse text-gray-500 uppercase font-black text-xs tracking-widest">Inisialisasi Cloud Engine...</div>;
+  if (loading) return <div className="py-40 text-center animate-pulse text-gray-500 uppercase font-black text-xs tracking-widest">Inisialisasi Jago Engine...</div>;
 
   return (
     <div className="min-h-screen bg-[#050505] flex flex-col pb-32">
+      {/* Hidden Inputs for Upload */}
+      <input type="file" ref={fileInputRef} onChange={handleFileChange} accept="image/*" className="hidden" />
+      <input type="file" ref={thumbInputRef} onChange={handleThumbUpload} accept="image/*" className="hidden" />
+
       {/* Header Utama */}
       <div className="sticky top-0 z-[120] bg-black/95 backdrop-blur-xl border-b border-white/10 px-6 py-4">
         <div className="max-w-[1400px] mx-auto flex items-center justify-between">
@@ -127,16 +165,24 @@ const BlogEditor: React.FC = () => {
             <button onClick={() => navigate('/admin')} className="text-gray-500 hover:text-white transition-colors">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M15 19l-7-7 7-7"/></svg>
             </button>
-            <h1 className="text-sm font-black uppercase italic tracking-tighter text-white">Cloud <span className="text-yellow-400">Editor V2.2</span></h1>
+            <h1 className="text-sm font-black uppercase italic tracking-tighter text-white">Jago <span className="text-yellow-400">Editor V2.2</span></h1>
           </div>
           <div className="flex gap-3">
-            <button disabled={isSaving} onClick={() => handleSave('draft')} className="bg-white/5 border border-white/10 text-gray-400 px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:text-white transition-all">Draft</button>
-            <button disabled={isSaving} onClick={() => handleSave('published')} className="bg-yellow-400 text-black px-8 py-3 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-xl shadow-yellow-400/20 active:scale-95 transition-all">
+            <button disabled={isSaving || isUploading} onClick={() => handleSave('draft')} className="bg-white/5 border border-white/10 text-gray-400 px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:text-white transition-all disabled:opacity-50">Draft</button>
+            <button disabled={isSaving || isUploading} onClick={() => handleSave('published')} className="bg-yellow-400 text-black px-8 py-3 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-xl shadow-yellow-400/20 active:scale-95 transition-all disabled:opacity-50">
               {isSaving ? 'Saving...' : 'Publish'}
             </button>
           </div>
         </div>
       </div>
+
+      {isUploading && (
+        <div className="fixed top-20 left-0 right-0 z-[150] flex justify-center pointer-events-none">
+          <div className="bg-yellow-400 text-black px-6 py-2 rounded-full text-[9px] font-black uppercase tracking-widest animate-bounce shadow-xl">
+            Mengunggah Gambar ke Cloud...
+          </div>
+        </div>
+      )}
 
       <div className="max-w-[1440px] mx-auto w-full px-4 md:px-10 py-10 grid grid-cols-1 lg:grid-cols-2 gap-10">
         <div className="space-y-8 h-fit">
@@ -173,9 +219,17 @@ const BlogEditor: React.FC = () => {
               </div>
             </div>
 
-            <div className="space-y-1">
-              <label className="text-[8px] font-black text-gray-600 uppercase tracking-widest ml-1">Thumbnail URL</label>
-              <input type="text" value={formData.imageUrl} onChange={e => setFormData({...formData, imageUrl: e.target.value})} placeholder="https://..." className="w-full bg-neutral-900 border border-white/10 rounded-xl p-3 text-[10px] font-bold text-gray-400 outline-none" />
+            <div className="space-y-2">
+              <label className="text-[8px] font-black text-gray-600 uppercase tracking-widest ml-1">Main Thumbnail</label>
+              <div className="flex gap-2">
+                <input type="text" value={formData.imageUrl} onChange={e => setFormData({...formData, imageUrl: e.target.value})} placeholder="Thumbnail URL atau Upload..." className="flex-1 bg-neutral-900 border border-white/10 rounded-xl p-3 text-[10px] font-bold text-gray-400 outline-none" />
+                <button 
+                  onClick={() => thumbInputRef.current?.click()}
+                  className="bg-white/5 border border-white/10 text-white px-4 rounded-xl text-[9px] font-black uppercase hover:bg-white/10 transition-all"
+                >
+                  Upload
+                </button>
+              </div>
             </div>
 
             <div className="space-y-1">
@@ -187,7 +241,6 @@ const BlogEditor: React.FC = () => {
           {/* Editor Tool Section */}
           <div className="bg-[#0c0c0c] border border-white/10 rounded-[2.5rem] overflow-hidden shadow-2xl flex flex-col">
              <div className="bg-neutral-900 p-3 flex flex-wrap gap-2 border-b border-white/5 sticky top-[80px] z-[100]">
-                {/* Text Controls - Visual Clarity Improved */}
                 <select onChange={(e) => execCommand('fontSize', e.target.value)} className="bg-black text-[9px] font-black text-white px-3 py-2 rounded-xl outline-none border border-white/20 cursor-pointer hover:border-yellow-400 transition-all">
                   <option value="3">Normal</option>
                   <option value="1">Small</option>
@@ -202,28 +255,27 @@ const BlogEditor: React.FC = () => {
                   <button onClick={() => execCommand('italic')} className="w-10 h-10 italic font-serif text-white hover:text-yellow-400 hover:bg-yellow-400/10 transition-all text-xl" title="Italic">I</button>
                 </div>
 
-                {/* Alignment Group */}
                 <div className="flex items-center bg-black/50 rounded-xl border border-white/20 px-1">
                   <button onClick={() => execCommand('justifyLeft')} className="w-10 h-10 flex items-center justify-center text-white hover:text-yellow-400 hover:bg-yellow-400/10 transition-all"><svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M3 15h18v2H3v-2zm0-8h18v2H3V7zm0 6h18v-2H3v2zm0 8h18v-2H3v2zM3 3v2h18V3H3z"/></svg></button>
                   <button onClick={() => execCommand('justifyCenter')} className="w-10 h-10 flex items-center justify-center text-white hover:text-yellow-400 hover:bg-yellow-400/10 transition-all"><svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M7 15h10v2H7v-2zm-4-8h18v2H3V7zm0 6h18v-2H3v2zm0 8h18v-2H3v2zM3 3v2h18V3H3z"/></svg></button>
                   <button onClick={() => execCommand('justifyRight')} className="w-10 h-10 flex items-center justify-center text-white hover:text-yellow-400 hover:bg-yellow-400/10 transition-all"><svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M11 15h10v2H11v-2zm-8-8h18v2H3V7zm0 6h18v-2H3v2zm0 8h18v-2H3v2zM3 3v2h18V3H3z"/></svg></button>
-                  <button onClick={() => execCommand('justifyFull')} className="w-10 h-10 flex items-center justify-center text-white hover:text-yellow-400 hover:bg-yellow-400/10 transition-all"><svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M3 3v2h18V3H3zm0 8h18v-2H3v2zm0 4h18v-2H3v2zm0 4h18v-2H3v2z"/></svg></button>
                 </div>
 
-                {/* Lists Group */}
                 <div className="flex items-center bg-black/50 rounded-xl border border-white/20 px-1">
                    <button onClick={() => execCommand('insertUnorderedList')} className="w-10 h-10 flex items-center justify-center text-white hover:text-yellow-400 hover:bg-yellow-400/10 transition-all" title="Bullets"><svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M4 10.5c-.83 0-1.5.67-1.5 1.5s.67 1.5 1.5 1.5 1.5-.67 1.5-1.5-.67-1.5-1.5-1.5zm0-6c-.83 0-1.5.67-1.5 1.5S3.17 7.5 4 7.5 5.5 6.83 5.5 6 4.83 4.5 4 4.5zm0 12c-.83 0-1.5.68-1.5 1.5s.68 1.5 1.5 1.5 1.5-.68 1.5-1.5-.67-1.5-1.5-1.5zM7 19h14v-2H7v2zm0-6h14v-2H7v2zm0-8v2h14V5H7z"/></svg></button>
                    <button onClick={() => execCommand('insertOrderedList')} className="w-10 h-10 flex items-center justify-center text-white hover:text-yellow-400 hover:bg-yellow-400/10 transition-all" title="Numbers"><svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M2 17h2v.5H3v1h1v.5H2v1h3v-4H2v1zm1-9h1V4H2v1h1v3zm-1 3h1.8L2 13.1v.9h3v-1H3.2L5 10.9V10H2v1zm5-6v2h14V5H7zm0 14h14v-2H7v2zm0-6h14v-2H7v2z"/></svg></button>
                 </div>
 
-                {/* Media Control */}
-                <button onClick={insertImage} className="ml-auto px-4 h-10 flex items-center gap-2 bg-yellow-400 text-black text-[10px] font-black uppercase rounded-xl hover:bg-yellow-500 shadow-lg transition-all active:scale-95">
+                <button 
+                  onClick={handleInsertImageClick} 
+                  disabled={isUploading}
+                  className="ml-auto px-4 h-10 flex items-center gap-2 bg-yellow-400 text-black text-[10px] font-black uppercase rounded-xl hover:bg-yellow-500 shadow-lg transition-all active:scale-95 disabled:opacity-50"
+                >
                   <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
-                  Insert Image
+                  Upload Gambar
                 </button>
              </div>
              
-             {/* Main Editor Area - PADDING ATAS PT-32 SUPAYA TIDAK KETUTUP */}
              <div 
                ref={editorRef}
                contentEditable

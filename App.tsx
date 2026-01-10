@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { HashRouter as Router, Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom';
 import Home from './pages/Home';
@@ -39,6 +38,7 @@ const Header: React.FC = () => {
   const navItems = isAdmin 
     ? [
         { name: 'Dashboard', path: '/admin' },
+        { name: 'Blog', path: '/blog' },
       ]
     : [
         { name: 'Beranda', path: '/' },

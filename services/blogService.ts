@@ -25,6 +25,31 @@ export const generateSlug = (title: string): string => {
     .replace(/^-+|-+$/g, '');
 };
 
+/**
+ * Fungsi untuk mengunggah gambar ke Supabase Storage
+ * Pastikan bucket bernama 'images' sudah dibuat di dashboard Supabase
+ */
+export const uploadImage = async (file: File): Promise<string> => {
+  const fileExt = file.name.split('.').pop();
+  const fileName = `${Math.random().toString(36).substring(2)}_${Date.now()}.${fileExt}`;
+  const filePath = `uploads/${fileName}`;
+
+  const { error: uploadError } = await supabase.storage
+    .from('images')
+    .upload(filePath, file);
+
+  if (uploadError) {
+    console.error("Upload Error:", uploadError);
+    throw uploadError;
+  }
+
+  const { data: { publicUrl } } = supabase.storage
+    .from('images')
+    .getPublicUrl(filePath);
+
+  return publicUrl;
+};
+
 export const getBlogPosts = async (includeDrafts: boolean = true): Promise<BlogPostExtended[]> => {
   try {
     let query = supabase
@@ -70,7 +95,6 @@ export const getBlogPosts = async (includeDrafts: boolean = true): Promise<BlogP
 
 export const getBlogPostBySlug = async (slug: string): Promise<BlogPostExtended | null> => {
   try {
-    // 1. Coba ambil dengan join (lebih rapi)
     const { data, error } = await supabase
       .from('blog_posts')
       .select(`
@@ -83,7 +107,6 @@ export const getBlogPostBySlug = async (slug: string): Promise<BlogPostExtended 
 
     if (error) {
       console.error("Query Error detail slug:", error);
-      // 2. Fallback: ambil raw data jika join gagal karena isu skema
       const { data: rawData, error: rawError } = await supabase
         .from('blog_posts')
         .select('*')
@@ -95,10 +118,7 @@ export const getBlogPostBySlug = async (slug: string): Promise<BlogPostExtended 
     }
 
     if (!data) return null;
-
-    // Increment views (Fixed: Removed .catch as it's not a native promise method on the builder)
     await supabase.rpc('increment_views', { post_id: data.id });
-
     return mapToExtended(data);
   } catch (err) {
     console.error("System Error getBlogPostBySlug:", err);
@@ -106,7 +126,6 @@ export const getBlogPostBySlug = async (slug: string): Promise<BlogPostExtended 
   }
 };
 
-// Helper mapper to avoid redundancy
 const mapToExtended = (data: any): BlogPostExtended => ({
   id: data.id,
   slug: data.slug,
