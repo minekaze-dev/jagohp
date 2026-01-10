@@ -23,12 +23,13 @@ const BlogEditor: React.FC = () => {
     author_id: '',
     excerpt: '',
     category_id: '',
-    imageUrl: '', // Default Kosong sesuai permintaan
+    imageUrl: '',
     content: '',
     status: 'draft' as 'draft' | 'published',
     publishDate: new Date().toISOString().split('T')[0]
   });
 
+  // Effect untuk inisialisasi data
   useEffect(() => {
     const token = sessionStorage.getItem('admin_token');
     if (token !== 'granted') { navigate('/'); return; }
@@ -41,7 +42,7 @@ const BlogEditor: React.FC = () => {
       if (id) {
         const { data: post } = await supabase.from('blog_posts').select('*').eq('id', id).single();
         if (post) {
-          setFormData({
+          const loadedData = {
             id: post.id,
             title: post.title,
             slug: post.slug,
@@ -52,8 +53,15 @@ const BlogEditor: React.FC = () => {
             content: post.content || '',
             status: post.status as any,
             publishDate: post.publish_date
-          });
-          if (editorRef.current) editorRef.current.innerHTML = post.content || '';
+          };
+          setFormData(loadedData);
+          
+          // Memastikan konten masuk ke editor dengan jeda kecil agar DOM siap
+          setTimeout(() => {
+            if (editorRef.current) {
+              editorRef.current.innerHTML = post.content || '';
+            }
+          }, 100);
         }
       } else {
         setFormData(prev => ({
@@ -69,6 +77,7 @@ const BlogEditor: React.FC = () => {
 
   const execCommand = (command: string, value: string = '') => {
     document.execCommand(command, false, value);
+    if (editorRef.current) editorRef.current.focus();
     updateContent();
   };
 
@@ -88,188 +97,161 @@ const BlogEditor: React.FC = () => {
   const insertImage = () => {
     const url = prompt("Masukkan URL Gambar:");
     if (!url) return;
-    const width = prompt("Lebar gambar (contoh: 100%, 400px):", "100%");
+    const width = prompt("Lebar gambar (contoh: 100%, 400px, atau auto):", "100%");
+    const height = prompt("Tinggi gambar (contoh: auto, 300px):", "auto");
     
-    const imgHtml = `<img src="${url}" style="width: ${width || '100%'}; height: auto; border-radius: 1rem; margin: 1rem 0;" alt="Blog Image" />`;
+    const imgHtml = `<img src="${url}" style="width: ${width || '100%'}; height: ${height || 'auto'}; border-radius: 1.5rem; margin: 1.5rem 0; display: block;" alt="Blog Image" />`;
     execCommand('insertHTML', imgHtml);
   };
 
   const handleSave = async (statusOverride?: 'draft' | 'published') => {
     if (!formData.title || !formData.content) return alert('Lengkapi data judul dan konten!');
-    
     setIsSaving(true);
     const result = await saveBlogPost({
       ...formData,
       status: statusOverride || formData.status
     });
-
-    if (result.error) {
-      alert("Gagal simpan: " + result.error.message);
-    } else {
-      navigate('/admin');
-    }
+    if (result.error) alert("Gagal simpan: " + result.error.message);
+    else navigate('/admin');
     setIsSaving(false);
   };
 
-  if (loading) return <div className="py-40 text-center animate-pulse text-gray-500 uppercase font-black text-xs tracking-widest">Inisialisasi Editor Cloud...</div>;
+  if (loading) return <div className="py-40 text-center animate-pulse text-gray-500 uppercase font-black text-xs tracking-widest">Inisialisasi Cloud Engine...</div>;
 
   return (
     <div className="min-h-screen bg-[#050505] flex flex-col pb-32">
-      {/* Header Utama (Tinggi ~80px) */}
+      {/* Header Utama */}
       <div className="sticky top-0 z-[120] bg-black/95 backdrop-blur-xl border-b border-white/10 px-6 py-4">
         <div className="max-w-[1400px] mx-auto flex items-center justify-between">
           <div className="flex items-center gap-6">
             <button onClick={() => navigate('/admin')} className="text-gray-500 hover:text-white transition-colors">
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M15 19l-7-7 7-7"/></svg>
             </button>
-            <h1 className="text-sm font-black uppercase italic tracking-tighter text-white">Cloud <span className="text-yellow-400">Editor V2</span></h1>
+            <h1 className="text-sm font-black uppercase italic tracking-tighter text-white">Cloud <span className="text-yellow-400">Editor V2.2</span></h1>
           </div>
           <div className="flex gap-3">
-            <div className="hidden sm:flex items-center bg-white/5 border border-white/10 rounded-2xl px-4 mr-2">
-               <span className="text-[8px] font-black text-gray-500 uppercase mr-3">Status:</span>
-               <select 
-                value={formData.status} 
-                onChange={(e) => setFormData({...formData, status: e.target.value as any})}
-                className="bg-neutral-900 text-[9px] font-black text-yellow-400 uppercase outline-none cursor-pointer p-1"
-               >
-                 <option value="draft">Draft</option>
-                 <option value="published">Published</option>
-               </select>
-            </div>
-            <button disabled={isSaving} onClick={() => handleSave('draft')} className="bg-white/5 border border-white/10 text-gray-400 px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:text-white transition-all">Simpan Draft</button>
+            <button disabled={isSaving} onClick={() => handleSave('draft')} className="bg-white/5 border border-white/10 text-gray-400 px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:text-white transition-all">Draft</button>
             <button disabled={isSaving} onClick={() => handleSave('published')} className="bg-yellow-400 text-black px-8 py-3 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-xl shadow-yellow-400/20 active:scale-95 transition-all">
-              {isSaving ? 'Processing...' : 'Publish'}
+              {isSaving ? 'Saving...' : 'Publish'}
             </button>
           </div>
         </div>
       </div>
 
       <div className="max-w-[1440px] mx-auto w-full px-4 md:px-10 py-10 grid grid-cols-1 lg:grid-cols-2 gap-10">
-        
         <div className="space-y-8 h-fit">
+          {/* Metadata Section */}
           <div className="bg-[#0c0c0c] border border-white/10 rounded-[2.5rem] p-8 space-y-6 shadow-2xl">
             <div className="space-y-1">
-               <label className="text-[8px] font-black text-gray-600 uppercase tracking-widest ml-1">Judul Utama</label>
+               <label className="text-[8px] font-black text-gray-600 uppercase tracking-widest ml-1">Judul Artikel</label>
                <input 
                 type="text" 
                 value={formData.title} 
                 onChange={e => setFormData({...formData, title: e.target.value, slug: generateSlug(e.target.value)})}
-                placeholder="TULIS JUDUL ARTIKEL DI SINI..."
+                placeholder="JUDUL SMARTPHONE REVIEW..."
                 className="w-full bg-transparent text-3xl font-black text-white outline-none placeholder:text-gray-900 italic uppercase tracking-tighter"
               />
+              <div className="text-[7px] font-bold text-yellow-400/40 mt-1 ml-1 truncate tracking-widest uppercase">Permalink: {formData.slug}</div>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="space-y-1">
-                <label className="text-[8px] font-black text-gray-600 uppercase tracking-widest ml-1">Penulis</label>
-                <select value={formData.author_id} onChange={e => setFormData({...formData, author_id: e.target.value})} className="w-full bg-neutral-900 border border-white/10 rounded-xl p-3 text-[10px] font-black uppercase text-white outline-none cursor-pointer">
+                <label className="text-[8px] font-black text-gray-600 uppercase tracking-widest ml-1">Author</label>
+                <select value={formData.author_id} onChange={e => setFormData({...formData, author_id: e.target.value})} className="w-full bg-neutral-900 border border-white/10 rounded-xl p-3 text-[10px] font-black uppercase text-white outline-none">
                   {authors.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
                 </select>
               </div>
               <div className="space-y-1">
-                <label className="text-[8px] font-black text-gray-600 uppercase tracking-widest ml-1">Kategori</label>
-                <select value={formData.category_id} onChange={e => setFormData({...formData, category_id: e.target.value})} className="w-full bg-neutral-900 border border-white/10 rounded-xl p-3 text-[10px] font-black uppercase text-white outline-none cursor-pointer">
+                <label className="text-[8px] font-black text-gray-600 uppercase tracking-widest ml-1">Category</label>
+                <select value={formData.category_id} onChange={e => setFormData({...formData, category_id: e.target.value})} className="w-full bg-neutral-900 border border-white/10 rounded-xl p-3 text-[10px] font-black uppercase text-white outline-none">
                   {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                 </select>
               </div>
               <div className="space-y-1">
-                <label className="text-[8px] font-black text-gray-600 uppercase tracking-widest ml-1">Tgl Publish</label>
-                <input 
-                  type="date" 
-                  value={formData.publishDate}
-                  onChange={e => setFormData({...formData, publishDate: e.target.value})}
-                  className="w-full bg-neutral-900 border border-white/10 rounded-xl p-3 text-[10px] font-black uppercase text-white outline-none"
-                />
+                <label className="text-[8px] font-black text-gray-600 uppercase tracking-widest ml-1">Date</label>
+                <input type="date" value={formData.publishDate} onChange={e => setFormData({...formData, publishDate: e.target.value})} className="w-full bg-neutral-900 border border-white/10 rounded-xl p-3 text-[10px] font-black uppercase text-white outline-none" />
               </div>
             </div>
 
             <div className="space-y-1">
               <label className="text-[8px] font-black text-gray-600 uppercase tracking-widest ml-1">Thumbnail URL</label>
-              <input 
-                type="text" 
-                value={formData.imageUrl} 
-                onChange={e => setFormData({...formData, imageUrl: e.target.value})}
-                placeholder="Masukkan URL Gambar..."
-                className="w-full bg-neutral-900 border border-white/10 rounded-xl p-3 text-[10px] font-bold text-gray-400 outline-none"
-              />
+              <input type="text" value={formData.imageUrl} onChange={e => setFormData({...formData, imageUrl: e.target.value})} placeholder="https://..." className="w-full bg-neutral-900 border border-white/10 rounded-xl p-3 text-[10px] font-bold text-gray-400 outline-none" />
             </div>
 
             <div className="space-y-1">
-              <label className="text-[8px] font-black text-gray-600 uppercase tracking-widest ml-1">Excerpt (Ringkasan)</label>
-              <textarea 
-                value={formData.excerpt} 
-                onChange={e => setFormData({...formData, excerpt: e.target.value})}
-                placeholder="Tulis ringkasan singkat artikel di sini..."
-                className="w-full bg-neutral-900 border border-white/10 rounded-xl p-4 text-[11px] font-medium italic text-gray-400 outline-none h-20 resize-none"
-              />
+              <label className="text-[8px] font-black text-gray-600 uppercase tracking-widest ml-1">Excerpt</label>
+              <textarea value={formData.excerpt} onChange={e => setFormData({...formData, excerpt: e.target.value})} placeholder="Ringkasan artikel..." className="w-full bg-neutral-900 border border-white/10 rounded-xl p-4 text-[11px] font-medium italic text-gray-400 outline-none h-20 resize-none" />
             </div>
           </div>
 
-          <div className="bg-[#0c0c0c] border border-white/10 rounded-[2.5rem] overflow-hidden shadow-2xl flex flex-col relative">
-             {/* Toolbar Sticky di bawah header (top 80px) */}
-             <div className="bg-neutral-900 p-2 flex flex-wrap gap-1 border-b border-white/5 sticky top-[80px] z-[100]">
-                <select onChange={(e) => execCommand('fontSize', e.target.value)} className="bg-black text-[9px] font-black text-white px-2 py-1.5 rounded-lg outline-none border border-white/10 cursor-pointer">
+          {/* Editor Tool Section */}
+          <div className="bg-[#0c0c0c] border border-white/10 rounded-[2.5rem] overflow-hidden shadow-2xl flex flex-col">
+             <div className="bg-neutral-900 p-3 flex flex-wrap gap-2 border-b border-white/5 sticky top-[80px] z-[100]">
+                {/* Text Controls - Visual Clarity Improved */}
+                <select onChange={(e) => execCommand('fontSize', e.target.value)} className="bg-black text-[9px] font-black text-white px-3 py-2 rounded-xl outline-none border border-white/20 cursor-pointer hover:border-yellow-400 transition-all">
                   <option value="3">Normal</option>
                   <option value="1">Small</option>
                   <option value="5">Large</option>
                   <option value="7">Huge</option>
                 </select>
-                <input type="color" onChange={(e) => execCommand('foreColor', e.target.value)} className="w-8 h-8 p-1 bg-black rounded-lg border border-white/10 cursor-pointer" />
-                <div className="w-[1px] h-8 bg-white/5 mx-1" />
-                <button onClick={() => execCommand('bold')} className="w-8 h-8 font-black text-white hover:bg-white/10 rounded-lg">B</button>
-                <button onClick={() => execCommand('italic')} className="w-8 h-8 italic font-serif text-white hover:bg-white/10 rounded-lg text-lg">I</button>
-                <div className="w-[1px] h-8 bg-white/5 mx-1" />
-                <button onClick={() => execCommand('justifyLeft')} className="w-8 h-8 flex items-center justify-center hover:bg-white/10 rounded-lg text-white"><svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M15 15H3v2h12v-2zm0-8H3v2h12V7zM3 13h18v-2H3v2zm0 8h18v-2H3v2zM3 3v2h18V3H3z"/></svg></button>
-                <button onClick={() => execCommand('justifyCenter')} className="w-8 h-8 flex items-center justify-center hover:bg-white/10 rounded-lg text-white"><svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M3 15h18v2H3v-2zm0-8h18v2H3V7zm0 6h18v-2H3v2zm0 8h18v-2H3v2zM3 3v2h18V3H3z"/></svg></button>
-                <button onClick={() => execCommand('justifyRight')} className="w-8 h-8 flex items-center justify-center hover:bg-white/10 rounded-lg text-white"><svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M9 15h12v2H9v-2zm0-8h12v2H9V7zM3 13h18v-2H3v2zm0 8h18v-2H3v2zM3 3v2h18V3H3z"/></svg></button>
-                <button onClick={() => execCommand('justifyFull')} className="w-8 h-8 flex items-center justify-center hover:bg-white/10 rounded-lg text-white"><svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M3 21h18v-2H3v2zm0-4h18v-2H3v2zm0-4h18v-2H3v2zm0-4h18V7H3v2zm0-6v2h18V3H3z"/></svg></button>
-                <div className="w-[1px] h-8 bg-white/5 mx-1" />
-                <button onClick={insertImage} className="px-3 h-8 flex items-center gap-2 bg-yellow-400 text-black text-[9px] font-black uppercase rounded-lg hover:bg-yellow-500">
-                  <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
-                  Add Image
+                
+                <div className="flex items-center bg-black/50 rounded-xl border border-white/20 px-1 overflow-hidden">
+                  <input type="color" onChange={(e) => execCommand('foreColor', e.target.value)} className="w-10 h-10 p-2 bg-transparent cursor-pointer border-none" title="Font Color" />
+                  <div className="w-[1px] h-6 bg-white/10 mx-1"></div>
+                  <button onClick={() => execCommand('bold')} className="w-10 h-10 font-black text-white hover:text-yellow-400 hover:bg-yellow-400/10 transition-all" title="Bold">B</button>
+                  <button onClick={() => execCommand('italic')} className="w-10 h-10 italic font-serif text-white hover:text-yellow-400 hover:bg-yellow-400/10 transition-all text-xl" title="Italic">I</button>
+                </div>
+
+                {/* Alignment Group */}
+                <div className="flex items-center bg-black/50 rounded-xl border border-white/20 px-1">
+                  <button onClick={() => execCommand('justifyLeft')} className="w-10 h-10 flex items-center justify-center text-white hover:text-yellow-400 hover:bg-yellow-400/10 transition-all"><svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M3 15h18v2H3v-2zm0-8h18v2H3V7zm0 6h18v-2H3v2zm0 8h18v-2H3v2zM3 3v2h18V3H3z"/></svg></button>
+                  <button onClick={() => execCommand('justifyCenter')} className="w-10 h-10 flex items-center justify-center text-white hover:text-yellow-400 hover:bg-yellow-400/10 transition-all"><svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M7 15h10v2H7v-2zm-4-8h18v2H3V7zm0 6h18v-2H3v2zm0 8h18v-2H3v2zM3 3v2h18V3H3z"/></svg></button>
+                  <button onClick={() => execCommand('justifyRight')} className="w-10 h-10 flex items-center justify-center text-white hover:text-yellow-400 hover:bg-yellow-400/10 transition-all"><svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M11 15h10v2H11v-2zm-8-8h18v2H3V7zm0 6h18v-2H3v2zm0 8h18v-2H3v2zM3 3v2h18V3H3z"/></svg></button>
+                  <button onClick={() => execCommand('justifyFull')} className="w-10 h-10 flex items-center justify-center text-white hover:text-yellow-400 hover:bg-yellow-400/10 transition-all"><svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M3 3v2h18V3H3zm0 8h18v-2H3v2zm0 4h18v-2H3v2zm0 4h18v-2H3v2z"/></svg></button>
+                </div>
+
+                {/* Lists Group */}
+                <div className="flex items-center bg-black/50 rounded-xl border border-white/20 px-1">
+                   <button onClick={() => execCommand('insertUnorderedList')} className="w-10 h-10 flex items-center justify-center text-white hover:text-yellow-400 hover:bg-yellow-400/10 transition-all" title="Bullets"><svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M4 10.5c-.83 0-1.5.67-1.5 1.5s.67 1.5 1.5 1.5 1.5-.67 1.5-1.5-.67-1.5-1.5-1.5zm0-6c-.83 0-1.5.67-1.5 1.5S3.17 7.5 4 7.5 5.5 6.83 5.5 6 4.83 4.5 4 4.5zm0 12c-.83 0-1.5.68-1.5 1.5s.68 1.5 1.5 1.5 1.5-.68 1.5-1.5-.67-1.5-1.5-1.5zM7 19h14v-2H7v2zm0-6h14v-2H7v2zm0-8v2h14V5H7z"/></svg></button>
+                   <button onClick={() => execCommand('insertOrderedList')} className="w-10 h-10 flex items-center justify-center text-white hover:text-yellow-400 hover:bg-yellow-400/10 transition-all" title="Numbers"><svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M2 17h2v.5H3v1h1v.5H2v1h3v-4H2v1zm1-9h1V4H2v1h1v3zm-1 3h1.8L2 13.1v.9h3v-1H3.2L5 10.9V10H2v1zm5-6v2h14V5H7zm0 14h14v-2H7v2zm0-6h14v-2H7v2z"/></svg></button>
+                </div>
+
+                {/* Media Control */}
+                <button onClick={insertImage} className="ml-auto px-4 h-10 flex items-center gap-2 bg-yellow-400 text-black text-[10px] font-black uppercase rounded-xl hover:bg-yellow-500 shadow-lg transition-all active:scale-95">
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
+                  Insert Image
                 </button>
              </div>
              
-             {/* Area Tulis dengan Padding-Top Ekstra (pt-44) untuk memastikan tidak tertutup toolbar */}
+             {/* Main Editor Area - PADDING ATAS PT-32 SUPAYA TIDAK KETUTUP */}
              <div 
                ref={editorRef}
                contentEditable
                onInput={updateContent}
                onPaste={handlePaste}
-               className="min-h-[700px] p-10 pt-44 text-white caret-white outline-none prose prose-invert max-w-none text-base leading-relaxed selection:bg-yellow-400 selection:text-black cursor-text"
+               className="min-h-[800px] p-10 pt-32 text-white caret-yellow-400 outline-none prose prose-invert max-w-none text-base leading-relaxed cursor-text selection:bg-yellow-400/30"
                style={{ color: 'white' }}
              />
           </div>
         </div>
 
+        {/* Preview Section */}
         <div className="space-y-6 h-fit">
            <div className="flex items-center gap-3 ml-2">
               <span className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
-              <h3 className="text-[10px] font-black uppercase text-gray-500 tracking-[0.4em]">Live Preview</h3>
+              <h3 className="text-[10px] font-black uppercase text-gray-500 tracking-[0.4em]">Real-time Preview</h3>
            </div>
-           
-           <div className="bg-black border border-white/5 rounded-[3rem] p-8 md:p-12 overflow-hidden sticky top-[100px] shadow-[0_0_100px_rgba(0,0,0,0.5)]">
-              <article className="space-y-8 animate-in fade-in duration-500">
+           <div className="bg-black border border-white/5 rounded-[3.5rem] p-8 md:p-14 overflow-hidden sticky top-[100px] shadow-[0_0_80px_rgba(0,0,0,0.8)]">
+              <article className="space-y-10 animate-in fade-in duration-500">
                  {formData.imageUrl ? (
-                   <img src={formData.imageUrl} className="w-full aspect-[16/9] object-cover rounded-[2rem] shadow-2xl border border-white/5" alt="" />
+                   <img src={formData.imageUrl} className="w-full aspect-video object-cover rounded-[2.5rem] border border-white/5 shadow-2xl" alt="" />
                  ) : (
-                   <div className="w-full aspect-[16/9] bg-white/5 rounded-[2rem] flex items-center justify-center text-gray-700 text-[10px] font-black uppercase">No Thumbnail</div>
+                   <div className="w-full aspect-video bg-white/5 rounded-[2.5rem] flex items-center justify-center text-gray-800 text-[10px] font-black uppercase border-2 border-dashed border-white/5">Thumbnail Area</div>
                  )}
-                 
                  <div className="space-y-4">
-                    <div className="flex items-center gap-2">
-                       <span className="text-[9px] font-black text-yellow-400 uppercase tracking-widest">{formData.publishDate}</span>
-                       <span className="text-[9px] font-black text-gray-600 uppercase tracking-widest">/</span>
-                       <span className="text-[9px] font-black text-gray-500 uppercase tracking-widest">{categories.find(c => c.id === formData.category_id)?.name || 'KATEGORI'}</span>
-                    </div>
-                    <h2 className="text-3xl md:text-4xl font-black text-white italic uppercase tracking-tighter leading-[0.9]">{formData.title || 'Draft Judul Artikel...'}</h2>
+                    <h2 className="text-3xl md:text-4xl font-black text-white italic uppercase tracking-tighter leading-[0.95]">{formData.title || 'Untitled Article'}</h2>
                  </div>
-
-                 <div dangerouslySetInnerHTML={{ __html: formData.content }} className="prose prose-invert prose-p:italic prose-p:font-medium prose-p:text-gray-400 prose-img:rounded-2xl prose-img:shadow-xl text-justify break-words" />
-                 
-                 <div className="pt-10 border-t border-white/5">
-                    <p className="text-[10px] font-black text-gray-600 uppercase tracking-widest italic">Penulis: <span className="text-white">{authors.find(a => a.id === formData.author_id)?.name || 'ADMIN'}</span></p>
-                 </div>
+                 <div dangerouslySetInnerHTML={{ __html: formData.content }} className="prose prose-invert prose-p:italic prose-p:text-gray-400 prose-img:rounded-3xl prose-img:shadow-2xl text-justify prose-li:italic" />
               </article>
            </div>
         </div>

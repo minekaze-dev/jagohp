@@ -36,6 +36,10 @@ const BlogDetail: React.FC = () => {
       }
       
       setLoading(true);
+      // Reset state saat ganti artikel
+      window.scrollTo(0, 0); 
+      setPost(null);
+
       try {
         const data = await getBlogPostBySlug(slug);
         if (data) {
@@ -43,7 +47,6 @@ const BlogDetail: React.FC = () => {
           const comms = await getCommentsByPostId(data.id);
           setComments(comms);
         } else {
-          // Jika data tidak ditemukan, kembali ke blog
           navigate('/blog');
         }
       } catch (err) {
