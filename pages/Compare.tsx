@@ -3,6 +3,18 @@ import React, { useState } from 'react';
 import { getComparison } from '../services/geminiService';
 import { ComparisonResult } from '../types';
 
+const FeatureIcon = ({ feature }: { feature: string }) => {
+  const f = feature.toLowerCase();
+  if (f.includes('harga')) return <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>;
+  if (f.includes('chipset')) return <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"/></svg>;
+  if (f.includes('layar')) return <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>;
+  if (f.includes('kamera')) return <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/></svg>;
+  if (f.includes('batere') || f.includes('baterai')) return <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>;
+  if (f.includes('charging')) return <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>;
+  if (f.includes('nfc')) return <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>;
+  return <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>;
+};
+
 const PerformanceBar = ({ label, scores, phones }: { label: string, scores: number[], phones: string[] }) => {
   const maxScore = Math.max(...scores);
   
@@ -125,13 +137,13 @@ const Compare: React.FC = () => {
   };
 
   return (
-    <div className="max-w-[900px] mx-auto px-4 py-16 space-y-12 pb-32">
+    <div className="max-w-[950px] mx-auto px-4 py-16 space-y-12 pb-32">
       <div className="text-center space-y-4">
         <h1 className="text-2xl md:text-4xl font-black uppercase tracking-tighter italic"><span className="text-yellow-400">Com</span>pare</h1>
         <p className="text-gray-400 text-sm md:text-base font-medium italic">Head-to-head spesifikasi biar lo gak salah pilih Smartphone.</p>
       </div>
 
-      {/* Input Section - Hidden when result exists */}
+      {/* Input Section */}
       {!result && !loading && (
         <div className="space-y-12 animate-in fade-in duration-500">
           <div className="grid md:grid-cols-3 gap-4">
@@ -163,7 +175,7 @@ const Compare: React.FC = () => {
               disabled={loading}
               className="bg-yellow-400 text-black px-10 py-3 rounded-full font-black uppercase tracking-[0.15em] text-[10px] hover:bg-yellow-500 transition-all disabled:opacity-50 shadow-xl shadow-yellow-400/10"
             >
-              Compare
+              Mulai Bandingkan
             </button>
           </div>
         </div>
@@ -193,32 +205,36 @@ const Compare: React.FC = () => {
           </div>
 
           {/* Table Data Section */}
-          <div className="overflow-x-auto bg-[#0c0c0c] rounded-3xl border border-white/10 p-5 md:p-8 shadow-2xl">
+          <div className="overflow-x-auto bg-[#0c0c0c] rounded-3xl border border-white/10 p-4 md:p-10 shadow-2xl">
             <table className="w-full">
               <thead>
                 <tr className="border-b border-white/10">
-                  <th className="text-left py-5 pr-4 text-gray-600 uppercase tracking-[0.3em] font-black text-[8px] w-1/4">Fitur Utama</th>
-                  <th className="text-left py-5 px-4 text-white font-black uppercase italic tracking-tighter text-sm md:text-base">{activePhonesHeader(0, phones)}</th>
-                  <th className="text-left py-5 px-4 text-white font-black uppercase italic tracking-tighter text-sm md:text-base">{activePhonesHeader(1, phones)}</th>
-                  {phones.filter(p=>p.trim()!=='').length === 3 && <th className="text-left py-5 px-4 text-white font-black uppercase italic tracking-tighter text-sm md:text-base">{activePhonesHeader(2, phones)}</th>}
+                  <th className="text-left py-6 pr-4 text-gray-600 uppercase tracking-[0.3em] font-black text-[8px] w-[20%]">Parameter Teknis</th>
+                  <th className="text-left py-6 px-4 text-white font-black uppercase italic tracking-tighter text-sm md:text-lg min-w-[200px]">{activePhonesHeader(0, phones)}</th>
+                  <th className="text-left py-6 px-4 text-white font-black uppercase italic tracking-tighter text-sm md:text-lg min-w-[200px]">{activePhonesHeader(1, phones)}</th>
+                  {phones.filter(p=>p.trim()!=='').length === 3 && <th className="text-left py-6 px-4 text-white font-black uppercase italic tracking-tighter text-sm md:text-lg min-w-[200px]">{activePhonesHeader(2, phones)}</th>}
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
                 {result.tableData.map((row, i) => {
                   const isPriceRow = row.feature.toLowerCase().includes('harga');
+                  const isNfcRow = row.feature.toLowerCase().includes('nfc');
                   return (
-                    <tr key={i} className={`transition-colors group ${isPriceRow ? 'bg-yellow-400/5' : 'hover:bg-white/[0.03]'}`}>
-                      <td className={`py-5 pr-4 font-black uppercase text-[8px] tracking-[0.2em] transition-colors ${isPriceRow ? 'text-yellow-400' : 'text-gray-500 group-hover:text-gray-300'}`}>
+                    <tr key={i} className={`transition-colors group ${isPriceRow ? 'bg-yellow-400/[0.03]' : 'hover:bg-white/[0.02]'}`}>
+                      <td className={`py-6 pr-4 font-black uppercase text-[8px] tracking-[0.2em] transition-colors flex items-start gap-2.5 ${isPriceRow ? 'text-yellow-400' : 'text-gray-500 group-hover:text-gray-300'}`}>
+                        <div className="mt-[-2px] shrink-0 opacity-40 group-hover:opacity-100 transition-opacity">
+                          <FeatureIcon feature={row.feature} />
+                        </div>
                         {row.feature}
                       </td>
-                      <td className={`py-5 px-4 font-bold text-[10px] md:text-[13px] tracking-tight ${isPriceRow ? 'text-white bg-yellow-400/10' : 'text-yellow-400'}`}>
+                      <td className={`py-6 px-4 font-bold text-[10px] md:text-[14px] leading-relaxed tracking-tight ${isPriceRow ? 'text-white bg-yellow-400/10' : 'text-gray-300'}`}>
                         {row.phone1}
                       </td>
-                      <td className={`py-5 px-4 font-bold text-[10px] md:text-[13px] tracking-tight ${isPriceRow ? 'text-white bg-yellow-400/10' : 'text-yellow-400'}`}>
+                      <td className={`py-6 px-4 font-bold text-[10px] md:text-[14px] leading-relaxed tracking-tight ${isPriceRow ? 'text-white bg-yellow-400/10' : 'text-gray-300'}`}>
                         {row.phone2}
                       </td>
                       {phones.filter(p=>p.trim()!=='').length === 3 && (
-                        <td className={`py-5 px-4 font-bold text-[10px] md:text-[13px] tracking-tight ${isPriceRow ? 'text-white bg-yellow-400/10' : 'text-yellow-400'}`}>
+                        <td className={`py-6 px-4 font-bold text-[10px] md:text-[14px] leading-relaxed tracking-tight ${isPriceRow ? 'text-white bg-yellow-400/10' : 'text-gray-300'}`}>
                           {row.phone3}
                         </td>
                       )}
@@ -246,23 +262,15 @@ const Compare: React.FC = () => {
             </div>
           </div>
 
-          {/* Analysis Text Section */}
-          <div className="space-y-8">
-            <div className="flex items-center gap-4">
-               <div className="h-[1px] flex-1 bg-white/10"></div>
-               <h3 className="text-[10px] font-black uppercase text-gray-500 tracking-[0.4em] whitespace-nowrap">Analisis Head-to-Head</h3>
-               <div className="h-[1px] flex-1 bg-white/10"></div>
-            </div>
-
+          {/* Analysis & Summary */}
+          <div className="space-y-10">
             <div className="grid gap-6">
               {parseAnalysis(result.conclusion).phonePoints.map((pointText, idx) => {
                 const { header, content } = getUnifiedText(pointText);
                 return (
-                  <div key={idx} className="bg-[#0a0a0a] border border-white/5 rounded-2xl p-6 md:p-8 space-y-5 shadow-xl relative overflow-hidden">
+                  <div key={idx} className="bg-[#0a0a0a] border border-white/5 rounded-2xl p-6 md:p-8 space-y-5 shadow-xl">
                     <div className="flex items-center justify-between border-b border-white/5 pb-4">
-                      <div className="flex items-center gap-3">
-                        <span className="text-white font-black uppercase italic tracking-widest text-xs md:text-sm">{header}</span>
-                      </div>
+                      <span className="text-white font-black uppercase italic tracking-widest text-xs md:text-sm">{header}</span>
                     </div>
                     <div className="text-gray-400 text-sm md:text-base leading-relaxed italic font-medium text-justify">
                       {content}
@@ -272,28 +280,21 @@ const Compare: React.FC = () => {
               })}
             </div>
 
-            {parseAnalysis(result.conclusion).conclusion && (
-              <div className="bg-white/5 p-8 md:p-12 rounded-[2.5rem] border border-white/10 space-y-6 shadow-2xl relative overflow-hidden text-center md:text-left">
-                <div className="absolute top-0 right-0 p-8 opacity-5">
-                   <svg className="w-24 h-24" fill="currentColor" viewBox="0 0 24 24"><path d="M14.017 21L14.017 18C14.017 16.8954 14.9124 16 16.017 16H19.017V14H15.017C13.9124 14 13.017 13.1046 13.017 12V6C13.017 4.89543 13.9124 4 15.017 4H21.017C22.1216 4 23.017 4.89543 23.017 6V12C23.017 13.1046 22.1216 14 21.017 14V16C21.017 18.7614 18.7784 21 16.017 21H14.017ZM1.017 21L1.017 18C1.017 16.8954 1.91243 16 3.017 16H6.017V14H2.017C0.91243 14 0.017 13.1046 0.017 12V6C0.017 4.89543 0.91243 4 2.017 4H8.017C9.12157 4 10.017 4.89543 10.017 6V12C10.017 13.1046 9.12157 14 8.017 14V16C8.017 18.7614 5.77843 21 3.017 21H1.017Z"/></svg>
-                </div>
-                <h4 className="text-[10px] font-black uppercase text-yellow-400 tracking-[0.5em]">Kesimpulan Akhir</h4>
-                <div className="text-white text-sm md:text-lg leading-snug font-black tracking-tight italic text-justify relative z-10">
-                  {parseAnalysis(result.conclusion).conclusion}
-                </div>
-              </div>
-            )}
-
-            <div className="bg-yellow-400 text-black p-8 md:p-10 rounded-[2.5rem] shadow-2xl shadow-yellow-400/20 border-t-4 border-black/10">
-              <span className="text-[8px] font-black uppercase tracking-[0.4em] opacity-40 block mb-3">Rekomendasi Terbaik JagoHP</span>
+            <div className="bg-yellow-400 text-black p-8 md:p-12 rounded-[2.5rem] shadow-2xl shadow-yellow-400/20 border-t-4 border-black/10">
+              <span className="text-[8px] font-black uppercase tracking-[0.4em] opacity-40 block mb-3">Rekomendasi Akhir JagoHP</span>
               <p className="text-base md:text-lg font-black italic leading-tight tracking-tighter">
                 {result.recommendation}
               </p>
+              {parseAnalysis(result.conclusion).conclusion && (
+                <p className="mt-6 text-sm md:text-base font-bold opacity-80 border-t border-black/10 pt-6">
+                  {parseAnalysis(result.conclusion).conclusion}
+                </p>
+              )}
             </div>
           </div>
           
           <div className="flex justify-center pb-20">
-             <button onClick={() => {setResult(null); setPhones(['','']); window.scrollTo({top:0, behavior:'smooth'})}} className="text-gray-600 hover:text-white text-[10px] font-black uppercase tracking-widest border-b border-transparent hover:border-white transition-all pb-1">Reset Perbandingan</button>
+             <button onClick={() => {setResult(null); setPhones(['','']); window.scrollTo({top:0, behavior:'smooth'})}} className="text-gray-600 hover:text-white text-[10px] font-black uppercase tracking-widest border-b border-transparent hover:border-white transition-all pb-1 italic">Reset & Bandingkan Lainnya</button>
           </div>
         </div>
       )}

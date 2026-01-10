@@ -78,10 +78,22 @@ export const getComparison = async (phones: string[]): Promise<ComparisonResult>
     contents: `${REAL_WORLD_DATA_INSTRUCTION} 
     Bandingkan smartphone berikut secara mendalam: ${phones.join(", ")}. 
     
-    WAJIB:
-    1. Sertakan estimasi 'HARGA PASAR INDONESIA (RESMI)' sebagai baris PERTAMA di tableData.
-    2. Berikan skor performa 1-10 untuk masing-masing kategori di performanceScores.
-    3. Pastikan data spesifikasi akurat sesuai rilis 2025/2026.`,
+    WAJIB menyertakan baris-baris berikut di tableData dalam urutan ini:
+    1. Harga Pasar Indonesia (Gunakan 'Harga: ' sebagai label)
+    2. Rilis & Status Distribusi
+    3. Jaringan (5G/4G)
+    4. Chipset (Processor)
+    5. Layar (Panel, Size, Refresh Rate)
+    6. Kamera Depan
+    7. Kamera Belakang (Setup Utama)
+    8. Storage (Internal)
+    9. Memory (RAM)
+    10. Batere (Kapasitas)
+    11. Charging (Speed & Fitur)
+    12. NFC (Sebutkan 'Ya' atau 'Tidak')
+    13. Fitur Lain (Rating IP, Speaker, Fingerprint, dll)
+
+    Jika fitur tidak ada/tidak didukung, tuliskan "Tidak Mendukung" atau "Tidak Ada" dengan penjelasan singkat.`,
     config: {
       tools: [{googleSearch: {}}],
       responseMimeType: "application/json",
