@@ -57,29 +57,32 @@ const SmartReview: React.FC = () => {
 
   return (
     <div className="max-w-[850px] mx-auto px-4 pt-16 pb-10 space-y-10">
-      {/* Search & Header Section */}
+      {/* Header Section (Always Visible) */}
       <div className="text-center space-y-4">
         <h1 className="text-2xl md:text-4xl font-black uppercase tracking-tighter italic"><span className="text-yellow-400">Smart</span> Review</h1>
-        <p className="text-gray-400 text-base md:text-base max-w-xl mx-auto leading-relaxed font-medium italic">
+        <p className="text-gray-400 text-sm md:text-base max-w-xl mx-auto leading-relaxed font-medium italic">
           Analisis spesifikasi secara cepat dan akurat.
         </p>
         
-        <form onSubmit={handleSearch} className="max-w-md mx-auto relative mt-8">
-          <input
-            type="text"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Tuliskan nama/tipe Smartphone"
-            className="w-full bg-white/5 border border-white/20 rounded-full px-6 py-4 text-xs md:text-sm focus:outline-none focus:border-yellow-400 transition-colors pr-32 font-bold"
-          />
-          <button
-            type="submit"
-            disabled={loading}
-            className="absolute right-1.5 top-1.5 bottom-1.5 bg-yellow-400 text-black px-6 rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-yellow-500 disabled:opacity-50 transition-colors"
-          >
-            {loading ? '...' : 'Review'}
-          </button>
-        </form>
+        {/* Formulir Pencarian - Disembunyikan jika review sudah ada */}
+        {!review && !loading && (
+          <form onSubmit={handleSearch} className="max-w-md mx-auto relative mt-8 animate-in fade-in duration-500">
+            <input
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Tuliskan nama/tipe Smartphone"
+              className="w-full bg-white/5 border border-white/20 rounded-full px-6 py-4 text-xs md:text-sm focus:outline-none focus:border-yellow-400 transition-colors pr-32 font-bold"
+            />
+            <button
+              type="submit"
+              disabled={loading}
+              className="absolute right-1.5 top-1.5 bottom-1.5 bg-yellow-400 text-black px-6 rounded-full text-[10px] font-black uppercase tracking-widest hover:bg-yellow-500 disabled:opacity-50 transition-colors"
+            >
+              Review
+            </button>
+          </form>
+        )}
       </div>
 
       {loading && (
@@ -94,36 +97,31 @@ const SmartReview: React.FC = () => {
 
       {error && <p className="text-red-400 text-center text-xs font-bold uppercase tracking-widest">{error}</p>}
 
-      {!review && !loading && !error && (
-        <div className="animate-in fade-in zoom-in duration-700">
-          <div className="bg-[#0a0a0a]/40 border-2 border-dashed border-white/5 rounded-[2.5rem] p-20 flex flex-col items-center justify-center space-y-4 group hover:border-white/10 transition-all">
-             <div className="bg-white/5 w-16 h-16 rounded-3xl flex items-center justify-center opacity-20 group-hover:opacity-40 transition-opacity">
-                <svg className="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-                </svg>
-             </div>
-             <p className="text-gray-700 text-[10px] md:text-xs font-black uppercase tracking-[0.5em] italic text-center px-4">Hasil review akan muncul disini.</p>
-          </div>
-        </div>
-      )}
-
       {review && !loading && (
         <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
           {/* Main Title Section */}
           <div className="bg-[#0a0a0a] p-6 md:p-10 rounded-3xl border border-white/5 space-y-5 shadow-2xl relative overflow-hidden group">
             <div className="relative z-10">
-              <div className="space-y-1">
-                <h2 className="text-2xl md:text-3xl font-black tracking-tighter text-white uppercase italic leading-none">{review.name}</h2>
-                <div className="flex flex-wrap items-center gap-3 pt-1">
-                   <div className="flex items-center gap-2">
-                      <div className="w-1.5 h-1.5 bg-yellow-400 rounded-full animate-pulse"></div>
-                      <p className="text-[10px] md:text-xs text-gray-500 font-bold uppercase tracking-[0.2em]">Rilis: {review.specs.releaseDate}</p>
-                   </div>
-                   <div className="h-3 w-[1px] bg-white/10 hidden sm:block"></div>
-                   <span className={`text-[8px] md:text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-md border ${getStatusColor(review.specs.availabilityStatus)}`}>
-                      {review.specs.availabilityStatus}
-                   </span>
+              <div className="flex justify-between items-start">
+                <div className="space-y-1">
+                  <h2 className="text-2xl md:text-3xl font-black tracking-tighter text-white uppercase italic leading-none">{review.name}</h2>
+                  <div className="flex flex-wrap items-center gap-3 pt-1">
+                     <div className="flex items-center gap-2">
+                        <div className="w-1.5 h-1.5 bg-yellow-400 rounded-full animate-pulse"></div>
+                        <p className="text-[10px] md:text-xs text-gray-500 font-bold uppercase tracking-[0.2em]">Rilis: {review.specs.releaseDate}</p>
+                     </div>
+                     <div className="h-3 w-[1px] bg-white/10 hidden sm:block"></div>
+                     <span className={`text-[8px] md:text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-md border ${getStatusColor(review.specs.availabilityStatus)}`}>
+                        {review.specs.availabilityStatus}
+                     </span>
+                  </div>
                 </div>
+                <button 
+                  onClick={() => {setReview(null); setQuery('');}}
+                  className="text-gray-600 hover:text-yellow-400 transition-colors text-[9px] font-black uppercase tracking-widest border-b border-gray-800 pb-1"
+                >
+                  Ubah Cari
+                </button>
               </div>
               <p className="text-sm md:text-lg text-yellow-400 font-bold italic tracking-tight pt-5 mt-5 border-t border-white/5">"{review.highlight}"</p>
             </div>
@@ -234,12 +232,12 @@ const SmartReview: React.FC = () => {
             </div>
           </div>
 
-          {/* SOURCES SECTION (GROUNDING) */}
+          {/* SOURCES SECTION */}
           {sources.length > 0 && (
             <div className="bg-[#050505] border border-white/5 rounded-3xl p-6 md:p-8 space-y-4">
               <div className="flex items-center gap-2">
                 <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/></svg>
-                <h4 className="text-[9px] font-black uppercase text-gray-600 tracking-[0.3em]">Disclaimer: Review ini dihasilkan oleh AI berdasarkan data spesifikasi dan referensi publik.</h4>
+                <h4 className="text-[9px] font-black uppercase text-gray-600 tracking-[0.3em]">Referensi Data</h4>
               </div>
               <div className="flex flex-wrap gap-3">
                 {sources.map((chunk, i) => (
@@ -279,6 +277,15 @@ const SmartReview: React.FC = () => {
               <span className="text-[9px] font-black uppercase tracking-[0.6em] opacity-40 block mb-3">Insight AI</span>
               <p className="text-sm md:text-lg font-black leading-tight italic tracking-tight">"{review.targetAudience}"</p>
             </div>
+          </div>
+
+          <div className="flex justify-center pt-10">
+            <button 
+              onClick={() => {setReview(null); setQuery(''); window.scrollTo({top:0, behavior:'smooth'})}} 
+              className="text-gray-600 hover:text-white text-[10px] font-black uppercase tracking-widest border-b border-transparent hover:border-white transition-all pb-1 italic"
+            >
+              Reset Review
+            </button>
           </div>
         </div>
       )}

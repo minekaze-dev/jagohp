@@ -44,6 +44,15 @@ export interface PhoneReview {
   targetAudience: string;
 }
 
+export interface ComparisonScores {
+  chipset: number;
+  memory: number;
+  camera: number;
+  gaming: number;
+  battery: number;
+  charging: number;
+}
+
 export interface ComparisonResult {
   conclusion: string;
   recommendation: string;
@@ -54,6 +63,11 @@ export interface ComparisonResult {
     phone3?: string;
     winnerIndex: number;
   }[];
+  performanceScores: {
+    phone1: ComparisonScores;
+    phone2: ComparisonScores;
+    phone3?: ComparisonScores;
+  };
 }
 
 export interface RecommendedPhone {

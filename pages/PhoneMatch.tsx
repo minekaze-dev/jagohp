@@ -20,6 +20,7 @@ const PhoneMatch: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<RecommendationResponse | null>(null);
   const [activeRecommendation, setActiveRecommendation] = useState<RecommendedPhone | null>(null);
+  const [error, setError] = useState('');
   
   // Refs for scrolling
   const resultRef = useRef<HTMLDivElement>(null);
@@ -28,7 +29,6 @@ const PhoneMatch: React.FC = () => {
   const [activities, setActivities] = useState<string[]>([]);
   const [cameraPrio, setCameraPrio] = useState(2); // Default to "Biasa" (middle)
   const [budget, setBudget] = useState('3 Jutaan');
-  const [count] = useState(3);
   const [extra, setExtra] = useState('');
 
   const activityOptions = [
@@ -57,29 +57,36 @@ const PhoneMatch: React.FC = () => {
   };
 
   const handleSearch = async () => {
+    if (activities.length === 0) {
+      alert("Pilih minimal satu aktivitas Kak!");
+      return;
+    }
+
     setLoading(true);
     setResult(null);
+    setError('');
     
-    setTimeout(() => {
-      resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }, 100);
-
     try {
       const res = await getMatch({
         activities,
         cameraPrio: cameraLabels[cameraPrio - 1],
         budget,
-        count,
         extra
       });
-      setResult(res);
-      setActiveRecommendation(res.primary);
       
-      setTimeout(() => {
-        resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 100);
+      if (res && res.primary) {
+        setResult(res);
+        setActiveRecommendation(res.primary);
+        // Scroll ke hasil setelah state update
+        setTimeout(() => {
+          resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 100);
+      } else {
+        setError('Maaf, AI tidak menemukan HP yang cocok. Coba ubah kriteria budget atau aktivitas.');
+      }
     } catch (err) {
       console.error(err);
+      setError('Terjadi kendala saat menghubungi AI. Coba lagi ya Kak.');
     } finally {
       setLoading(false);
     }
@@ -92,137 +99,126 @@ const PhoneMatch: React.FC = () => {
     setCameraPrio(2);
     setBudget('3 Jutaan');
     setExtra('');
+    setError('');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
     <div className="max-w-[1000px] mx-auto px-4 pt-16 pb-10 md:py-16">
-      <div className="space-y-8 animate-in fade-in duration-700 mb-12">
+      <div className="space-y-8 mb-12">
         <div className="text-center space-y-4">
           <h1 className="text-2xl md:text-4xl font-black uppercase tracking-tighter italic text-white leading-none">
             <span className="text-yellow-400">Phone</span> Match
           </h1>
-          <p className="text-gray-400 text-[11px] md:text-base font-medium italic">
+          <p className="text-gray-400 text-sm md:text-base font-medium italic">
             Cari Smartphone terbaik sesuai kebutuhan lo.
           </p>
         </div>
 
-        <div className="bg-[#0a0a0a] border border-white/10 rounded-[2.5rem] p-6 md:p-12 shadow-2xl relative overflow-hidden group">
-          <div className="relative z-10">
-            <div className="grid md:grid-cols-2 gap-10 md:gap-16 items-start">
-              
-              <div className="space-y-10">
-                <section className="space-y-6">
-                  <h3 className="text-[11px] font-black uppercase tracking-widest text-gray-500 border-l-4 border-yellow-400 pl-4">1. Apa aktivitas & kebutuhan utama lo?</h3>
-                  <div className="grid grid-cols-2 gap-2.5">
-                    {activityOptions.map(opt => (
-                      <button
-                        key={opt}
-                        onClick={() => toggleActivity(opt)}
-                        className={`text-left p-2.5 md:p-3.5 rounded-xl border transition-all text-[9px] md:text-[10px] font-bold uppercase tracking-tight leading-tight flex items-center gap-2.5 ${
-                          activities.includes(opt) 
-                          ? 'bg-yellow-400 border-yellow-400 text-black shadow-lg shadow-yellow-400/20' 
-                          : 'bg-white/5 border-white/10 text-gray-400 hover:border-white/20'
-                        }`}
-                      >
-                        <div className={`w-2.5 h-2.5 rounded-full border shrink-0 transition-all ${activities.includes(opt) ? 'bg-black border-black scale-110' : 'border-gray-700'}`}></div>
-                        {opt}
-                      </button>
-                    ))}
-                  </div>
-                </section>
+        {/* Input Section - Disembunyikan jika result sudah ada */}
+        {!result && !loading && (
+          <div className="bg-[#0a0a0a] border border-white/10 rounded-[2.5rem] p-6 md:p-12 shadow-2xl relative overflow-hidden group animate-in fade-in duration-500">
+            <div className="relative z-10">
+              <div className="grid md:grid-cols-2 gap-10 md:gap-16 items-start">
+                
+                <div className="space-y-10">
+                  <section className="space-y-6">
+                    <h3 className="text-[11px] font-black uppercase tracking-widest text-gray-500 border-l-4 border-yellow-400 pl-4">1. Apa aktivitas lo?</h3>
+                    <div className="grid grid-cols-2 gap-2.5">
+                      {activityOptions.map(opt => (
+                        <button
+                          key={opt}
+                          onClick={() => toggleActivity(opt)}
+                          className={`text-left p-2.5 md:p-3.5 rounded-xl border transition-all text-[9px] md:text-[10px] font-bold uppercase tracking-tight leading-tight flex items-center gap-2.5 ${
+                            activities.includes(opt) 
+                            ? 'bg-yellow-400 border-yellow-400 text-black shadow-lg shadow-yellow-400/20' 
+                            : 'bg-white/5 border-white/10 text-gray-400 hover:border-white/20'
+                          }`}
+                        >
+                          <div className={`w-2.5 h-2.5 rounded-full border shrink-0 transition-all ${activities.includes(opt) ? 'bg-black border-black scale-110' : 'border-gray-700'}`}></div>
+                          {opt}
+                        </button>
+                      ))}
+                    </div>
+                  </section>
 
-                <section className="space-y-8">
-                  <h3 className="text-[11px] font-black uppercase tracking-widest text-gray-500 border-l-4 border-yellow-400 pl-4">2. Seberapa penting kualitas kamera?</h3>
-                  <div className="px-1">
-                    <div className="relative h-14">
-                      {/* Custom Range Input (3 steps) */}
-                      <input 
-                        type="range" 
-                        min="1" 
-                        max="3" 
-                        step="1"
-                        value={cameraPrio}
-                        onChange={(e) => setCameraPrio(parseInt(e.target.value))}
-                        className="absolute w-full h-1.5 bg-white/10 rounded-lg appearance-none cursor-pointer accent-yellow-400 z-20 top-0"
-                        style={{
-                          WebkitAppearance: 'none',
-                        }}
-                      />
-                      
-                      {/* Precise Labels Mapping (0%, 50%, 100%) */}
-                      <div className="absolute top-7 left-0 right-0 h-6">
-                        {cameraLabels.map((label, idx) => {
-                          const isActive = cameraPrio === idx + 1;
-                          // Calculate exact percentage for 3 steps: 0, 50, 100
-                          const position = (idx / (cameraLabels.length - 1)) * 100;
-                          
-                          return (
-                            <span 
-                              key={label} 
-                              className={`absolute top-0 transition-all duration-300 text-[8px] md:text-[9px] font-black uppercase tracking-widest whitespace-nowrap
-                                ${isActive ? 'text-yellow-400 scale-110' : 'text-gray-700'}
-                                ${idx === 0 ? 'left-0' : idx === cameraLabels.length - 1 ? 'right-0' : ''}
-                              `}
-                              style={
-                                idx !== 0 && idx !== cameraLabels.length - 1 
-                                ? { left: `${position}%`, transform: 'translateX(-50%)' } 
-                                : {}
-                              }
-                            >
-                              {label}
-                            </span>
-                          );
-                        })}
+                  <section className="space-y-8">
+                    <h3 className="text-[11px] font-black uppercase tracking-widest text-gray-500 border-l-4 border-yellow-400 pl-4">2. Pentingnya Kamera?</h3>
+                    <div className="px-1">
+                      <div className="relative h-14">
+                        <input 
+                          type="range" 
+                          min="1" 
+                          max="3" 
+                          step="1"
+                          value={cameraPrio}
+                          onChange={(e) => setCameraPrio(parseInt(e.target.value))}
+                          className="absolute w-full h-1.5 bg-white/10 rounded-lg appearance-none cursor-pointer accent-yellow-400 z-20 top-0"
+                        />
+                        <div className="absolute top-7 left-0 right-0 h-6">
+                          {cameraLabels.map((label, idx) => {
+                            const isActive = cameraPrio === idx + 1;
+                            const position = (idx / (cameraLabels.length - 1)) * 100;
+                            return (
+                              <span 
+                                key={label} 
+                                className={`absolute top-0 transition-all duration-300 text-[8px] md:text-[9px] font-black uppercase tracking-widest whitespace-nowrap
+                                  ${isActive ? 'text-yellow-400 scale-110' : 'text-gray-700'}
+                                  ${idx === 0 ? 'left-0' : idx === cameraLabels.length - 1 ? 'right-0' : ''}
+                                `}
+                                style={idx !== 0 && idx !== cameraLabels.length - 1 ? { left: `${position}%`, transform: 'translateX(-50%)' } : {}}
+                              >
+                                {label}
+                              </span>
+                            );
+                          })}
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </section>
-              </div>
+                  </section>
+                </div>
 
-              <div className="space-y-10 flex flex-col h-full">
-                <section className="space-y-6">
-                  <h3 className="text-[11px] font-black uppercase tracking-widest text-gray-500 border-l-4 border-yellow-400 pl-4">3. Berapa budget maksimal lo?</h3>
-                  <div className="relative">
-                    <select 
-                      value={budget}
-                      onChange={(e) => setBudget(e.target.value)}
-                      className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-[11px] md:text-xs font-black uppercase tracking-widest focus:outline-none focus:border-yellow-400 appearance-none text-white cursor-pointer shadow-inner"
-                    >
-                      {budgetOptions.map(opt => (
-                        <option key={opt} value={opt} className="bg-neutral-900">{opt}</option>
-                      ))}
-                    </select>
-                    <div className="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none text-gray-500">
-                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M19 9l-7 7-7-7" /></svg>
+                <div className="space-y-10 flex flex-col h-full">
+                  <section className="space-y-6">
+                    <h3 className="text-[11px] font-black uppercase tracking-widest text-gray-500 border-l-4 border-yellow-400 pl-4">3. Budget Maksimal?</h3>
+                    <div className="relative">
+                      <select 
+                        value={budget}
+                        onChange={(e) => setBudget(e.target.value)}
+                        className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-[11px] md:text-xs font-black uppercase tracking-widest focus:outline-none focus:border-yellow-400 appearance-none text-white cursor-pointer shadow-inner"
+                      >
+                        {budgetOptions.map(opt => (
+                          <option key={opt} value={opt} className="bg-neutral-900">{opt}</option>
+                        ))}
+                      </select>
                     </div>
+                  </section>
+
+                  <section className="space-y-6">
+                    <h3 className="text-[11px] font-black uppercase tracking-widest text-gray-500 border-l-4 border-yellow-400 pl-4">4. Preferensi Lain?</h3>
+                    <input
+                      type="text"
+                      value={extra}
+                      onChange={(e) => setExtra(e.target.value)}
+                      placeholder="Contoh: Harus ada charger..."
+                      className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-[11px] md:text-xs font-bold focus:outline-none focus:border-yellow-400 text-white placeholder:text-gray-700 shadow-inner"
+                    />
+                  </section>
+
+                  <div className="pt-2 mt-auto">
+                    <button
+                      onClick={handleSearch}
+                      disabled={loading}
+                      className="w-full bg-yellow-400 text-black py-5 rounded-2xl font-black uppercase tracking-widest text-[11px] hover:bg-yellow-500 transition-all flex items-center justify-center gap-4 shadow-2xl shadow-yellow-400/30 active:scale-[0.98] group disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Cari The Perfect Match
+                    </button>
                   </div>
-                </section>
-
-                <section className="space-y-6">
-                  <h3 className="text-[11px] font-black uppercase tracking-widest text-gray-500 border-l-4 border-yellow-400 pl-4">4. Ada preferensi lain? (Opsional)</h3>
-                  <input
-                    type="text"
-                    value={extra}
-                    onChange={(e) => setExtra(e.target.value)}
-                    placeholder="Misal: Harus ada charger di box..."
-                    className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-[11px] md:text-xs font-bold focus:outline-none focus:border-yellow-400 text-white placeholder:text-gray-700 shadow-inner"
-                  />
-                </section>
-
-                <div className="pt-2 mt-auto">
-                  <button
-                    onClick={handleSearch}
-                    disabled={loading}
-                    className="w-full bg-yellow-400 text-black py-5 rounded-2xl font-black uppercase tracking-widest text-[11px] hover:bg-yellow-500 transition-all flex items-center justify-center gap-4 shadow-2xl shadow-yellow-400/30 active:scale-[0.98] group disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {loading ? 'Sedang Memproses...' : 'Mulai Pencarian'}
-                  </button>
                 </div>
               </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
 
       <div ref={resultRef} className="scroll-mt-24"></div>
@@ -237,8 +233,25 @@ const PhoneMatch: React.FC = () => {
         </div>
       )}
 
+      {error && (
+        <div className="text-center py-10 bg-red-500/10 border border-red-500/20 rounded-3xl animate-in fade-in duration-500">
+           <p className="text-red-500 font-bold uppercase text-[10px] tracking-widest">{error}</p>
+        </div>
+      )}
+
       {result && activeRecommendation && !loading && (
         <div className="space-y-12 animate-in fade-in slide-in-from-bottom-6 duration-700 pt-10 border-t border-white/5">
+          {/* Header Action */}
+          <div className="flex justify-end">
+            <button 
+              onClick={() => {setResult(null);}}
+              className="text-gray-600 hover:text-yellow-400 transition-colors text-[9px] font-black uppercase tracking-widest border-b border-gray-800 pb-1"
+            >
+              Ubah Preferensi
+            </button>
+          </div>
+
+          {/* Main Selected Card */}
           <div className="bg-yellow-400 text-black p-6 md:p-8 rounded-[2rem] space-y-6 shadow-2xl shadow-yellow-400/30 relative overflow-hidden">
             <div className="absolute top-0 right-0 w-64 h-64 bg-black/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl"></div>
             
@@ -276,13 +289,12 @@ const PhoneMatch: React.FC = () => {
             </div>
           </div>
 
-          {(result.alternatives.length > 0) && (
+          {/* Alternatives List */}
+          {(result.alternatives && result.alternatives.length > 0) && (
             <div className="space-y-5">
               <h3 className="text-[9px] font-black uppercase text-gray-500 tracking-[0.5em] pl-4 italic">Opsi Alternatif Menarik</h3>
               <div className="grid md:grid-cols-2 gap-4">
-                {[result.primary, ...result.alternatives]
-                  .filter(phone => phone.name !== activeRecommendation.name)
-                  .map((alt, i) => (
+                {result.alternatives.map((alt, i) => (
                   <button 
                     key={i} 
                     onClick={() => {

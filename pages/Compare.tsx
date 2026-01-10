@@ -3,6 +3,49 @@ import React, { useState } from 'react';
 import { getComparison } from '../services/geminiService';
 import { ComparisonResult } from '../types';
 
+const PerformanceBar = ({ label, scores, phones }: { label: string, scores: number[], phones: string[] }) => {
+  const maxScore = Math.max(...scores);
+  
+  return (
+    <div className="space-y-4 bg-[#0a0a0a] border border-white/5 p-6 rounded-3xl shadow-xl hover:border-white/10 transition-all">
+      <h4 className="text-[10px] font-black uppercase text-gray-500 tracking-[0.4em] mb-4 flex items-center gap-2">
+        <span className="w-1.5 h-1.5 bg-yellow-400 rounded-full"></span>
+        {label}
+      </h4>
+      <div className="space-y-6">
+        {scores.map((score, idx) => {
+          const isWinner = score === maxScore && score > 0;
+          return (
+            <div key={idx} className={`space-y-2 relative p-4 rounded-2xl transition-all ${isWinner ? 'bg-yellow-400/5 border border-yellow-400/30 ring-1 ring-yellow-400/10' : 'bg-transparent'}`}>
+              <div className="flex justify-between items-center mb-1">
+                <span className={`text-[10px] font-black uppercase tracking-tight italic ${isWinner ? 'text-yellow-400' : 'text-gray-400'}`}>
+                  {phones[idx]}
+                </span>
+                <div className="flex items-center gap-2">
+                  {isWinner && (
+                    <span className="bg-yellow-400 text-black text-[7px] font-black px-2 py-0.5 rounded uppercase tracking-tighter animate-pulse">
+                      Rekomendasi JagoHP
+                    </span>
+                  )}
+                  <span className={`text-xs font-black ${isWinner ? 'text-yellow-400' : 'text-white'}`}>
+                    {score}/10
+                  </span>
+                </div>
+              </div>
+              <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden">
+                <div 
+                  className={`h-full rounded-full transition-all duration-1000 ease-out ${isWinner ? 'bg-gradient-to-r from-yellow-600 to-yellow-400' : 'bg-gray-800'}`}
+                  style={{ width: `${score * 10}%` }}
+                ></div>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
 const Compare: React.FC = () => {
   const [phones, setPhones] = useState(['', '']);
   const [result, setResult] = useState<ComparisonResult | null>(null);
@@ -33,6 +76,7 @@ const Compare: React.FC = () => {
       const res = await getComparison(activePhones);
       setResult(res);
     } catch (err) {
+      console.error(err);
       setError('Gagal membandingkan. Silakan coba lagi.');
     } finally {
       setLoading(false);
@@ -71,45 +115,59 @@ const Compare: React.FC = () => {
     return { header, content };
   };
 
+  const getMetricScores = (metric: keyof typeof result.performanceScores.phone1) => {
+    const activePhones = phones.filter(p => p.trim() !== '');
+    const s = [result?.performanceScores.phone1[metric], result?.performanceScores.phone2[metric]];
+    if (activePhones.length === 3 && result?.performanceScores.phone3) {
+      s.push(result.performanceScores.phone3[metric]);
+    }
+    return s as number[];
+  };
+
   return (
-    <div className="max-w-[900px] mx-auto px-4 py-16 space-y-12">
+    <div className="max-w-[900px] mx-auto px-4 py-16 space-y-12 pb-32">
       <div className="text-center space-y-4">
         <h1 className="text-2xl md:text-4xl font-black uppercase tracking-tighter italic"><span className="text-yellow-400">Com</span>pare</h1>
-        <p className="text-gray-400 text-base md:text-base font-medium italic">Head-to-head spesifikasi biar lo gak salah pilih Smartphone.</p>
+        <p className="text-gray-400 text-sm md:text-base font-medium italic">Head-to-head spesifikasi biar lo gak salah pilih Smartphone.</p>
       </div>
 
-      <div className="grid md:grid-cols-3 gap-4">
-        {phones.map((p, i) => (
-          <div key={i} className="space-y-4">
-            <label className="text-[11px] font-black text-gray-500 uppercase tracking-widest">Smartphone {i + 1}</label>
-            <input
-              type="text"
-              value={p}
-              onChange={(e) => updatePhone(i, e.target.value)}
-              placeholder="Tuliskan nama/tipe Smartphone"
-              className="w-full bg-white/5 border border-white/20 rounded-xl px-4 py-3.5 text-xs md:text-sm focus:outline-none focus:border-yellow-400 transition-colors font-bold"
-            />
+      {/* Input Section - Hidden when result exists */}
+      {!result && !loading && (
+        <div className="space-y-12 animate-in fade-in duration-500">
+          <div className="grid md:grid-cols-3 gap-4">
+            {phones.map((p, i) => (
+              <div key={i} className="space-y-4">
+                <label className="text-[11px] font-black text-gray-500 uppercase tracking-widest">Smartphone {i + 1}</label>
+                <input
+                  type="text"
+                  value={p}
+                  onChange={(e) => updatePhone(i, e.target.value)}
+                  placeholder="Nama/tipe Smartphone"
+                  className="w-full bg-white/5 border border-white/20 rounded-xl px-4 py-3.5 text-xs md:text-sm focus:outline-none focus:border-yellow-400 transition-colors font-bold"
+                />
+              </div>
+            ))}
+            {phones.length < 3 && (
+              <button
+                onClick={addPhoneSlot}
+                className="h-[52px] mt-6 border-2 border-dashed border-white/10 rounded-xl text-gray-500 hover:text-white hover:border-white/20 transition-colors font-bold text-[9px] tracking-widest"
+              >
+                + Tambah HP
+              </button>
+            )}
           </div>
-        ))}
-        {phones.length < 3 && (
-          <button
-            onClick={addPhoneSlot}
-            className="h-[52px] mt-6 border-2 border-dashed border-white/10 rounded-xl text-gray-500 hover:text-white hover:border-white/20 transition-colors font-bold text-[9px] tracking-widest"
-          >
-            + Tambah HP
-          </button>
-        )}
-      </div>
 
-      <div className="flex justify-center">
-        <button
-          onClick={handleCompare}
-          disabled={loading}
-          className="bg-yellow-400 text-black px-10 py-3 rounded-full font-black uppercase tracking-[0.15em] text-[10px] hover:bg-yellow-500 transition-all disabled:opacity-50 shadow-xl shadow-yellow-400/10"
-        >
-          {loading ? 'Processing...' : 'Compare'}
-        </button>
-      </div>
+          <div className="flex justify-center">
+            <button
+              onClick={handleCompare}
+              disabled={loading}
+              className="bg-yellow-400 text-black px-10 py-3 rounded-full font-black uppercase tracking-[0.15em] text-[10px] hover:bg-yellow-500 transition-all disabled:opacity-50 shadow-xl shadow-yellow-400/10"
+            >
+              Compare
+            </button>
+          </div>
+        </div>
+      )}
 
       {loading && (
         <div className="text-center py-20 space-y-6 animate-in fade-in duration-500">
@@ -124,39 +182,72 @@ const Compare: React.FC = () => {
       {error && <p className="text-red-400 text-center font-bold uppercase text-[10px] tracking-widest">{error}</p>}
 
       {result && !loading && (
-        <div className="space-y-12 animate-in fade-in slide-in-from-bottom-4 duration-500">
-          <div className="overflow-x-auto bg-[#0c0c0c] rounded-3xl border border-white/10 p-5 md:p-8">
+        <div className="space-y-16 animate-in fade-in slide-in-from-bottom-4 duration-500">
+          <div className="flex justify-end mb-4">
+            <button 
+              onClick={() => {setResult(null); setPhones(['','']);}}
+              className="text-gray-600 hover:text-yellow-400 transition-colors text-[9px] font-black uppercase tracking-widest border-b border-gray-800 pb-1"
+            >
+              Bandingkan Lainnya
+            </button>
+          </div>
+
+          {/* Table Data Section */}
+          <div className="overflow-x-auto bg-[#0c0c0c] rounded-3xl border border-white/10 p-5 md:p-8 shadow-2xl">
             <table className="w-full">
               <thead>
                 <tr className="border-b border-white/10">
-                  <th className="text-left py-5 pr-4 text-gray-600 uppercase tracking-[0.3em] font-black text-[8px] w-1/4">Fitur</th>
+                  <th className="text-left py-5 pr-4 text-gray-600 uppercase tracking-[0.3em] font-black text-[8px] w-1/4">Fitur Utama</th>
                   <th className="text-left py-5 px-4 text-white font-black uppercase italic tracking-tighter text-sm md:text-base">{activePhonesHeader(0, phones)}</th>
                   <th className="text-left py-5 px-4 text-white font-black uppercase italic tracking-tighter text-sm md:text-base">{activePhonesHeader(1, phones)}</th>
-                  {phones[2] && <th className="text-left py-5 px-4 text-white font-black uppercase italic tracking-tighter text-sm md:text-base">{activePhonesHeader(2, phones)}</th>}
+                  {phones.filter(p=>p.trim()!=='').length === 3 && <th className="text-left py-5 px-4 text-white font-black uppercase italic tracking-tighter text-sm md:text-base">{activePhonesHeader(2, phones)}</th>}
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
-                {result.tableData.map((row, i) => (
-                  <tr key={i} className="hover:bg-white/[0.03] transition-colors group">
-                    <td className="py-5 pr-4 font-black text-gray-500 group-hover:text-gray-300 transition-colors uppercase text-[8px] tracking-[0.2em]">{row.feature}</td>
-                    <td className="py-5 px-4 font-bold text-yellow-400 text-[10px] md:text-[13px] tracking-tight">
-                      {row.phone1}
-                    </td>
-                    <td className="py-5 px-4 font-bold text-yellow-400 text-[10px] md:text-[13px] tracking-tight">
-                      {row.phone2}
-                    </td>
-                    {phones[2] && (
-                      <td className="py-5 px-4 font-bold text-yellow-400 text-[10px] md:text-[13px] tracking-tight">
-                        {row.phone3}
+                {result.tableData.map((row, i) => {
+                  const isPriceRow = row.feature.toLowerCase().includes('harga');
+                  return (
+                    <tr key={i} className={`transition-colors group ${isPriceRow ? 'bg-yellow-400/5' : 'hover:bg-white/[0.03]'}`}>
+                      <td className={`py-5 pr-4 font-black uppercase text-[8px] tracking-[0.2em] transition-colors ${isPriceRow ? 'text-yellow-400' : 'text-gray-500 group-hover:text-gray-300'}`}>
+                        {row.feature}
                       </td>
-                    )}
-                  </tr>
-                ))}
+                      <td className={`py-5 px-4 font-bold text-[10px] md:text-[13px] tracking-tight ${isPriceRow ? 'text-white bg-yellow-400/10' : 'text-yellow-400'}`}>
+                        {row.phone1}
+                      </td>
+                      <td className={`py-5 px-4 font-bold text-[10px] md:text-[13px] tracking-tight ${isPriceRow ? 'text-white bg-yellow-400/10' : 'text-yellow-400'}`}>
+                        {row.phone2}
+                      </td>
+                      {phones.filter(p=>p.trim()!=='').length === 3 && (
+                        <td className={`py-5 px-4 font-bold text-[10px] md:text-[13px] tracking-tight ${isPriceRow ? 'text-white bg-yellow-400/10' : 'text-yellow-400'}`}>
+                          {row.phone3}
+                        </td>
+                      )}
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
 
-          <div className="space-y-6">
+          {/* PERFORMANCE SCORES SECTION */}
+          <div className="space-y-8">
+            <div className="flex items-center gap-4">
+               <h3 className="text-xl md:text-2xl font-black uppercase text-white italic tracking-tighter">Skor Performa AI</h3>
+               <div className="h-[1px] flex-1 bg-white/10"></div>
+            </div>
+            
+            <div className="grid md:grid-cols-2 gap-6">
+              <PerformanceBar label="Chipset & Raw Power" scores={getMetricScores('chipset')} phones={phones.filter(p=>p.trim()!=='')} />
+              <PerformanceBar label="Multitasking (Memory)" scores={getMetricScores('memory')} phones={phones.filter(p=>p.trim()!=='')} />
+              <PerformanceBar label="Photography & Video" scores={getMetricScores('camera')} phones={phones.filter(p=>p.trim()!=='')} />
+              <PerformanceBar label="Gaming Experience" scores={getMetricScores('gaming')} phones={phones.filter(p=>p.trim()!=='')} />
+              <PerformanceBar label="Battery Endurance" scores={getMetricScores('battery')} phones={phones.filter(p=>p.trim()!=='')} />
+              <PerformanceBar label="Charging Speed" scores={getMetricScores('charging')} phones={phones.filter(p=>p.trim()!=='')} />
+            </div>
+          </div>
+
+          {/* Analysis Text Section */}
+          <div className="space-y-8">
             <div className="flex items-center gap-4">
                <div className="h-[1px] flex-1 bg-white/10"></div>
                <h3 className="text-[10px] font-black uppercase text-gray-500 tracking-[0.4em] whitespace-nowrap">Analisis Head-to-Head</h3>
