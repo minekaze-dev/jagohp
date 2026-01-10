@@ -18,6 +18,7 @@ const BlogDetail: React.FC = () => {
   const [newContent, setNewContent] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [cooldown, setCooldown] = useState(0);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     setIsAdmin(sessionStorage.getItem('admin_token') === 'granted');
@@ -30,7 +31,6 @@ const BlogDetail: React.FC = () => {
     setGuestId(storedId);
 
     const fetchData = async () => {
-      // Pastikan slug ada dan bersih dari whitespace
       const targetSlug = slug?.trim();
       if (!targetSlug) return;
       
@@ -44,7 +44,6 @@ const BlogDetail: React.FC = () => {
           const comms = await getCommentsByPostId(data.id);
           setComments(comms);
         } else {
-          console.error("Artikel tidak ditemukan untuk slug:", targetSlug);
           setPost(null);
         }
       } catch (err) {
@@ -66,6 +65,12 @@ const BlogDetail: React.FC = () => {
     }
     return () => clearInterval(timer);
   }, [cooldown]);
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(window.location.href);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   const handleCommentSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -119,10 +124,7 @@ const BlogDetail: React.FC = () => {
         <div className="w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center mx-auto">
           <svg className="w-10 h-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
         </div>
-        <div className="space-y-2">
-          <h2 className="text-xl font-black text-white uppercase italic tracking-tighter">Artikel Tidak Ditemukan</h2>
-          <p className="text-gray-500 text-xs font-medium italic">Maaf Kak, artikel dengan alamat ini tidak ada di database kami atau telah dihapus.</p>
-        </div>
+        <h2 className="text-xl font-black text-white uppercase italic tracking-tighter">Artikel Tidak Ditemukan</h2>
         <Link to="/blog" className="block w-full bg-yellow-400 text-black py-4 rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-lg shadow-yellow-400/20 active:scale-95 transition-all">
           Kembali ke Blog Utama
         </Link>
@@ -153,11 +155,7 @@ const BlogDetail: React.FC = () => {
           </div>
 
           <div className="relative aspect-video rounded-[2.5rem] overflow-hidden shadow-2xl border border-white/10 bg-neutral-900">
-            {post.imageUrl ? (
-              <img src={post.imageUrl} className="w-full h-full object-cover" alt={post.title} />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center text-gray-700 font-black uppercase tracking-widest italic">No Cover Image Available</div>
-            )}
+            {post.imageUrl && <img src={post.imageUrl} className="w-full h-full object-cover" alt={post.title} />}
           </div>
 
           <div 
@@ -168,6 +166,32 @@ const BlogDetail: React.FC = () => {
             prose-ul:italic prose-ol:italic prose-li:mb-2 prose-strong:text-yellow-400"
             dangerouslySetInnerHTML={{ __html: post.content || '' }}
           />
+
+          {/* SECTION BAGIKAN */}
+          <div className="py-10 border-t border-white/5 space-y-6">
+            <div className="flex items-center gap-4">
+               <h3 className="text-sm font-black text-white italic uppercase tracking-widest">Bagikan Artikel</h3>
+               <div className="h-[1px] flex-1 bg-white/5"></div>
+            </div>
+            <div className="flex flex-wrap gap-3">
+              <a 
+                href={`https://wa.me/?text=${encodeURIComponent(post.title + '\n' + window.location.href)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-emerald-500 hover:text-white transition-all shadow-lg shadow-emerald-500/5 active:scale-95"
+              >
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662c1.72 0.94 3.659 1.437 5.634 1.437h.005c6.558 0 11.894-5.335 11.897-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+                WhatsApp
+              </a>
+              <button 
+                onClick={handleCopy}
+                className={`flex items-center gap-3 px-6 py-3 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all shadow-lg active:scale-95 ${copied ? 'bg-yellow-400 text-black border-yellow-400' : 'bg-white/5 border border-white/10 text-white hover:text-yellow-400 hover:border-yellow-400'}`}
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
+                {copied ? 'Tersalin!' : 'Salin Tautan'}
+              </button>
+            </div>
+          </div>
 
           <div className="py-6 border-t border-white/5 flex items-center justify-between">
              <p className="text-[#a5c4e0] font-black italic text-xs md:text-sm uppercase tracking-tight opacity-80">
@@ -186,21 +210,19 @@ const BlogDetail: React.FC = () => {
              </div>
 
              <form onSubmit={handleCommentSubmit} className="bg-[#0a0a0a] border border-white/5 rounded-[2.5rem] p-8 space-y-6 shadow-2xl relative overflow-hidden group">
-                <div className="grid md:grid-cols-1 gap-6">
-                  <input 
-                    type="text" 
-                    value={newAuthor}
-                    onChange={(e) => setNewAuthor(e.target.value)}
-                    placeholder="Tulis nama lo..." 
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs font-bold text-white focus:border-yellow-400 outline-none transition-all"
-                  />
-                  <textarea 
-                    value={newContent}
-                    onChange={(e) => setNewContent(e.target.value)}
-                    placeholder="Tulis komentar lo disini..." 
-                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 text-xs font-medium italic text-gray-300 h-32 focus:border-yellow-400 outline-none resize-none transition-all"
-                  />
-                </div>
+                <input 
+                  type="text" 
+                  value={newAuthor}
+                  onChange={(e) => setNewAuthor(e.target.value)}
+                  placeholder="Tulis nama lo..." 
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs font-bold text-white focus:border-yellow-400 outline-none transition-all"
+                />
+                <textarea 
+                  value={newContent}
+                  onChange={(e) => setNewContent(e.target.value)}
+                  placeholder="Tulis komentar lo disini..." 
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 text-xs font-medium italic text-gray-300 h-32 focus:border-yellow-400 outline-none resize-none transition-all"
+                />
                 <button 
                   type="submit"
                   disabled={isSubmitting || cooldown > 0}
