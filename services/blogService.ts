@@ -3,7 +3,6 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.7';
 import { BlogPost, BlogComment } from "../types";
 
 const SUPABASE_URL = 'https://jgxdvxczmcpcazdhyqbi.supabase.co';
-// Anon key yang diberikan oleh user
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpneGR2eGN6bWNwY2F6ZGh5cWJpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjgwMTg3NTAsImV4cCI6MjA4MzU5NDc1MH0.xDWITn4cJXAgij9-32lT4hNZ2poRAFoFyPhhlCrs8EY';
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -26,10 +25,6 @@ export const generateSlug = (title: string): string => {
     .replace(/^-+|-+$/g, '');
 };
 
-/**
- * Mengambil semua post
- * @param includeDrafts Jika true, akan mengambil semua data (untuk admin)
- */
 export const getBlogPosts = async (includeDrafts: boolean = true): Promise<BlogPostExtended[]> => {
   try {
     let query = supabase
@@ -42,7 +37,6 @@ export const getBlogPosts = async (includeDrafts: boolean = true): Promise<BlogP
       `)
       .order('created_at', { ascending: false });
 
-    // Jika bukan admin, hanya ambil yang 'published'
     if (!includeDrafts) {
       const today = new Date().toISOString().split('T')[0];
       query = query.eq('status', 'published').lte('publish_date', today);
@@ -50,10 +44,7 @@ export const getBlogPosts = async (includeDrafts: boolean = true): Promise<BlogP
 
     const { data, error } = await query;
 
-    if (error) {
-      console.error("Supabase Error:", error);
-      return [];
-    }
+    if (error) throw error;
 
     return (data || []).map(p => ({
       id: p.id,
@@ -74,14 +65,11 @@ export const getBlogPosts = async (includeDrafts: boolean = true): Promise<BlogP
       comments: p.comments?.[0]?.count || 0
     }));
   } catch (err) {
-    console.error("Critical Blog Fetch Error:", err);
-    return [];
+    console.error("Fetch Blog Error:", err);
+    return []; // Return empty array instead of crashing
   }
 };
 
-/**
- * Simpan atau Update Post
- */
 export const saveBlogPost = async (post: any) => {
   const payload = {
     slug: post.slug,
@@ -95,7 +83,6 @@ export const saveBlogPost = async (post: any) => {
     publish_date: post.publishDate
   };
 
-  // Cek apakah ID adalah UUID Supabase yang valid (biasanya > 30 karakter)
   if (post.id && post.id.length > 20) {
     return await supabase.from('blog_posts').update(payload).eq('id', post.id);
   } else {
@@ -108,36 +95,31 @@ export const deleteBlogPost = async (id: string) => {
 };
 
 export const getBlogPostBySlug = async (slug: string): Promise<BlogPostExtended | null> => {
-  const { data, error } = await supabase
-    .from('blog_posts')
-    .select(`
-      *,
-      authors (name),
-      categories (name)
-    `)
-    .eq('slug', slug)
-    .single();
+  try {
+    const { data, error } = await supabase
+      .from('blog_posts')
+      .select(`*, authors (name), categories (name)`)
+      .eq('slug', slug)
+      .single();
 
-  if (error || !data) return null;
+    if (error || !data) return null;
 
-  // Increment views secara asinkron tanpa menunggu
-  supabase.rpc('increment_views', { post_id: data.id }).catch(() => {
-    // Fallback jika RPC tidak tersedia
-    supabase.from('blog_posts').update({ views: (data.views || 0) + 1 }).eq('id', data.id).then();
-  });
+    supabase.rpc('increment_views', { post_id: data.id }).catch(() => {});
 
-  return {
-    ...data,
-    author: data.authors?.name,
-    category: data.categories?.name,
-    categories: [data.categories?.name],
-    imageUrl: data.image_url,
-    publishDate: data.publish_date
-  } as BlogPostExtended;
+    return {
+      ...data,
+      author: data.authors?.name,
+      category: data.categories?.name,
+      categories: [data.categories?.name],
+      imageUrl: data.image_url,
+      publishDate: data.publish_date
+    } as BlogPostExtended;
+  } catch {
+    return null;
+  }
 };
 
-// --- Manajemen Kategori ---
-export const getCategories = async (): Promise<{id: string, name: string}[]> => {
+export const getCategories = async () => {
   const { data } = await supabase.from('categories').select('*').order('name');
   return data || [];
 };
@@ -150,8 +132,7 @@ export const deleteCategory = async (id: string) => {
   return await supabase.from('categories').delete().eq('id', id);
 };
 
-// --- Manajemen Author ---
-export const getAuthors = async (): Promise<{id: string, name: string}[]> => {
+export const getAuthors = async () => {
   const { data } = await supabase.from('authors').select('*').order('name');
   return data || [];
 };
@@ -160,7 +141,6 @@ export const saveAuthor = async (name: string) => {
   return await supabase.from('authors').insert([{ name }]);
 };
 
-// --- Manajemen Komentar ---
 export const getCommentsByPostId = async (postId: string): Promise<BlogComment[]> => {
   const { data } = await supabase
     .from('comments')

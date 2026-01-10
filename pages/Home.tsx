@@ -93,7 +93,7 @@ const Home: React.FC = () => {
       {newsItems.length > 0 && (
         <section className="space-y-8 pt-8">
           <div className="flex items-end justify-between border-b border-white/5 pb-2">
-            <h2 className="text-2xl font-black uppercase italic tracking-tighter">Berita Cloud <span className="text-yellow-400">Terbaru</span></h2>
+            <h2 className="text-2xl font-black uppercase italic tracking-tighter">Berita Gadget <span className="text-yellow-400">Terbaru</span></h2>
             <Link to="/blog" className="text-gray-500 text-[10px] font-black uppercase hover:text-white border-b border-gray-800 pb-1">Lihat Semua</Link>
           </div>
           
