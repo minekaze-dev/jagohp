@@ -207,8 +207,8 @@ const Footer = ({ onDonateClick }: { onDonateClick: () => void }) => (
       <nav className="flex flex-wrap justify-center gap-8">
         <button onClick={onDonateClick} className="text-[10px] font-black uppercase text-gray-500 hover:text-yellow-400">Donasi</button>
         <Link to="/faq" className="text-[10px] font-black uppercase text-gray-500 hover:text-yellow-400">FAQ</Link>
-        <Link to="/privacy" className="text-[10px] font-black uppercase text-gray-500 hover:text-yellow-400">Privacy Policy</Link>
-        <Link to="/terms" className="text-[10px] font-black uppercase text-gray-500 hover:text-yellow-400">Terms & Condition</Link>
+        <Link to="/privacy" className="text-[10px] font-black uppercase text-gray-500 hover:text-yellow-400">Kebijakan Privasi</Link>
+        <Link to="/terms" className="text-[10px] font-black uppercase text-gray-500 hover:text-yellow-400">Syarat Ketentuan</Link>
       </nav>
       <p className="text-gray-600 text-[10px] uppercase font-black tracking-widest">© 2025 - 2026 JAGOHP | #1 Portal Gadget Smartphone Berbasis AI</p>
     </div>
