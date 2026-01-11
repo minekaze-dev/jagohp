@@ -161,10 +161,8 @@ const Home: React.FC = () => {
             className="w-full group relative flex items-center justify-between bg-yellow-400 text-black px-6 py-0.5 rounded-[2.5rem] hover:bg-yellow-500 transition-all duration-300 shadow-2xl shadow-yellow-400/10"
           >
             <div className="flex items-center gap-4">
-              <div className="bg-black/10 p-2.5 rounded-full">
-              <svg className="w-5 h-5 md:w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-              </svg>
+              <div className="bg-black/10 p-2 md:p-2.5 rounded-full">
+                <img src="https://imgur.com/d3OzP78.jpg" className="w-5 h-5 md:w-7 h-7 object-contain rounded-lg" alt="JAGOBOT" />
               </div>
               <span className="text-sm md:text-sm font-black tracking-tight italic">Cari HP apa Kak? Tanya dulu aja sini</span>
             </div>

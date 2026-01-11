@@ -134,7 +134,7 @@ const TopTier: React.FC = () => {
           </div>
 
           <div className="text-center pt-10">
-            <p className="text-[10px] font-black text-gray-700 uppercase tracking-[0.6em] italic">Data Top Tier diperbarui secara per 3 bulan</p>
+            <p className="text-[10px] font-black text-gray-700 uppercase tracking-[0.6em] italic">Data Top Tier akan selalu diperbarui per 3 bulan</p>
           </div>
         </div>
       ) : null}

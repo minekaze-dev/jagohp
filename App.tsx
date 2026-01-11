@@ -49,6 +49,7 @@ const Header: React.FC = () => {
         { name: 'Compare', path: '/compare' },
         { name: 'Phone Match', path: '/match' },
         { name: 'Blog', path: '/blog' },
+        { name: 'Tentang', path: '/about' },
       ];
 
   return (
@@ -66,13 +67,13 @@ const Header: React.FC = () => {
           </Link>
         </div>
 
-        {/* Menu Navigasi Presisi di Tengah */}
-        <nav className="hidden lg:flex absolute left-1/2 -translate-x-1/2 items-center gap-7">
+        {/* Menu Navigasi Presisi di Tengah - Gap dikecilkan agar muat 1 baris */}
+        <nav className="hidden lg:flex absolute left-1/2 -translate-x-1/2 items-center gap-5 whitespace-nowrap">
           {navItems.map((item) => (
             <Link
               key={item.path}
               to={item.path}
-              className={`text-[9px] font-black uppercase tracking-[0.2em] transition-all hover:text-yellow-400 ${
+              className={`text-[9px] font-black uppercase tracking-[0.15em] transition-all hover:text-yellow-400 ${
                 isActive(item.path) ? 'text-yellow-400' : 'text-gray-500'
               }`}
             >
@@ -88,22 +89,9 @@ const Header: React.FC = () => {
               to="/top-tier" 
               className="bg-yellow-400 text-black px-3 py-2 md:px-4 md:py-2.5 rounded-xl text-[8px] md:text-[9px] font-black uppercase tracking-widest hover:bg-yellow-500 transition-all flex items-center gap-2 shadow-lg shadow-yellow-400/20"
             >
-              <svg className="w-3.5 h-3.5 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-7.714 2.143L11 21l-2.286-6.857L1 12l7.714-2.143L11 3z" />
-              </svg>
-              <span className="inline">Top Tier</span>
+            <span className="inline">🏆 Top Tier</span>
             </Link>
           )}
-
-          <Link 
-            to="/about" 
-            className="bg-yellow-400 text-black px-3 py-2 md:px-4 md:py-2.5 rounded-xl text-[8px] md:text-[9px] font-black uppercase tracking-widest hover:bg-yellow-500 transition-all flex items-center gap-2 shadow-lg shadow-yellow-400/20"
-          >
-            <svg className="w-3.5 h-3.5 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <span className="inline">Tentang</span>
-          </Link>
 
           {isAdmin && (
             <button 
@@ -133,11 +121,12 @@ const BottomNavbar: React.FC = () => {
   };
 
   const userNavItems = [
-    { name: 'HOME', path: '/', icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg> },
+    { name: 'BERANDA', path: '/', icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg> },
     { name: 'REVIEW', path: '/review', icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg> },
     { name: 'COMPARE', path: '/compare', icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg> },
     { name: 'MATCH', path: '/match', icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"/></svg> },
-    { name: 'BLOG', path: '/blog', icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10l4 4v10a2 2 0 01-2 2zM14 4v4h4"/></svg> }
+    { name: 'BLOG', path: '/blog', icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10l4 4v10a2 2 0 01-2 2zM14 4v4h4"/></svg> },
+    { name: 'TENTANG', path: '/about', icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> }
   ];
 
   const adminNavItems = [
@@ -150,18 +139,18 @@ const BottomNavbar: React.FC = () => {
   const currentNav = isAdmin ? adminNavItems : userNavItems;
 
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-[200] bg-black/90 backdrop-blur-2xl border-t border-white/10 px-2 pb-safe pt-2">
-      <div className="flex items-center justify-around">
+    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-[200] bg-black/90 backdrop-blur-2xl border-t border-white/10 px-1 pb-safe pt-2">
+      <div className="flex items-center justify-between">
         {currentNav.map((item) => (
           item.path === '#logout' ? (
-            <button key={item.path} onClick={handleLogout} className="flex flex-col items-center gap-1 py-2 px-3 text-gray-500">
+            <button key={item.path} onClick={handleLogout} className="flex flex-col items-center gap-1 py-2 px-1 text-gray-500 flex-1">
               {item.icon}
-              <span className="text-[8px] font-black uppercase tracking-widest">{item.name}</span>
+              <span className="text-[7px] font-black uppercase tracking-widest leading-none">{item.name}</span>
             </button>
           ) : (
-            <Link key={item.path} to={item.path} className={`flex flex-col items-center gap-1 py-2 px-3 ${isActive(item.path) ? 'text-yellow-400' : 'text-gray-500'}`}>
+            <Link key={item.path} to={item.path} className={`flex flex-col items-center gap-1 py-2 px-1 flex-1 ${isActive(item.path) ? 'text-yellow-400' : 'text-gray-500'}`}>
               {item.icon}
-              <span className="text-[8px] font-black uppercase tracking-widest">{item.name}</span>
+              <span className="text-[7px] font-black uppercase tracking-widest leading-none">{item.name}</span>
             </Link>
           )
         ))}

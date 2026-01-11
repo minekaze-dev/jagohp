@@ -62,7 +62,6 @@ const AIChat: React.FC = () => {
         parts: [{ text: msg.content }]
       }));
 
-      // Fix: Create a new GoogleGenAI instance right before making the API call as per guidelines
       const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
       const response = await ai.models.generateContent({
         model: 'gemini-3-flash-preview',
@@ -99,8 +98,8 @@ const AIChat: React.FC = () => {
     <div className="max-w-[800px] mx-auto px-4 py-6 h-[calc(100vh-100px)] flex flex-col">
       <div className="flex items-center justify-between mb-6 border-b border-white/10 pb-4">
         <div className="flex items-center gap-4">
-          <div className="bg-yellow-400 p-1.5 rounded-2xl shadow-xl shadow-yellow-400/20">
-            <img src="https://imgur.com/C9MiCU8.jpg" className="w-12 h-12 object-contain rounded-xl" alt="JAGOHP AI" />
+          <div className="bg-yellow-400 p-1 rounded-2xl shadow-xl shadow-yellow-400/20">
+            <img src="https://imgur.com/d3OzP78.jpg" className="w-12 h-12 object-contain rounded-xl" alt="JAGOBOT AI" />
           </div>
           <div>
             <h1 className="text-xl font-black uppercase tracking-tighter italic">JAGOBOT AI</h1>
