@@ -3,8 +3,6 @@ import React, { useState, useRef, useEffect } from 'react';
 import { GoogleGenAI } from "@google/genai";
 import { useNavigate } from 'react-router-dom';
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-
 interface Message {
   role: 'user' | 'model';
   content: string;
@@ -64,6 +62,8 @@ const AIChat: React.FC = () => {
         parts: [{ text: msg.content }]
       }));
 
+      // Fix: Create a new GoogleGenAI instance right before making the API call as per guidelines
+      const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
       const response = await ai.models.generateContent({
         model: 'gemini-3-flash-preview',
         contents: history,

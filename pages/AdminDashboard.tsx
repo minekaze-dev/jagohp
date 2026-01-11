@@ -94,9 +94,14 @@ const AdminDashboard: React.FC = () => {
           <h1 className="text-3xl font-black uppercase italic tracking-tighter"><span className="text-yellow-400">Admin</span> Dashboard</h1>
           <p className="text-gray-500 text-[10px] font-black uppercase tracking-[0.4em]">Database Status: <span className="text-emerald-500">Connected to Supabase</span></p>
         </div>
-        <button onClick={() => navigate('/admin/editor')} className="bg-yellow-400 text-black px-8 py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-yellow-500 transition-all shadow-lg active:scale-95">
-          + Tulis Berita
-        </button>
+        <div className="flex gap-3">
+          <button onClick={() => navigate('/admin/top-tier')} className="bg-white/5 border border-white/10 text-white px-6 py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition-all shadow-lg active:scale-95">
+            Manage Top Tier
+          </button>
+          <button onClick={() => navigate('/admin/editor')} className="bg-yellow-400 text-black px-8 py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-yellow-500 transition-all shadow-lg active:scale-95">
+            + Tulis Berita
+          </button>
+        </div>
       </div>
 
       {loading ? (

@@ -100,6 +100,26 @@ export interface RecommendationResponse {
   alternatives: RecommendedPhone[];
 }
 
+export interface TopTierPhone {
+  rank: number;
+  name: string;
+  reason: string;
+  price: string;
+  specs: {
+    processor: string;
+    screen: string;
+    camera: string;
+    battery: string;
+    ramStorage: string;
+  };
+}
+
+export interface TopTierResponse {
+  category: string;
+  description: string;
+  phones: TopTierPhone[];
+}
+
 export interface BlogPost {
   id: string;
   slug: string;
