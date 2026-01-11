@@ -18,7 +18,8 @@ export const getTopTierRankings = async (category: string): Promise<TopTierRespo
   const response = await ai.models.generateContent({
     model: 'gemini-3-flash-preview',
     contents: `${REAL_WORLD_DATA_INSTRUCTION}
-    Berikan ranking 3 smartphone teratas (Top Tier) untuk kategori: ${category}.
+    Berikan HANYA 1 smartphone terbaik mutlak (Peringkat #1) untuk kategori: ${category}.
+    Jangan berikan ranking 2 atau 3. Fokus pada pemenang utama di kategori tersebut.
     Gunakan harga pasar Indonesia terbaru.`,
     config: {
       tools: [{googleSearch: {}}],

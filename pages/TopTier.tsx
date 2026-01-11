@@ -4,15 +4,13 @@ import { getSavedTopTier } from '../services/topTierService';
 import { TopTierResponse, TopTierPhone } from '../types';
 
 const TierCard: React.FC<{ phone: TopTierPhone }> = ({ phone }) => (
-  <div className="bg-[#0c0c0c] border border-white/5 rounded-[2.5rem] p-8 md:p-12 space-y-8 shadow-2xl relative overflow-hidden group hover:border-yellow-400/30 transition-all duration-500 w-full">
+  <div className="bg-[#0c0c0c] border border-white/5 rounded-[2.5rem] p-8 md:p-12 space-y-8 shadow-2xl relative overflow-hidden group hover:border-yellow-400/30 transition-all duration-500 w-full animate-in fade-in zoom-in duration-700">
     <div className="absolute top-0 right-0 w-64 h-64 bg-yellow-400/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-[80px] group-hover:bg-yellow-400/10 transition-colors"></div>
     
     <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 relative z-10">
       <div className="flex items-center gap-6">
-        <div className={`w-16 h-16 rounded-3xl flex items-center justify-center text-3xl font-black italic shadow-2xl transform transition-transform group-hover:scale-110 duration-500 ${
-          phone.rank === 1 ? 'bg-yellow-400 text-black shadow-yellow-400/20' : 'bg-white/5 text-white border border-white/10'
-        }`}>
-          #{phone.rank}
+        <div className="w-16 h-16 rounded-3xl flex items-center justify-center text-3xl font-black italic shadow-2xl transform transition-transform group-hover:scale-110 duration-500 bg-yellow-400 text-black shadow-yellow-400/20">
+          #1
         </div>
         <div>
           <h3 className="text-2xl md:text-4xl font-black text-white uppercase italic tracking-tighter leading-none group-hover:text-yellow-400 transition-colors">{phone.name}</h3>
@@ -20,11 +18,9 @@ const TierCard: React.FC<{ phone: TopTierPhone }> = ({ phone }) => (
         </div>
       </div>
       
-      {phone.rank === 1 && (
-        <div className="bg-yellow-400/10 border border-yellow-400/20 text-yellow-400 px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-[0.3em] animate-pulse">
-          🏆 Juara Bertahan
-        </div>
-      )}
+      <div className="bg-yellow-400/10 border border-yellow-400/20 text-yellow-400 px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-[0.3em] animate-pulse">
+        🏆 Pilihan Terbaik
+      </div>
     </div>
 
     <div className="relative">
@@ -34,7 +30,7 @@ const TierCard: React.FC<{ phone: TopTierPhone }> = ({ phone }) => (
       </p>
     </div>
 
-    <div className="grid grid-cols-2 md:grid-cols-5 gap-4 pt-4">
+    <div className="grid grid-cols-2 md:grid-cols-5 gap-4 pt-4 relative z-10">
       <div className="bg-white/5 p-4 rounded-2xl border border-white/5 space-y-1 group-hover:bg-white/[0.07] transition-colors">
         <span className="text-gray-600 text-[8px] font-black uppercase tracking-widest block">Processor</span>
         <span className="text-white text-xs font-bold block">{phone.specs.processor}</span>
@@ -92,12 +88,14 @@ const TopTier: React.FC = () => {
   }, []);
 
   const data = allData.find(d => d.category === activeCategory);
+  // Hanya ambil peringkat #1 jika ada
+  const topPhone = data?.phones?.find(p => p.rank === 1) || data?.phones?.[0];
 
   return (
     <div className="max-w-[1000px] mx-auto px-4 py-16 space-y-12 pb-32">
       <div className="text-center space-y-4">
         <h1 className="text-3xl md:text-4xl font-black uppercase tracking-tighter italic"><span className="text-yellow-400">Top</span> Tier Rank</h1>
-        <p className="text-gray-500 text-sm md:text-base font-medium italic max-w-xl mx-auto">3 Top Tier Smartphone per Januari 2026 menurut Jagohp.</p>
+        <p className="text-gray-500 text-sm md:text-base font-medium italic max-w-xl mx-auto">The Best Smartphone per Januari 2026 menurut Jagohp.</p>
       </div>
 
       <div className="flex flex-wrap justify-center gap-2">
@@ -123,17 +121,15 @@ const TopTier: React.FC = () => {
         <div className="space-y-16 animate-in fade-in duration-700">
           <div className="bg-[#0a0a0a] border border-white/5 rounded-[2.5rem] p-10 md:p-14 text-center space-y-6 shadow-inner relative overflow-hidden">
             <div className="absolute inset-0 bg-yellow-400/[0.02] pointer-events-none"></div>
-            <h2 className="text-2xl md:text-4xl font-black uppercase italic tracking-tighter relative z-10">The Best of <span className="text-yellow-400">{data.category}</span></h2>
+            <h2 className="text-2xl md:text-4xl font-black uppercase italic tracking-tighter relative z-10">Best of <span className="text-yellow-400">{data.category}</span></h2>
             <p className="text-gray-500 text-sm md:text-lg italic font-medium max-w-2xl mx-auto relative z-10">"{data.description}"</p>
           </div>
           
-          <div className="flex flex-col gap-8">
-            {data.phones && data.phones.length > 0 ? (
-              [...data.phones]
-                .sort((a, b) => a.rank - b.rank)
-                .map((phone, i) => (<TierCard key={i} phone={phone} />))
+          <div className="flex flex-col items-center">
+            {topPhone ? (
+              <TierCard phone={topPhone} />
             ) : (
-              <div className="py-20 text-center border-2 border-dashed border-white/5 rounded-[3rem]"><p className="text-gray-700 font-black uppercase text-xs italic">Data belum diperbarui bulan ini.</p></div>
+              <div className="py-20 text-center border-2 border-dashed border-white/5 rounded-[3rem] w-full"><p className="text-gray-700 font-black uppercase text-xs italic">Data belum diperbarui bulan ini.</p></div>
             )}
           </div>
 
