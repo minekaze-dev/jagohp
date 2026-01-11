@@ -95,7 +95,7 @@ const Header: React.FC = () => {
                 to="/top-tier" 
                 className="bg-yellow-400 text-black px-3 py-2 md:px-4 md:py-2.5 rounded-xl text-[8px] md:text-[9px] font-black uppercase tracking-widest hover:bg-yellow-500 transition-all flex items-center gap-2 shadow-lg shadow-yellow-400/20"
               >
-                <span className="inline text-[9px]">🏆 Top Tier</span>
+                <span className="inline text-[9px]">🏆 Top Tier Rank</span>
               </Link>
             </>
           )}
