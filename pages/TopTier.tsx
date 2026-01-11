@@ -94,7 +94,7 @@ const TopTier: React.FC = () => {
     <div className="bg-black min-h-screen transition-colors duration-500">
       <div className="max-w-[1000px] mx-auto px-4 py-16 space-y-12 pb-32">
         <div className="text-center space-y-4">
-          <h1 className="text-2xl md:text-5xl font-black uppercase tracking-tighter italic text-white leading-none">
+          <h1 className="text-2xl md:text-4xl font-black uppercase tracking-tighter italic text-white leading-none">
             Top Tier <span className="text-yellow-400">Rank</span>
           </h1>
           <p className="text-gray-400 text-sm md:text-base font-bold italic max-w-xl mx-auto">
