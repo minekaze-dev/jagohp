@@ -150,7 +150,7 @@ const Blog: React.FC = () => {
         <div className="inline-block bg-yellow-400 text-black px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-[0.3em] italic mb-2">
           Update Mingguan
         </div>
-        <h1 className="text-3xl md:text-4xl font-black uppercase italic tracking-tighter">
+        <h1 className="text-2xl md:text-4xl font-black uppercase italic tracking-tighter">
           Blog & <span className="text-yellow-400">Berita</span>
         </h1>
         <p className="text-gray-500 text-sm md:text-base font-medium italic">

@@ -5,8 +5,8 @@ const About: React.FC = () => {
   return (
     <div className="max-w-[900px] mx-auto px-4 py-24 space-y-16">
       <section className="text-center space-y-6">
-        <h1 className="text-5xl font-bold tracking-tight">Cerdas Memilih <br /> <span className="text-yellow-400">Gadget Masa Depan.</span></h1>
-        <p className="text-gray-400 text-lg max-w-2xl mx-auto leading-relaxed">
+        <h1 className="text-2xl md:text-4xl font-bold tracking-tight uppercase">Cerdas Memilih <br /> <span className="text-yellow-400">Gadget Masa Depan</span></h1>
+        <p className="text-gray-400 text-sm md:text-lg max-w-2xl mx-auto leading-relaxed">
           JAGOHP lahir dari keinginan untuk menyederhanakan proses pemilihan gadget yang semakin kompleks. Kami percaya teknologi harus membantu, bukan membingungkan apalagi disalahgunakan.
         </p>
       </section>
