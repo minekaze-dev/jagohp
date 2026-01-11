@@ -11,7 +11,6 @@ const BlogCard: React.FC<{ post: BlogPostExtended }> = ({ post }) => {
   const shareUrl = `${window.location.origin}/#/blog/${post.slug}`;
   const shareText = encodeURIComponent(`${post.title}\nBaca selengkapnya di JAGOHP: `);
 
-  // Menutup menu jika klik di luar
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (shareMenuRef.current && !shareMenuRef.current.contains(event.target as Node)) {
@@ -50,9 +49,12 @@ const BlogCard: React.FC<{ post: BlogPostExtended }> = ({ post }) => {
 
       <div className="flex-1 p-6 md:p-8 flex flex-col justify-between space-y-4">
         <div className="space-y-4">
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap items-center gap-3">
             <span className="text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-lg bg-yellow-400 text-black">
               {post.category}
+            </span>
+            <span className="text-[9px] font-bold text-gray-600 uppercase tracking-widest">
+              {new Date(post.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
             </span>
           </div>
 

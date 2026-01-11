@@ -94,11 +94,11 @@ const AdminDashboard: React.FC = () => {
           <h1 className="text-3xl font-black uppercase italic tracking-tighter"><span className="text-yellow-400">Admin</span> Dashboard</h1>
           <p className="text-gray-500 text-[10px] font-black uppercase tracking-[0.4em]">Database Status: <span className="text-emerald-500">Connected to Supabase</span></p>
         </div>
-        <div className="flex gap-3">
-          <button onClick={() => navigate('/admin/top-tier')} className="bg-white/5 border border-white/10 text-white px-6 py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition-all shadow-lg active:scale-95">
+        <div className="flex flex-wrap gap-2 w-full md:w-auto">
+          <button onClick={() => navigate('/admin/top-tier')} className="flex-1 md:flex-none bg-white/5 border border-white/10 text-white px-5 py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition-all shadow-lg active:scale-95">
             Manage Top Tier
           </button>
-          <button onClick={() => navigate('/admin/editor')} className="bg-yellow-400 text-black px-8 py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-yellow-500 transition-all shadow-lg active:scale-95">
+          <button onClick={() => navigate('/admin/editor')} className="flex-1 md:flex-none bg-yellow-400 text-black px-6 py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-yellow-500 transition-all shadow-lg active:scale-95">
             + Tulis Berita
           </button>
         </div>
@@ -110,7 +110,7 @@ const AdminDashboard: React.FC = () => {
           <p className="text-gray-600 font-black uppercase tracking-widest italic text-[10px]">Mengambil data terbaru dari Cloud...</p>
         </div>
       ) : (
-        <div className="grid lg:grid-cols-4 gap-10">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-10">
           <div className="lg:col-span-2 space-y-6">
             <h2 className="text-sm font-black uppercase tracking-[0.3em] text-gray-400 italic">Daftar Artikel ({posts.length})</h2>
             <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2 custom-scrollbar">
@@ -122,7 +122,7 @@ const AdminDashboard: React.FC = () => {
                        <span className={`text-[7px] font-black px-2 py-0.5 rounded uppercase tracking-widest ${post.status === 'published' ? 'bg-emerald-500/10 text-emerald-500' : 'bg-yellow-400/10 text-yellow-400'}`}>
                          {post.status}
                        </span>
-                       <span className="text-[7px] font-black text-gray-600 uppercase tracking-widest">{post.category}</span>
+                       <span className="text-[7px] font-black text-gray-600 uppercase tracking-widest truncate">{post.category}</span>
                     </div>
                     <h3 className="text-xs font-bold text-white uppercase italic tracking-tight truncate">{post.title}</h3>
                   </div>
@@ -147,10 +147,10 @@ const AdminDashboard: React.FC = () => {
                     type="text" 
                     value={newCat} 
                     onChange={e => setNewCat(e.target.value)} 
-                    placeholder="Nama kategori baru..."
+                    placeholder="Nama baru..."
                     className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs font-bold text-white focus:border-yellow-400 outline-none transition-all"
                   />
-                  <button type="submit" className="bg-yellow-400 text-black px-6 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-yellow-500 transition-all">Tambah</button>
+                  <button type="submit" className="bg-yellow-400 text-black px-4 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-yellow-500 transition-all">Add</button>
                 </form>
                 <div className="flex flex-wrap gap-2">
                   {categories.map(cat => (
@@ -172,10 +172,10 @@ const AdminDashboard: React.FC = () => {
                     type="text" 
                     value={newAuthor} 
                     onChange={e => setNewAuthor(e.target.value)} 
-                    placeholder="Nama penulis baru..."
+                    placeholder="Nama penulis..."
                     className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs font-bold text-white focus:border-yellow-400 outline-none transition-all"
                   />
-                  <button type="submit" className="bg-white text-black px-6 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-gray-200 transition-all">Tambah</button>
+                  <button type="submit" className="bg-white text-black px-4 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-gray-200 transition-all">Add</button>
                 </form>
                 <div className="flex flex-wrap gap-2">
                   {authors.map(a => (

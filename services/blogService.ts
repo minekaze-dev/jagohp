@@ -27,18 +27,14 @@ export const generateSlug = (title: string): string => {
 
 /**
  * Fungsi untuk mengunggah gambar ke Supabase Storage
- * Menggunakan bucket 'IMAGES' (Huruf Besar) sesuai konfigurasi di Dashboard Supabase user
  */
 export const uploadImage = async (file: File): Promise<string> => {
   const fileExt = file.name.split('.').pop();
   const fileName = `${Math.random().toString(36).substring(2)}_${Date.now()}.${fileExt}`;
-  
-  // Menggunakan path langsung tanpa folder 'uploads/' agar lebih aman jika policy user terbatas
-  // Jika Anda ingin tetap pakai folder, pastikan policy di Supabase mengizinkan path 'uploads/*'
   const filePath = `${fileName}`; 
 
   const { error: uploadError } = await supabase.storage
-    .from('IMAGES') // Menyamakan dengan screenshot user (case-sensitive)
+    .from('IMAGES')
     .upload(filePath, file);
 
   if (uploadError) {
@@ -62,7 +58,7 @@ export const getBlogPosts = async (includeDrafts: boolean = true): Promise<BlogP
         authors (name),
         categories (name)
       `)
-      .order('created_at', { ascending: false });
+      .order('publish_date', { ascending: false }); // Urutkan berdasarkan tanggal publikasi
 
     if (!includeDrafts) {
       const today = new Date().toISOString().split('T')[0];
@@ -80,7 +76,7 @@ export const getBlogPosts = async (includeDrafts: boolean = true): Promise<BlogP
       author_id: p.author_id,
       excerpt: p.excerpt,
       content: p.content,
-      date: p.created_at,
+      date: p.publish_date || p.created_at, // Menggunakan tanggal pilihan editor
       publishDate: p.publish_date,
       status: p.status,
       category: p.categories?.name || 'Uncategorized',
@@ -128,7 +124,7 @@ const mapToExtended = (data: any): BlogPostExtended => ({
   title: data.title,
   excerpt: data.excerpt,
   content: data.content,
-  date: data.created_at,
+  date: data.publish_date || data.created_at, // Menggunakan tanggal pilihan editor
   status: data.status,
   publishDate: data.publish_date,
   views: data.views || 0,

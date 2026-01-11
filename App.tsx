@@ -55,7 +55,6 @@ const Header: React.FC = () => {
   return (
     <header className="sticky top-0 z-[100] bg-gradient-to-b from-neutral-900 via-black/95 to-black backdrop-blur-md border-b border-white/10">
       <div className="max-w-[1000px] mx-auto px-4 h-20 flex items-center justify-between relative">
-        {/* Logo ke Kiri */}
         <div className="flex-shrink-0 relative z-[110]">
           <Link to="/" className="flex items-center group">
             <img 
@@ -67,7 +66,6 @@ const Header: React.FC = () => {
           </Link>
         </div>
 
-        {/* Menu Navigasi Tengah Desktop - Font diperbesar dan jarak ditambah */}
         <nav className="hidden lg:flex absolute left-1/2 -translate-x-1/2 items-center gap-7 whitespace-nowrap">
           {navItems.map((item) => (
             <Link
@@ -82,11 +80,9 @@ const Header: React.FC = () => {
           ))}
         </nav>
 
-        {/* Action Buttons ke Kanan */}
         <div className="flex items-center gap-2 relative z-[110]">
           {!isAdmin && (
             <>
-              {/* Menu Blog untuk Mobile (Hidden di Desktop) */}
               <Link 
                 to="/blog" 
                 className={`lg:hidden text-[9px] font-black uppercase tracking-widest px-3 py-2 rounded-xl border transition-all ${
@@ -140,8 +136,8 @@ const BottomNavbar: React.FC = () => {
   ];
 
   const adminNavItems = [
-    { name: 'ADMIN', path: '/admin', icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg> },
-    { name: 'TENTANG', path: '/about', icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg> },
+    { name: 'DASHBOARD', path: '/admin', icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg> },
+    { name: 'BLOG', path: '/blog', icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6m-6 4h10"/></svg> },
     { name: 'LOGOUT', path: '#logout', icon: <svg className="w-5 h-5 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg> }
   ];
 

@@ -43,7 +43,12 @@ const NewsCard: React.FC<{ item: BlogPostExtended }> = ({ item }) => {
       </div>
       <div className="flex-1 p-5 md:p-6 flex flex-col justify-between">
         <div className="space-y-3">
-          <span className="text-[8px] font-black uppercase tracking-widest px-2 py-1 rounded bg-yellow-400 text-black inline-block">{item.category}</span>
+          <div className="flex items-center gap-3">
+            <span className="text-[8px] font-black uppercase tracking-widest px-2 py-1 rounded bg-yellow-400 text-black inline-block">{item.category}</span>
+            <span className="text-[8px] font-bold text-gray-600 uppercase tracking-widest">
+              {new Date(item.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
+            </span>
+          </div>
           <Link to={`/blog/${item.slug}`}>
             <h4 className="text-sm md:text-base font-black text-white uppercase italic tracking-tighter group-hover:text-yellow-400 transition-colors line-clamp-2 leading-tight">
               {item.title}
