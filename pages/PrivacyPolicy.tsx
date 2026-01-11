@@ -5,7 +5,7 @@ const PrivacyPolicy: React.FC = () => {
   return (
     <div className="max-w-[800px] mx-auto px-4 py-20 space-y-12 pb-32">
       <div className="text-center space-y-4">
-        <h1 className="text-3xl md:text-4xl font-black uppercase tracking-tighter italic text-white"><span className="text-yellow-400">Privacy</span> Policy</h1>
+        <h1 className="text-3xl md:text-4xl font-black uppercase tracking-tighter italic text-white"><span className="text-yellow-400">Kebijakan</span> Privasi</h1>
         <p className="text-gray-500 text-[10px] font-black uppercase tracking-[0.4em]">Terakhir Diperbarui: Januari 2026</p>
       </div>
 
