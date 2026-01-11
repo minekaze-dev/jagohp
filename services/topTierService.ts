@@ -15,10 +15,10 @@ export const getSavedTopTier = async (): Promise<TopTierResponse[]> => {
 
   if (error) throw error;
 
-  return data.map((cat: any) => ({
+  return (data || []).map((cat: any) => ({
     category: cat.name,
     description: cat.description,
-    phones: cat.top_tier_rankings
+    phones: (cat.top_tier_rankings || [])
       .sort((a: any, b: any) => a.rank - b.rank)
       .map((p: any) => ({
         rank: p.rank,
@@ -37,7 +37,6 @@ export const getSavedTopTier = async (): Promise<TopTierResponse[]> => {
 };
 
 export const saveTopTierRankings = async (categoryName: string, phones: TopTierPhone[]) => {
-  // 1. Dapatkan Category ID
   const { data: cat } = await supabase
     .from('top_tier_categories')
     .select('id')
@@ -46,11 +45,9 @@ export const saveTopTierRankings = async (categoryName: string, phones: TopTierP
 
   if (!cat) throw new Error("Kategori tidak ditemukan");
 
-  // 2. Hapus ranking lama untuk kategori ini
   await supabase.from('top_tier_rankings').delete().eq('category_id', cat.id);
 
-  // 3. Masukkan ranking baru
-  const rows = phones.map(p => ({
+  const rows = (phones || []).map(p => ({
     category_id: cat.id,
     rank: p.rank,
     name: p.name,
@@ -66,6 +63,5 @@ export const saveTopTierRankings = async (categoryName: string, phones: TopTierP
   const { error } = await supabase.from('top_tier_rankings').insert(rows);
   if (error) throw error;
 
-  // 4. Update timestamp kategori
   await supabase.from('top_tier_categories').update({ updated_at: new Date().toISOString() }).eq('id', cat.id);
 };

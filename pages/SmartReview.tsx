@@ -38,8 +38,12 @@ const SmartReview: React.FC = () => {
     setError('');
     try {
       const result = await getSmartReview(query);
-      setReview(result.review);
-      setSources(result.sources);
+      if (result && result.review) {
+        setReview(result.review);
+        setSources(result.sources || []);
+      } else {
+        setError('Data tidak ditemukan.');
+      }
     } catch (err) {
       setError('Gagal memuat review. Pastikan koneksi internet aktif.');
     } finally {
@@ -57,14 +61,12 @@ const SmartReview: React.FC = () => {
 
   return (
     <div className="max-w-[850px] mx-auto px-4 pt-16 pb-10 space-y-10">
-      {/* Header Section (Always Visible) */}
       <div className="text-center space-y-4">
         <h1 className="text-2xl md:text-4xl font-black uppercase tracking-tighter italic"><span className="text-yellow-400">Smart</span> Review</h1>
         <p className="text-gray-400 text-sm md:text-base max-w-xl mx-auto leading-relaxed font-medium italic">
           Analisis spesifikasi secara cepat dan akurat.
         </p>
         
-        {/* Formulir Pencarian - Menggunakan rounded-2xl dan rounded-xl agar tidak terlalu bulat (pill) */}
         {!review && !loading && (
           <form onSubmit={handleSearch} className="max-w-md mx-auto relative mt-8 animate-in fade-in duration-500">
             <input
@@ -99,7 +101,6 @@ const SmartReview: React.FC = () => {
 
       {review && !loading && (
         <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
-          {/* Main Title Section */}
           <div className="bg-[#0a0a0a] p-6 md:p-10 rounded-3xl border border-white/5 space-y-5 shadow-2xl relative overflow-hidden group">
             <div className="relative z-10">
               <div className="flex justify-between items-start">
@@ -108,16 +109,16 @@ const SmartReview: React.FC = () => {
                   <div className="flex flex-wrap items-center gap-3 pt-1">
                      <div className="flex items-center gap-2">
                         <div className="w-1.5 h-1.5 bg-yellow-400 rounded-full animate-pulse"></div>
-                        <p className="text-[10px] md:text-xs text-gray-500 font-bold uppercase tracking-[0.2em]">Rilis: {review.specs.releaseDate}</p>
+                        <p className="text-[10px] md:text-xs text-gray-500 font-bold uppercase tracking-[0.2em]">Rilis: {review.specs?.releaseDate}</p>
                      </div>
                      <div className="h-3 w-[1px] bg-white/10"></div>
                      <div className="flex items-center gap-2">
                         <svg className="w-3 h-3 text-yellow-400" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 14h-2v-2h2v2zm0-4h-2V7h2v5z"/></svg>
-                        <p className="text-[10px] md:text-xs text-yellow-400 font-black uppercase tracking-[0.2em]">{review.specs.price}</p>
+                        <p className="text-[10px] md:text-xs text-yellow-400 font-black uppercase tracking-[0.2em]">{review.specs?.price}</p>
                      </div>
                      <div className="h-3 w-[1px] bg-white/10 hidden sm:block"></div>
-                     <span className={`text-[8px] md:text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-md border ${getStatusColor(review.specs.availabilityStatus)}`}>
-                        {review.specs.availabilityStatus}
+                     <span className={`text-[8px] md:text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-md border ${getStatusColor(review.specs?.availabilityStatus || '')}`}>
+                        {review.specs?.availabilityStatus}
                      </span>
                   </div>
                 </div>
@@ -132,7 +133,6 @@ const SmartReview: React.FC = () => {
             </div>
           </div>
 
-          {/* SPEC ANALYSIS */}
           <div className="bg-[#050505] border border-white/5 rounded-3xl p-6 md:p-10 space-y-8 shadow-inner">
             <div className="flex items-center gap-3">
               <div className="w-1.5 h-6 bg-yellow-400 rounded-full"></div>
@@ -140,18 +140,17 @@ const SmartReview: React.FC = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <SpecCard label="CHIPSET" value={review.specs.processor} review={review.specs.processorReview} icon={<svg fill="currentColor" viewBox="0 0 24 24"><path d="M11 15h2v2h-2v-2m0-8h2v6h-2V7m1-5C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2m0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8Z"/></svg>} />
-              <SpecCard label="DISPLAY" value={review.specs.screen} review={review.specs.screenReview} icon={<svg fill="currentColor" viewBox="0 0 24 24"><path d="M17 1H7c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-2-2-2m0 18H7V5h10v14Z"/></svg>} />
-              <SpecCard label="RAM" value={review.specs.ram} review={review.specs.ramReview} icon={<svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9-4.03-9-9-9m0 16c-3.86 0-7-3.14-7-7s3.14-7 7-7 7 3.14 7 7-3.14 7-7 7Z"/></svg>} />
-              <SpecCard label="STORAGE" value={review.specs.storage} review={review.specs.storageReview} icon={<svg fill="currentColor" viewBox="0 0 24 24"><path d="M18 2H10L4 8v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2M9 4v4H6l3-4m9 16H6V9h4c1.1 0 2-.9 2-2V4h6v16Z"/></svg>} />
-              <SpecCard label="CAMERA" value={review.specs.cameraSummary} review={review.specs.cameraReview} icon={<svg fill="currentColor" viewBox="0 0 24 24"><path d="M4 4h3l2-2h6l2 2h3c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2m8 3c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5m0 2c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3Z"/></svg>} />
-              <SpecCard label="BATTERY" value={review.specs.battery} review={review.specs.batteryReview} icon={<svg fill="currentColor" viewBox="0 0 24 24"><path d="M16.67 4H15V2H9v2H7.33C6.6 4 6 4.6 6 5.33v15.33C6 21.4 6.6 22 7.33 22h9.33c.74 0 1.34-.6 1.34-1.33V5.33C18 4.6 17.4 4 16.67 4M15 20H9V6h6v14Z"/></svg>} />
-              <SpecCard label="NETWORK" value={review.specs.network} review={review.specs.networkReview} icon={<svg fill="currentColor" viewBox="0 0 24 24"><path d="M2 22h20V2L2 22zm18-2H6.83L20 6.83V20z"/></svg>} />
-              <SpecCard label="CONNECT" value={review.specs.connectivity} review={review.specs.connectivityReview} icon={<svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 18h-2v-2h2v2zm3-4H8v-2h8v2zm0-4H8v-2h8v2zm0-4H8V6h8v2z"/></svg>} />
+              <SpecCard label="CHIPSET" value={review.specs?.processor} review={review.specs?.processorReview} icon={<svg fill="currentColor" viewBox="0 0 24 24"><path d="M11 15h2v2h-2v-2m0-8h2v6h-2V7m1-5C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2m0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8Z"/></svg>} />
+              <SpecCard label="DISPLAY" value={review.specs?.screen} review={review.specs?.screenReview} icon={<svg fill="currentColor" viewBox="0 0 24 24"><path d="M17 1H7c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-2-2-2m0 18H7V5h10v14Z"/></svg>} />
+              <SpecCard label="RAM" value={review.specs?.ram} review={review.specs?.ramReview} icon={<svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9-4.03-9-9-9m0 16c-3.86 0-7-3.14-7-7s3.14-7 7-7 7 3.14 7 7-3.14 7-7 7Z"/></svg>} />
+              <SpecCard label="STORAGE" value={review.specs?.storage} review={review.specs?.storageReview} icon={<svg fill="currentColor" viewBox="0 0 24 24"><path d="M18 2H10L4 8v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2M9 4v4H6l3-4m9 16H6V9h4c1.1 0 2-.9 2-2V4h6v16Z"/></svg>} />
+              <SpecCard label="CAMERA" value={review.specs?.cameraSummary} review={review.specs?.cameraReview} icon={<svg fill="currentColor" viewBox="0 0 24 24"><path d="M4 4h3l2-2h6l2 2h3c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2m8 3c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5m0 2c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3Z"/></svg>} />
+              <SpecCard label="BATTERY" value={review.specs?.battery} review={review.specs?.batteryReview} icon={<svg fill="currentColor" viewBox="0 0 24 24"><path d="M16.67 4H15V2H9v2H7.33C6.6 4 6 4.6 6 5.33v15.33C6 21.4 6.6 22 7.33 22h9.33c.74 0 1.34-.6 1.34-1.33V5.33C18 4.6 17.4 4 16.67 4M15 20H9V6h6v14Z"/></svg>} />
+              <SpecCard label="NETWORK" value={review.specs?.network} review={review.specs?.networkReview} icon={<svg fill="currentColor" viewBox="0 0 24 24"><path d="M2 22h20V2L2 22zm18-2H6.83L20 6.83V20z"/></svg>} />
+              <SpecCard label="CONNECT" value={review.specs?.connectivity} review={review.specs?.connectivityReview} icon={<svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 18h-2v-2h2v2zm3-4H8v-2h8v2zm0-4H8v-2h8v2zm0-4H8V6h8v2z"/></svg>} />
             </div>
           </div>
 
-          {/* GAMING PERFORMANCE */}
           <div className="bg-[#0a0a0a] border border-white/10 rounded-3xl p-6 md:p-10 space-y-8">
             <div className="flex items-center gap-3">
               <div className="w-1.5 h-6 bg-yellow-400 rounded-full"></div>
@@ -168,7 +167,7 @@ const SmartReview: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/5">
-                  {review.gamingPerformance.map((g, i) => (
+                  {(review.gamingPerformance || []).map((g, i) => (
                     <tr key={i} className="group hover:bg-white/5 transition-colors">
                       <td className="py-5 font-black text-white text-xs md:text-base uppercase italic tracking-tighter">{g.game}</td>
                       <td className="py-5 px-4">
@@ -183,7 +182,6 @@ const SmartReview: React.FC = () => {
               </table>
             </div>
 
-            {/* Overall Gaming Summary */}
             <div className="pt-6 border-t border-white/10 space-y-4">
                <div className="flex items-center gap-2">
                   <div className="w-3 h-3 bg-yellow-400 rotate-45"></div>
@@ -195,22 +193,21 @@ const SmartReview: React.FC = () => {
             </div>
           </div>
 
-          {/* BENCHMARK & PHOTOGRAPHY */}
           <div className="grid md:grid-cols-2 gap-6">
             <div className="bg-[#0a0a0a] border border-white/5 p-8 rounded-[2rem] space-y-8 shadow-2xl">
               <div className="space-y-6">
                 <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-500">Benchmark Performa</h4>
                 <div className="space-y-1">
                   <div className="text-[10px] text-gray-400 font-black uppercase tracking-widest">ANTUTU V10</div>
-                  <div className="text-3xl font-black text-yellow-400 italic tracking-tighter">{review.performance.antutu}</div>
+                  <div className="text-3xl font-black text-yellow-400 italic tracking-tighter">{review.performance?.antutu}</div>
                 </div>
-                <p className="text-[11px] md:text-xs text-gray-500 leading-relaxed font-medium italic">"{review.performance.description}"</p>
+                <p className="text-[11px] md:text-xs text-gray-500 leading-relaxed font-medium italic">"{review.performance?.description}"</p>
               </div>
               
               <div className="bg-black/40 p-6 rounded-2xl border border-white/5 space-y-4">
                 <h5 className="text-[9px] font-black text-gray-700 uppercase tracking-widest border-b border-white/5 pb-2">Smartphone Rival</h5>
                 <div className="space-y-3">
-                  {review.performance.rivals.map((rival, i) => (
+                  {(review.performance?.rivals || []).map((rival, i) => (
                     <div key={i} className="flex justify-between items-center">
                       <span className="text-xs font-black text-gray-300 uppercase italic">{rival.name}</span>
                       <span className="text-yellow-400 font-black text-xs">{rival.score}</span>
@@ -225,20 +222,19 @@ const SmartReview: React.FC = () => {
               <div className="flex flex-col items-center gap-6 py-4">
                 <div className="space-y-1 text-center">
                   <div className="text-[10px] font-black text-gray-400 uppercase tracking-[0.3em]">DXOMARK SCORE</div>
-                  <div className="text-4xl font-black text-yellow-400 tracking-tighter italic leading-none">{review.camera.score}</div>
+                  <div className="text-4xl font-black text-yellow-400 tracking-tighter italic leading-none">{review.camera?.score}</div>
                 </div>
                 <div className="bg-[#151515] text-white text-[10px] px-6 py-2.5 rounded-full font-black tracking-widest uppercase border border-white/10">
-                  {review.camera.dxoMarkClass}
+                  {review.camera?.dxoMarkClass}
                 </div>
               </div>
               <div className="pt-4 border-t border-white/5">
-                <p className="text-[11px] md:text-xs text-gray-500 leading-relaxed italic font-medium">"{review.camera.description}"</p>
+                <p className="text-[11px] md:text-xs text-gray-500 leading-relaxed italic font-medium">"{review.camera?.description}"</p>
               </div>
             </div>
           </div>
 
-          {/* SOURCES SECTION */}
-          {sources.length > 0 && (
+          {(sources || []).length > 0 && (
             <div className="bg-[#050505] border border-white/5 rounded-3xl p-6 md:p-8 space-y-4">
               <div className="flex items-center gap-2">
                 <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 105.656 5.656l-1.1 1.1"/></svg>
@@ -262,19 +258,18 @@ const SmartReview: React.FC = () => {
             </div>
           )}
 
-          {/* PROS / CONS / VERDICT */}
           <div className="bg-yellow-400 text-black p-8 md:p-12 rounded-[2.5rem] space-y-10 shadow-2xl shadow-yellow-400/20">
             <div className="grid sm:grid-cols-2 gap-8">
               <div className="space-y-4">
                 <h3 className="text-[10px] font-black uppercase tracking-[0.4em] opacity-40">Kelebihan</h3>
                 <ul className="space-y-2 text-xs md:text-base font-black italic tracking-tight leading-snug">
-                  {review.pros.map((p, i) => <li key={i} className="flex gap-2"><span>+</span> {p}</li>)}
+                  {(review.pros || []).map((p, i) => <li key={i} className="flex gap-2"><span>+</span> {p}</li>)}
                 </ul>
               </div>
               <div className="space-y-4">
                 <h3 className="text-[10px] font-black uppercase tracking-[0.4em] opacity-40">Kekurangan</h3>
                 <ul className="space-y-2 text-xs md:text-base font-black italic tracking-tight opacity-70 leading-snug">
-                  {review.cons.map((c, i) => <li key={i} className="flex gap-2"><span>-</span> {c}</li>)}
+                  {(review.cons || []).map((c, i) => <li key={i} className="flex gap-2"><span>-</span> {c}</li>)}
                 </ul>
               </div>
             </div>
