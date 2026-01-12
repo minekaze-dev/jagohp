@@ -60,7 +60,7 @@ const SmartReview: React.FC = () => {
   };
 
   return (
-    <div className="max-w-[850px] mx-auto px-4 pt-16 pb-10 space-y-10">
+    <div className="max-w-[850px] mx-auto px-4 pt-16 pb-40 space-y-10">
       <div className="text-center space-y-4">
         <h1 className="text-2xl md:text-4xl font-black uppercase tracking-tighter italic"><span className="text-yellow-400">Smart</span> Review</h1>
         <p className="text-gray-400 text-sm md:text-base max-w-xl mx-auto leading-relaxed font-medium italic">
@@ -68,22 +68,39 @@ const SmartReview: React.FC = () => {
         </p>
         
         {!review && !loading && (
-          <form onSubmit={handleSearch} className="max-w-md mx-auto relative mt-8 animate-in fade-in duration-500">
-            <input
-              type="text"
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Tulis nama/tipe Smartphone"
-              className="w-full bg-white/5 border border-white/20 rounded-2xl px-6 py-4 text-xs md:text-sm focus:outline-none focus:border-yellow-400 transition-colors pr-32 font-bold"
-            />
-            <button
-              type="submit"
-              disabled={loading}
-              className="absolute right-1.5 top-1.5 bottom-1.5 bg-yellow-400 text-black px-6 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-yellow-500 disabled:opacity-50 transition-colors"
-            >
-              Review
-            </button>
-          </form>
+          <div className="max-w-2xl mx-auto space-y-20 mt-8 animate-in fade-in duration-500">
+            <form onSubmit={handleSearch} className="relative">
+              <input
+                type="text"
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Tulis nama/tipe Smartphone"
+                className="w-full bg-white/5 border border-white/20 rounded-2xl px-6 py-4 text-xs md:text-sm focus:outline-none focus:border-yellow-400 transition-colors pr-32 font-bold shadow-2xl"
+              />
+              <button
+                type="submit"
+                disabled={loading}
+                className="absolute right-1.5 top-1.5 bottom-1.5 bg-yellow-400 text-black px-6 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-yellow-500 disabled:opacity-50 transition-colors active:scale-95 shadow-lg shadow-yellow-400/20"
+              >
+                Review
+              </button>
+            </form>
+            
+            {/* Dashed Box Placeholder - Wider and Lower */}
+            <div className="relative group">
+              <div className="absolute inset-0 bg-yellow-400/5 blur-3xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+              <div className="relative border-2 border-dashed border-white/5 bg-white/[0.02] rounded-[2.5rem] p-16 md:p-24 flex flex-col items-center justify-center gap-6 shadow-2xl overflow-hidden group-hover:border-yellow-400/20 transition-all duration-500">
+                <div className="flex items-center justify-center gap-3">
+                  <div className="w-1.5 h-1.5 bg-yellow-400/20 rounded-full group-hover:bg-yellow-400/50 transition-colors"></div>
+                  <div className="w-2.5 h-2.5 bg-yellow-400/40 rotate-45 group-hover:bg-yellow-400 transition-all group-hover:scale-125 duration-500"></div>
+                  <div className="w-1.5 h-1.5 bg-yellow-400/20 rounded-full group-hover:bg-yellow-400/50 transition-colors"></div>
+                </div>
+                <p className="text-[10px] md:text-[11px] font-black uppercase tracking-[0.5em] text-gray-700 group-hover:text-gray-500 transition-colors italic text-center">
+                  Hasil review akan muncul di sini.
+                </p>
+              </div>
+            </div>
+          </div>
         )}
       </div>
 
@@ -238,7 +255,7 @@ const SmartReview: React.FC = () => {
             <div className="bg-[#050505] border border-white/5 rounded-3xl p-6 md:p-8 space-y-4">
               <div className="flex items-center gap-2">
                 <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 105.656 5.656l-1.1 1.1"/></svg>
-                <h4 className="text-[9px] font-black uppercase text-gray-600 tracking-[0.3em]">Referensi Data</h4>
+                <h4 className="text-[9px] font-black uppercase text-gray-600 tracking-[0.3em]">Review ini dihasilkan oleh AI berdasarkan data spesifikasi dan referensi publik.</h4>
               </div>
               <div className="flex flex-wrap gap-3">
                 {sources.map((chunk, i) => (
@@ -261,13 +278,13 @@ const SmartReview: React.FC = () => {
           <div className="bg-yellow-400 text-black p-8 md:p-12 rounded-[2.5rem] space-y-10 shadow-2xl shadow-yellow-400/20">
             <div className="grid sm:grid-cols-2 gap-8">
               <div className="space-y-4">
-                <h3 className="text-[10px] font-black uppercase tracking-[0.4em] opacity-40">Kelebihan</h3>
+                <h3 className="text-[10px] font-black uppercase tracking-prop-4em opacity-40">Kelebihan</h3>
                 <ul className="space-y-2 text-xs md:text-base font-black italic tracking-tight leading-snug">
                   {(review.pros || []).map((p, i) => <li key={i} className="flex gap-2"><span>+</span> {p}</li>)}
                 </ul>
               </div>
               <div className="space-y-4">
-                <h3 className="text-[10px] font-black uppercase tracking-[0.4em] opacity-40">Kekurangan</h3>
+                <h3 className="text-[10px] font-black uppercase tracking-prop-4em opacity-40">Kekurangan</h3>
                 <ul className="space-y-2 text-xs md:text-base font-black italic tracking-tight opacity-70 leading-snug">
                   {(review.cons || []).map((c, i) => <li key={i} className="flex gap-2"><span>-</span> {c}</li>)}
                 </ul>
