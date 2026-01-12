@@ -22,7 +22,7 @@ const AIChat: React.FC = () => {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
     }
-  }, [messages]);
+  }, [messages, loading]);
 
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -95,35 +95,37 @@ const AIChat: React.FC = () => {
   };
 
   return (
-    <div className="max-w-[800px] mx-auto px-4 py-6 h-[calc(100vh-100px)] flex flex-col">
-      <div className="flex items-center justify-between mb-6 border-b border-white/10 pb-4">
-        <div className="flex items-center gap-4">
-          <div className="bg-yellow-400 p-1 rounded-2xl shadow-xl shadow-yellow-400/20">
-            <img src="https://imgur.com/d3OzP78.jpg" className="w-12 h-12 object-contain rounded-xl" alt="JAGOBOT AI" />
+    <div className="max-w-[800px] mx-auto px-4 flex flex-col h-[calc(100dvh-165px)] md:h-[calc(100vh-100px)] pt-4">
+      {/* Chat Header */}
+      <div className="flex items-center justify-between mb-4 border-b border-white/10 pb-4 shrink-0">
+        <div className="flex items-center gap-3">
+          <div className="bg-yellow-400 p-1 rounded-xl shadow-xl shadow-yellow-400/20 shrink-0">
+            <img src="https://imgur.com/d3OzP78.jpg" className="w-10 h-10 object-contain rounded-lg" alt="JAGOBOT AI" />
           </div>
-          <div>
-            <h1 className="text-xl font-black uppercase tracking-tighter italic">JAGOBOT AI</h1>
-            <div className="flex items-center gap-1.5">
+          <div className="min-w-0">
+            <h1 className="text-lg font-black uppercase tracking-tighter italic leading-none truncate">JAGOBOT AI</h1>
+            <div className="flex items-center gap-1.5 mt-1">
               <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
-              <p className="text-[9px] text-gray-500 font-bold tracking-widest">Sedang Online</p>
+              <p className="text-[8px] text-gray-500 font-bold tracking-widest uppercase">Sedang Online</p>
             </div>
           </div>
         </div>
         <button 
           onClick={() => setMessages([{ role: 'model', content: 'Halo Kak! Ada yang bisa saya bantu lagi soal gadget terbaru?' }])}
-          className="text-[9px] font-black text-gray-600 uppercase tracking-widest hover:text-white transition-colors"
+          className="text-[8px] font-black text-gray-600 uppercase tracking-widest hover:text-white transition-colors"
         >
-          Reset Chat
+          Reset
         </button>
       </div>
 
+      {/* Messages List */}
       <div 
         ref={scrollRef}
-        className="flex-1 overflow-y-auto space-y-4 pr-2 mb-4 scroll-smooth"
+        className="flex-1 overflow-y-auto space-y-4 pr-1 mb-4 scroll-smooth custom-scrollbar"
       >
         {messages.map((msg, i) => (
           <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-            <div className={`max-w-[85%] p-4 rounded-2xl text-sm leading-relaxed shadow-sm ${
+            <div className={`max-w-[88%] p-3.5 rounded-2xl text-xs md:text-sm leading-relaxed shadow-sm ${
               msg.role === 'user' 
                 ? 'bg-yellow-400 text-black font-bold rounded-tr-none' 
                 : 'bg-neutral-900 text-gray-200 font-medium rounded-tl-none border border-white/5'
@@ -137,29 +139,32 @@ const AIChat: React.FC = () => {
         {loading && (
           <div className="flex justify-start">
             <div className="bg-neutral-900 p-3 rounded-2xl border border-white/5 flex gap-1 items-center">
-              <span className="w-1 h-1 bg-gray-600 rounded-full animate-bounce"></span>
-              <span className="w-1 h-1 bg-gray-600 rounded-full animate-bounce delay-75"></span>
-              <span className="w-1 h-1 bg-gray-600 rounded-full animate-bounce delay-150"></span>
+              <span className="w-1 h-1 bg-yellow-400 rounded-full animate-bounce"></span>
+              <span className="w-1 h-1 bg-yellow-400 rounded-full animate-bounce delay-75"></span>
+              <span className="w-1 h-1 bg-yellow-400 rounded-full animate-bounce delay-150"></span>
             </div>
           </div>
         )}
       </div>
 
-      <form onSubmit={handleSend} className="relative group">
-        <input
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="Tanya soal iPhone 17, Xiaomi 17, atau spek HP lainnya..."
-          className="w-full bg-[#0a0a0a] border border-white/10 rounded-2xl px-6 py-4 pr-16 text-sm focus:outline-none focus:border-yellow-400 transition-all shadow-xl group-focus-within:border-yellow-400/50"
-        />
-        <button
-          type="submit"
-          disabled={loading || !input.trim()}
-          className="absolute right-2 top-2 bottom-2 bg-yellow-400 text-black px-5 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-yellow-500 disabled:opacity-50 transition-all active:scale-95"
-        >
-          Kirim
-        </button>
+      {/* Input Form - Mobile Optimized Flex Layout */}
+      <form onSubmit={handleSend} className="shrink-0 mb-4 md:mb-6">
+        <div className="bg-[#0c0c0c] border border-white/10 rounded-2xl p-1.5 flex gap-2 items-center group focus-within:border-yellow-400/50 transition-all shadow-2xl">
+          <input
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="Tanya soal gadget..."
+            className="flex-1 bg-transparent px-4 py-3 text-xs md:text-sm focus:outline-none text-white placeholder:text-gray-700 font-medium"
+          />
+          <button
+            type="submit"
+            disabled={loading || !input.trim()}
+            className="bg-yellow-400 text-black h-10 px-5 md:px-7 rounded-xl text-[9px] md:text-[10px] font-black uppercase tracking-widest hover:bg-yellow-500 disabled:opacity-30 transition-all active:scale-95 shadow-lg shrink-0"
+          >
+            Kirim
+          </button>
+        </div>
       </form>
     </div>
   );
