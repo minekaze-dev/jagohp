@@ -74,17 +74,19 @@ export const getSmartReview = async (phoneName: string): Promise<{review: PhoneR
       .maybeSingle();
 
     if (cachedData && !fetchError) {
-      console.log("JAGOHP Engine: Memuat data dari cache database...");
+      console.log("JAGOHP Engine: Memuat data dari cache database (Supabase)...");
       return {
         review: cachedData.review_data,
         sources: cachedData.sources || []
       };
     }
+    if (fetchError) console.warn("Supabase Fetch Warning:", fetchError.message);
   } catch (err) {
     console.error("Database check failed, falling back to AI:", err);
   }
 
   // 2. Jika tidak ada di cache, panggil Gemini AI
+  console.log("JAGOHP Engine: Data tidak ditemukan di cache. Memanggil AI untuk riset...");
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   const response = await ai.models.generateContent({
     model: 'gemini-3-flash-preview',
@@ -178,16 +180,21 @@ export const getSmartReview = async (phoneName: string): Promise<{review: PhoneR
   const parsedReview = JSON.parse(response.text || "{}");
   const parsedSources = response.candidates?.[0]?.groundingMetadata?.groundingChunks || [];
 
-  // 3. Simpan ke Database (Background Process)
+  // 3. Simpan/Update ke Database (Background Process)
   if (parsedReview && parsedReview.name) {
-    supabase.from('smart_reviews').insert([{
+    supabase.from('smart_reviews').upsert([{
       slug: slug,
       phone_name: parsedReview.name,
       review_data: parsedReview,
-      sources: parsedSources
-    }]).then(({ error }) => {
-      if (error) console.error("Gagal menyimpan ke cache database:", error.message);
-      else console.log("Berhasil menyimpan review ke cache database.");
+      sources: parsedSources,
+      updated_at: new Date().toISOString()
+    }], { onConflict: 'slug' }).then(({ error }) => {
+      if (error) {
+        console.error("JAGOHP Engine Error: Gagal menyimpan ke database Supabase.", error.message);
+        console.error("Detail Error:", error);
+      } else {
+        console.log("JAGOHP Engine Success: Review berhasil disimpan ke database cloud.");
+      }
     });
   }
 
