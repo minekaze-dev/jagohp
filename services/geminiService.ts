@@ -1,6 +1,7 @@
 
 import { GoogleGenAI, Type } from "@google/genai";
 import { PhoneReview, ComparisonResult, RecommendationResponse, TopTierResponse } from "../types";
+import { supabase, generateSlug } from "./blogService";
 
 const REAL_WORLD_DATA_INSTRUCTION = `
   PENTING: Anda adalah Ahli Reviewer Gadget Senior.
@@ -62,6 +63,28 @@ export const getTopTierRankings = async (category: string): Promise<TopTierRespo
 };
 
 export const getSmartReview = async (phoneName: string): Promise<{review: PhoneReview, sources: any[]}> => {
+  const slug = generateSlug(phoneName);
+  
+  // 1. Cek Cache Database Terlebih Dahulu
+  try {
+    const { data: cachedData, error: fetchError } = await supabase
+      .from('smart_reviews')
+      .select('*')
+      .eq('slug', slug)
+      .maybeSingle();
+
+    if (cachedData && !fetchError) {
+      console.log("JAGOHP Engine: Memuat data dari cache database...");
+      return {
+        review: cachedData.review_data,
+        sources: cachedData.sources || []
+      };
+    }
+  } catch (err) {
+    console.error("Database check failed, falling back to AI:", err);
+  }
+
+  // 2. Jika tidak ada di cache, panggil Gemini AI
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   const response = await ai.models.generateContent({
     model: 'gemini-3-flash-preview',
@@ -152,9 +175,25 @@ export const getSmartReview = async (phoneName: string): Promise<{review: PhoneR
     }
   });
 
+  const parsedReview = JSON.parse(response.text || "{}");
+  const parsedSources = response.candidates?.[0]?.groundingMetadata?.groundingChunks || [];
+
+  // 3. Simpan ke Database (Background Process)
+  if (parsedReview && parsedReview.name) {
+    supabase.from('smart_reviews').insert([{
+      slug: slug,
+      phone_name: parsedReview.name,
+      review_data: parsedReview,
+      sources: parsedSources
+    }]).then(({ error }) => {
+      if (error) console.error("Gagal menyimpan ke cache database:", error.message);
+      else console.log("Berhasil menyimpan review ke cache database.");
+    });
+  }
+
   return {
-    review: JSON.parse(response.text || "{}"),
-    sources: response.candidates?.[0]?.groundingMetadata?.groundingChunks || []
+    review: parsedReview,
+    sources: parsedSources
   };
 };
 
