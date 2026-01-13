@@ -174,7 +174,7 @@ const Compare: React.FC = () => {
                   type="text"
                   value={p}
                   onChange={(e) => updatePhone(i, e.target.value)}
-                  placeholder="Tulis nama/tipe Smartphone"
+                  placeholder="Tulis merk dan tipe Smartphone"
                   className="w-full bg-white/5 border border-white/20 rounded-xl px-4 py-3.5 text-xs md:text-sm focus:outline-none focus:border-yellow-400 transition-colors font-bold"
                 />
               </div>

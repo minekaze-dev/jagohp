@@ -13,8 +13,16 @@ export interface PhoneReview {
     batteryReview: string;
     screen: string;
     screenReview: string;
-    cameraSummary: string;
-    cameraReview: string;
+    body: string;
+    bodyReview: string;
+    mainCamera: string;
+    mainCameraReview: string;
+    selfieCamera: string;
+    selfieCameraReview: string;
+    sound: string;
+    soundReview: string;
+    os: string;
+    osReview: string;
     network: string;
     networkReview: string;
     connectivity: string;

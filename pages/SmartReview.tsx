@@ -74,7 +74,7 @@ const SmartReview: React.FC = () => {
                 type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Tulis nama/tipe Smartphone"
+                placeholder="Tulis merk dan tipe Smartphone (Ex: Samsung S25 Ultra)"
                 className="w-full bg-white/5 border border-white/20 rounded-2xl px-6 py-4 text-xs md:text-sm focus:outline-none focus:border-yellow-400 transition-colors pr-32 font-bold shadow-2xl"
               />
               <button
@@ -86,7 +86,6 @@ const SmartReview: React.FC = () => {
               </button>
             </form>
             
-            {/* Dashed Box Placeholder - Wider and Lower */}
             <div className="relative group">
               <div className="absolute inset-0 bg-yellow-400/5 blur-3xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
               <div className="relative border-2 border-dashed border-white/5 bg-white/[0.02] rounded-[2.5rem] p-16 md:p-24 flex flex-col items-center justify-center gap-6 shadow-2xl overflow-hidden group-hover:border-yellow-400/20 transition-all duration-500">
@@ -157,14 +156,29 @@ const SmartReview: React.FC = () => {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <SpecCard label="CHIPSET" value={review.specs?.processor} review={review.specs?.processorReview} icon={<svg fill="currentColor" viewBox="0 0 24 24"><path d="M11 15h2v2h-2v-2m0-8h2v6h-2V7m1-5C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2m0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8Z"/></svg>} />
-              <SpecCard label="DISPLAY" value={review.specs?.screen} review={review.specs?.screenReview} icon={<svg fill="currentColor" viewBox="0 0 24 24"><path d="M17 1H7c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-2-2-2m0 18H7V5h10v14Z"/></svg>} />
-              <SpecCard label="RAM" value={review.specs?.ram} review={review.specs?.ramReview} icon={<svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9-4.03-9-9-9m0 16c-3.86 0-7-3.14-7-7s3.14-7 7-7 7 3.14 7 7-3.14 7-7 7Z"/></svg>} />
-              <SpecCard label="STORAGE" value={review.specs?.storage} review={review.specs?.storageReview} icon={<svg fill="currentColor" viewBox="0 0 24 24"><path d="M18 2H10L4 8v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2M9 4v4H6l3-4m9 16H6V9h4c1.1 0 2-.9 2-2V4h6v16Z"/></svg>} />
-              <SpecCard label="CAMERA" value={review.specs?.cameraSummary} review={review.specs?.cameraReview} icon={<svg fill="currentColor" viewBox="0 0 24 24"><path d="M4 4h3l2-2h6l2 2h3c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2m8 3c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5m0 2c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3Z"/></svg>} />
-              <SpecCard label="BATTERY" value={review.specs?.battery} review={review.specs?.batteryReview} icon={<svg fill="currentColor" viewBox="0 0 24 24"><path d="M16.67 4H15V2H9v2H7.33C6.6 4 6 4.6 6 5.33v15.33C6 21.4 6.6 22 7.33 22h9.33c.74 0 1.34-.6 1.34-1.33V5.33C18 4.6 17.4 4 16.67 4M15 20H9V6h6v14Z"/></svg>} />
-              <SpecCard label="NETWORK" value={review.specs?.network} review={review.specs?.networkReview} icon={<svg fill="currentColor" viewBox="0 0 24 24"><path d="M2 22h20V2L2 22zm18-2H6.83L20 6.83V20z"/></svg>} />
-              <SpecCard label="CONNECT" value={review.specs?.connectivity} review={review.specs?.connectivityReview} icon={<svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 18h-2v-2h2v2zm3-4H8v-2h8v2zm0-4H8v-2h8v2zm0-4H8V6h8v2z"/></svg>} />
+              {/* Pair 1: Jaringan dan OS */}
+              <SpecCard label="JARINGAN" value={review.specs?.network} review={review.specs?.networkReview} icon={<svg fill="currentColor" viewBox="0 0 24 24"><path d="M2 22h20V2L2 22zm18-2H6.83L20 6.83V20z"/></svg>} />
+              <SpecCard label="SISTEM OPERASI (OS)" value={review.specs?.os} review={review.specs?.osReview} icon={<svg fill="currentColor" viewBox="0 0 24 24"><path d="M3 13h12v-2H3v2zm0 4h12v-2H3v2zm0-8h12V7H3v2zm14 8h2v-2h-2v2zm0-4h2v-2h-2v2zm0-8v2h2V5h-2z"/></svg>} />
+              
+              {/* Pair 2: Material dan Layar */}
+              <SpecCard label="MATERIAL BODY" value={review.specs?.body} review={review.specs?.bodyReview} icon={<svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 18h-2v-2h2v2zm3-4H8v-2h8v2zm0-4H8v-2h8v2zm0-4H8V6h8v2z"/></svg>} />
+              <SpecCard label="DISPLAY / LAYAR" value={review.specs?.screen} review={review.specs?.screenReview} icon={<svg fill="currentColor" viewBox="0 0 24 24"><path d="M17 1H7c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-2-2-2m0 18H7V5h10v14Z"/></svg>} />
+              
+              {/* Pair 3: Chipset dan Penyimpanan */}
+              <SpecCard label="CHIPSET / PROCESSOR" value={review.specs?.processor} review={review.specs?.processorReview} icon={<svg fill="currentColor" viewBox="0 0 24 24"><path d="M11 15h2v2h-2v-2m0-8h2v6h-2V7m1-5C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2m0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8Z"/></svg>} />
+              <SpecCard label="STORAGE / PENYIMPANAN" value={review.specs?.storage} review={review.specs?.storageReview} icon={<svg fill="currentColor" viewBox="0 0 24 24"><path d="M18 2H10L4 8v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2M9 4v4H6l3-4m9 16H6V9h4c1.1 0 2-.9 2-2V4h6v16Z"/></svg>} />
+              
+              {/* Pair 4: Kamera Utama dan Kamera Depan */}
+              <SpecCard label="KAMERA UTAMA" value={review.specs?.mainCamera} review={review.specs?.mainCameraReview} icon={<svg fill="currentColor" viewBox="0 0 24 24"><path d="M4 4h3l2-2h6l2 2h3c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2m8 3c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5m0 2c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3Z"/></svg>} />
+              <SpecCard label="KAMERA DEPAN (SELFIE)" value={review.specs?.selfieCamera} review={review.specs?.selfieCameraReview} icon={<svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>} />
+              
+              {/* Pair 5: RAM dan Koneksi */}
+              <SpecCard label="KAPASITAS RAM" value={review.specs?.ram} review={review.specs?.ramReview} icon={<svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9-4.03-9-9-9m0 16c-3.86 0-7-3.14-7-7s3.14-7 7-7 7 3.14 7 7-3.14 7-7 7Z"/></svg>} />
+              <SpecCard label="KONEKSI / CONNECT" value={review.specs?.connectivity} review={review.specs?.connectivityReview} icon={<svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 18h-2v-2h2v2zm3-4H8v-2h8v2zm0-4H8v-2h8v2zm0-4H8V6h8v2z"/></svg>} />
+              
+              {/* Pair 6: Audio dan Baterai */}
+              <SpecCard label="AUDIO / SOUND" value={review.specs?.sound} review={review.specs?.soundReview} icon={<svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 3v9.28c-.47-.17-.97-.28-1.5-.28C8.57 12 7 13.57 7 15.5S8.57 19 10.5 19s3.5-1.57 3.5-3.5V7h4V3h-6z"/></svg>} />
+              <SpecCard label="BATTERY / BATERAI" value={review.specs?.battery} review={review.specs?.batteryReview} icon={<svg fill="currentColor" viewBox="0 0 24 24"><path d="M16.67 4H15V2H9v2H7.33C6.6 4 6 4.6 6 5.33v15.33C6 21.4 6.6 22 7.33 22h9.33c.74 0 1.34-.6 1.34-1.33V5.33C18 4.6 17.4 4 16.67 4M15 20H9V6h6v14Z"/></svg>} />
             </div>
           </div>
 

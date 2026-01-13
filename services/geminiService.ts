@@ -6,6 +6,7 @@ import { supabase, generateSlug } from "./blogService";
 const REAL_WORLD_DATA_INSTRUCTION = `
   PENTING: Anda adalah Ahli Reviewer Gadget Senior.
   PENGETAHUAN: Data harus bersumber dari riset web terbaru (GSMArena, DXOMark, AnTuTu).
+  BAHASA: WAJIB menggunakan Bahasa Indonesia yang profesional dan lugas untuk SEMUA output teks, terutama bagian 'highlight', 'description', 'review', dan 'targetAudience'.
   
   ATURAN PRIORITAS DATA:
   1. WAJIB mengutamakan unit RESMI INDONESIA jika tersedia.
@@ -65,7 +66,6 @@ export const getTopTierRankings = async (category: string): Promise<TopTierRespo
 export const getSmartReview = async (phoneName: string): Promise<{review: PhoneReview, sources: any[]}> => {
   const slug = generateSlug(phoneName);
   
-  // 1. Cek Cache Database Terlebih Dahulu
   try {
     const { data: cachedData, error: fetchError } = await supabase
       .from('smart_reviews')
@@ -80,19 +80,24 @@ export const getSmartReview = async (phoneName: string): Promise<{review: PhoneR
         sources: cachedData.sources || []
       };
     }
-    if (fetchError) console.warn("Supabase Fetch Warning:", fetchError.message);
   } catch (err) {
     console.error("Database check failed, falling back to AI:", err);
   }
 
-  // 2. Jika tidak ada di cache, panggil Gemini AI
-  console.log("JAGOHP Engine: Data tidak ditemukan di cache. Memanggil AI untuk riset...");
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   const response = await ai.models.generateContent({
     model: 'gemini-3-flash-preview',
     contents: `${REAL_WORLD_DATA_INSTRUCTION}
     Lakukan riset mendalam untuk smartphone: ${phoneName}.
-    Cari spesifikasi teknis lengkap, skor AnTuTu v10, skor DXOMark, harga resmi/pasar Indonesia, dan ulasan gaming (Genshin Impact/PUBG).`,
+    PASTIKAN BAGIAN 'HIGHLIGHT' DITULIS DALAM BAHASA INDONESIA YANG MENARIK.
+    
+    Cari detail:
+    1. Jaringan & Sistem Operasi (OS saat ini & janji update).
+    2. Material Body (Bahan frame/belakang) & Kualitas Layar.
+    3. Chipset (Processor) & Penyimpanan (Internal Storage).
+    4. Kamera Utama & Kamera Depan (Selfie).
+    5. Kapasitas RAM & Konektivitas (Wi-Fi, NFC, Bluetooth).
+    6. Kualitas Audio & Daya Tahan Baterai.`,
     config: {
       tools: [{googleSearch: {}}],
       responseMimeType: "application/json",
@@ -114,18 +119,31 @@ export const getSmartReview = async (phoneName: string): Promise<{review: PhoneR
               batteryReview: { type: Type.STRING },
               screen: { type: Type.STRING },
               screenReview: { type: Type.STRING },
-              cameraSummary: { type: Type.STRING },
-              cameraReview: { type: Type.STRING },
+              body: { type: Type.STRING },
+              bodyReview: { type: Type.STRING },
+              mainCamera: { type: Type.STRING },
+              mainCameraReview: { type: Type.STRING },
+              selfieCamera: { type: Type.STRING },
+              selfieCameraReview: { type: Type.STRING },
+              sound: { type: Type.STRING },
+              soundReview: { type: Type.STRING },
+              os: { type: Type.STRING },
+              osReview: { type: Type.STRING },
               network: { type: Type.STRING },
               networkReview: { type: Type.STRING },
               connectivity: { type: Type.STRING },
               connectivityReview: { type: Type.STRING },
               releaseDate: { type: Type.STRING },
-              releaseReview: { type: Type.STRING },
               availabilityStatus: { type: Type.STRING },
               price: { type: Type.STRING }
             },
-            required: ["processor", "processorReview", "ram", "ramReview", "storage", "storageReview", "battery", "batteryReview", "screen", "screenReview", "cameraSummary", "cameraReview", "network", "networkReview", "connectivity", "connectivityReview", "releaseDate", "availabilityStatus", "price"]
+            required: [
+              "processor", "processorReview", "ram", "ramReview", "storage", "storageReview", 
+              "battery", "batteryReview", "screen", "screenReview", "body", "bodyReview",
+              "mainCamera", "mainCameraReview", "selfieCamera", "selfieCameraReview", 
+              "sound", "soundReview", "os", "osReview", "network", "networkReview", 
+              "connectivity", "connectivityReview", "releaseDate", "availabilityStatus", "price"
+            ]
           },
           performance: {
             type: Type.OBJECT,
@@ -180,7 +198,6 @@ export const getSmartReview = async (phoneName: string): Promise<{review: PhoneR
   const parsedReview = JSON.parse(response.text || "{}");
   const parsedSources = response.candidates?.[0]?.groundingMetadata?.groundingChunks || [];
 
-  // 3. Simpan/Update ke Database (Background Process)
   if (parsedReview && parsedReview.name) {
     supabase.from('smart_reviews').upsert([{
       slug: slug,
@@ -189,12 +206,7 @@ export const getSmartReview = async (phoneName: string): Promise<{review: PhoneR
       sources: parsedSources,
       updated_at: new Date().toISOString()
     }], { onConflict: 'slug' }).then(({ error }) => {
-      if (error) {
-        console.error("JAGOHP Engine Error: Gagal menyimpan ke database Supabase.", error.message);
-        console.error("Detail Error:", error);
-      } else {
-        console.log("JAGOHP Engine Success: Review berhasil disimpan ke database cloud.");
-      }
+      if (error) console.error("JAGOHP Engine Error:", error.message);
     });
   }
 
