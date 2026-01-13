@@ -24,8 +24,8 @@ const FAQ: React.FC = () => {
       a: "Top Tier adalah kurasi eksklusif dari JAGOHP yang menampilkan juara mutlak (#1) di setiap kategori (Flagship, Gaming, Kamera, dll). Ranking ini diperbarui setiap 3 bulan untuk memastikan lo selalu mendapatkan informasi mengenai smartphone kasta tertinggi di pasaran."
     },
     {
-      q: "Dari mana data harga dan spesifikasi berasal?",
-      a: "Data kami ditarik secara real-time melalui riset web yang didukung AI, merujuk pada standar industri seperti GSMArena, AnTuTu, DXOMark, serta harga pasar resmi di Indonesia per Januari 2026."
+      q: "Dari mana data, harga dan spesifikasi berasal?",
+      a: "Data kami ditarik secara real-time melalui riset web yang didukung AI, merujuk pada standar industri seperti GSMArena, AnTuTu, DXOMark, Google (Gemini AI), serta harga pasar resmi di Indonesia per Januari 2026."
     },
     {
       q: "Apakah saya bisa memberikan opini di blog JAGOHP?",

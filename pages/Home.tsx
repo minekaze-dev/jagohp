@@ -150,7 +150,7 @@ const Home: React.FC = () => {
     <div className="max-w-[900px] mx-auto px-4 pt-4 space-y-10 pb-20">
       <section className="text-center space-y-4 pt-4">
         <h1 className="text-2xl md:text-4xl font-black tracking-tighter uppercase italic">
-          #1 Portal Gadget <span className="text-yellow-400">Smartphone Berbasis AI</span>
+          Platform Rekomendasi<span className="text-yellow-400"> Smartphone Berbasis AI</span>
         </h1>
         <p className="text-gray-400 text-lg md:text-base max-w-2xl mx-auto leading-relaxed italic">
           Dapatkan review objektif dan rekomendasi Smartphone terbaik disini.
