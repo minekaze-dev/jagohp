@@ -1,19 +1,66 @@
 
 import { GoogleGenAI, Type } from "@google/genai";
-import { PhoneReview, ComparisonResult, RecommendationResponse, TopTierResponse } from "../types";
+import { PhoneReview, ComparisonResult, RecommendationResponse, TopTierResponse, CatalogItem } from "../types";
 import { supabase, generateSlug } from "./blogService";
 
 const REAL_WORLD_DATA_INSTRUCTION = `
   PENTING: Anda adalah Ahli Reviewer Gadget Senior.
   PENGETAHUAN: Data harus bersumber dari riset web terbaru (GSMArena, DXOMark, AnTuTu).
-  BAHASA: WAJIB menggunakan Bahasa Indonesia yang profesional dan lugas untuk SEMUA output teks, terutama bagian 'highlight', 'description', 'review', dan 'targetAudience'.
-  
-  ATURAN PRIORITAS DATA:
-  1. WAJIB mengutamakan unit RESMI INDONESIA jika tersedia.
-  2. Gunakan Google Search untuk mengambil data spesifikasi dan harga terbaru Januari 2026.
-  3. Status: 'Resmi Indonesia', 'Global (Non-Indonesia)', atau 'China (Eksklusif)'.
-  4. Berikan output dalam format JSON yang valid sesuai schema yang diminta.
+  BAHASA: WAJIB menggunakan Bahasa Indonesia yang profesional dan lugas.
+  NETRALITAS: Hindari kata subjektif (terbaik, worth it, recommended). Fokus pada spesifikasi teknis dan klasifikasi objektif.
 `;
+
+/**
+ * Mengambil semua data review mentah dari database untuk dikelola di katalog
+ */
+export const getAllCatalogItems = async (): Promise<CatalogItem[]> => {
+  const { data: dbReviews, error } = await supabase
+    .from('smart_reviews')
+    .select('review_data, updated_at')
+    .order('updated_at', { ascending: false });
+
+  if (error || !dbReviews) return [];
+
+  return dbReviews.map(d => {
+    const r: PhoneReview = d.review_data;
+    const priceStr = r.specs.price || "Rp 0";
+    
+    // Parsing harga yang lebih cerdas
+    const cleanPricePart = priceStr.split('-')[0].split('~')[0].split('(')[0].trim();
+    const priceNum = parseInt(cleanPricePart.replace(/[^0-9]/g, '')) || 0;
+
+    let segment: 'Entry' | 'Midrange' | 'Flagship' = 'Midrange';
+    if (priceNum < 3000000) segment = 'Entry';
+    else if (priceNum >= 9000000) segment = 'Flagship';
+
+    const brandName = r.name.split(' ')[0];
+
+    return {
+      name: r.name,
+      brand: brandName,
+      year: r.specs.releaseDate?.split(' ').pop() || "2025",
+      price: priceStr,
+      releaseDateRaw: r.specs.releaseDate || d.updated_at,
+      segment: segment,
+      specs: {
+        network: r.specs.network,
+        chipset: r.specs.processor,
+        ramStorage: `${r.specs.ram} / ${r.specs.storage}`,
+        screen: r.specs.screen,
+        mainCamera: r.specs.mainCamera,
+        selfieCamera: r.specs.selfieCamera,
+        audio: r.specs.sound,
+        batteryCharging: r.specs.battery,
+        features: r.specs.connectivity
+      },
+      classification: {
+        suitableFor: r.targetAudience.split(',').slice(0, 3).map(s => s.trim()),
+        targetAudience: r.targetAudience
+      },
+      aiNote: r.highlight
+    };
+  });
+};
 
 export const getTopTierRankings = async (category: string): Promise<TopTierResponse> => {
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
@@ -21,7 +68,6 @@ export const getTopTierRankings = async (category: string): Promise<TopTierRespo
     model: 'gemini-3-flash-preview',
     contents: `${REAL_WORLD_DATA_INSTRUCTION}
     Berikan HANYA 1 smartphone terbaik mutlak (Peringkat #1) untuk kategori: ${category}.
-    Jangan berikan ranking 2 atau 3. Fokus pada pemenang utama di kategori tersebut.
     Gunakan harga pasar Indonesia terbaru.`,
     config: {
       tools: [{googleSearch: {}}],
@@ -74,7 +120,6 @@ export const getSmartReview = async (phoneName: string): Promise<{review: PhoneR
       .maybeSingle();
 
     if (cachedData && !fetchError) {
-      console.log("JAGOHP Engine: Memuat data dari cache database (Supabase)...");
       return {
         review: cachedData.review_data,
         sources: cachedData.sources || []
@@ -218,24 +263,10 @@ export const getSmartReview = async (phoneName: string): Promise<{review: PhoneR
 
 export const getComparison = async (phones: string[]): Promise<ComparisonResult> => {
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-  const scoresSchema = {
-    type: Type.OBJECT,
-    properties: {
-      chipset: { type: Type.NUMBER },
-      memory: { type: Type.NUMBER },
-      camera: { type: Type.NUMBER },
-      gaming: { type: Type.NUMBER },
-      battery: { type: Type.NUMBER },
-      charging: { type: Type.NUMBER }
-    },
-    required: ["chipset", "memory", "camera", "gaming", "battery", "charging"]
-  };
-
   const response = await ai.models.generateContent({
     model: 'gemini-3-flash-preview',
     contents: `${REAL_WORLD_DATA_INSTRUCTION}
-    Bandingkan secara objektif: ${phones.join(", ")}.
-    Lakukan riset web untuk parameter teknis, benchmark, dan harga terbaru.`,
+    Bandingkan secara objektif: ${phones.join(", ")}.`,
     config: {
       tools: [{googleSearch: {}}],
       responseMimeType: "application/json",
@@ -252,7 +283,6 @@ export const getComparison = async (phones: string[]): Promise<ComparisonResult>
                 feature: { type: Type.STRING },
                 phone1: { type: Type.STRING },
                 phone2: { type: Type.STRING },
-                phone3: { type: Type.STRING },
                 winnerIndex: { type: Type.NUMBER }
               },
               required: ["feature", "phone1", "phone2", "winnerIndex"]
@@ -261,14 +291,11 @@ export const getComparison = async (phones: string[]): Promise<ComparisonResult>
           performanceScores: {
             type: Type.OBJECT,
             properties: {
-              phone1: scoresSchema,
-              phone2: scoresSchema,
-              phone3: scoresSchema
-            },
-            required: ["phone1", "phone2"]
+              phone1: { type: Type.OBJECT },
+              phone2: { type: Type.OBJECT }
+            }
           }
-        },
-        required: ["conclusion", "recommendation", "tableData", "performanceScores"]
+        }
       }
     }
   });
@@ -277,65 +304,21 @@ export const getComparison = async (phones: string[]): Promise<ComparisonResult>
 
 export const getMatch = async (criteria: any): Promise<RecommendationResponse> => {
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-  const phoneSchema = {
-    type: Type.OBJECT,
-    properties: {
-      name: { type: Type.STRING },
-      reason: { type: Type.STRING },
-      price: { type: Type.STRING },
-      specs: {
-        type: Type.OBJECT,
-        properties: {
-          processor: { type: Type.STRING },
-          ram: { type: Type.STRING },
-          storage: { type: Type.STRING },
-          battery: { type: Type.STRING },
-          charging: { type: Type.STRING },
-          screen: { type: Type.STRING },
-          cameraSummary: { type: Type.STRING },
-          network: { type: Type.STRING },
-          connectivity: { type: Type.STRING },
-          releaseDate: { type: Type.STRING }
-        },
-        required: ["processor", "ram", "storage", "battery", "charging", "screen", "cameraSummary", "network", "connectivity", "releaseDate"]
-      },
-      performance: {
-        type: Type.OBJECT,
-        properties: { antutu: { type: Type.STRING } },
-        required: ["antutu"]
-      },
-      camera: {
-        type: Type.OBJECT,
-        properties: { score: { type: Type.STRING } },
-        required: ["score"]
-      }
-    },
-    required: ["name", "reason", "price", "specs", "performance", "camera"]
-  };
-
   const response = await ai.models.generateContent({
     model: 'gemini-3-flash-preview',
     contents: `${REAL_WORLD_DATA_INSTRUCTION}
     Cari smartphone terbaik untuk kebutuhan:
     - Aktivitas: ${criteria.activities?.join(", ")}
-    - Prioritas Kamera: ${criteria.cameraPrio}
-    - Budget: ${criteria.budget}
-    - Tambahan: ${criteria.extra}
-    
-    Riset pasar Januari 2026 untuk memberikan pilihan paling relevan.`,
+    - Budget: ${criteria.budget}`,
     config: {
       tools: [{googleSearch: {}}],
       responseMimeType: "application/json",
       responseSchema: {
         type: Type.OBJECT,
         properties: {
-          primary: phoneSchema,
-          alternatives: {
-            type: Type.ARRAY,
-            items: phoneSchema
-          }
-        },
-        required: ["primary", "alternatives"]
+          primary: { type: Type.OBJECT },
+          alternatives: { type: Type.ARRAY, items: { type: Type.OBJECT } }
+        }
       }
     }
   });

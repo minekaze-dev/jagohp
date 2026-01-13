@@ -1,4 +1,29 @@
 
+export interface CatalogItem {
+  name: string;
+  brand: string;
+  year: string;
+  price: string;
+  releaseDateRaw: string;
+  segment: 'Entry' | 'Midrange' | 'Flagship';
+  specs: {
+    network: string;
+    chipset: string;
+    ramStorage: string;
+    screen: string;
+    mainCamera: string;
+    selfieCamera: string;
+    audio: string;
+    batteryCharging: string;
+    features: string;
+  };
+  classification: {
+    suitableFor: string[];
+    targetAudience: string;
+  };
+  aiNote: string;
+}
+
 export interface PhoneReview {
   name: string;
   highlight: string;
