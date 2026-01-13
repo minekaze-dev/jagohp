@@ -226,7 +226,7 @@ const Footer = ({ onDonateClick }: { onDonateClick: () => void }) => (
         <Link to="/privacy" className="text-[10px] font-black uppercase text-gray-500 hover:text-yellow-400">Kebijakan Privasi</Link>
         <Link to="/terms" className="text-[10px] font-black uppercase text-gray-500 hover:text-yellow-400">Syarat & Ketentuan</Link>
       </nav>
-      <p className="text-gray-600 text-[10px] uppercase font-black tracking-widest">© 2026 JAGOHP | Platform Rekomendasi Smartphone Berbasis AI</p>
+      <p className="text-gray-600 text-[10px] uppercase font-black tracking-widest">© 2026 JAGOHP | Platform Rekomendasi HP Berbasis AI</p>
     </div>
   </footer>
 );

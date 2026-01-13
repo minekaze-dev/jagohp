@@ -56,7 +56,7 @@ const PhoneMatch: React.FC = () => {
   const handleSearch = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     if (activities.length === 0) {
-      alert("Pilih minimal satu aktivitas Kak!");
+      alert("Pilih minimal satu aktivitas!");
       return;
     }
 
@@ -84,7 +84,7 @@ const PhoneMatch: React.FC = () => {
       }
     } catch (err) {
       console.error(err);
-      setError('Terjadi kendala saat menghubungi AI. Coba lagi ya Kak.');
+      setError('Terjadi kendala saat menghubungi AI. Coba lagi ya.');
     } finally {
       setLoading(false);
     }
@@ -112,7 +112,7 @@ const PhoneMatch: React.FC = () => {
             <span className="text-yellow-400">Phone</span> Match
           </h1>
           <p className="text-gray-400 text-sm md:text-base font-medium italic">
-            Cari Smartphone terbaik sesuai kebutuhan dan budget.
+            Cari HP terbaik sesuai kebutuhan dan budget.
           </p>
         </div>
 
@@ -123,7 +123,7 @@ const PhoneMatch: React.FC = () => {
                 
                 <div className="space-y-10">
                   <section className="space-y-6">
-                    <h3 className="text-[11px] font-black uppercase tracking-widest text-gray-500 border-l-4 border-yellow-400 pl-4">1. Apa aktivitas lo?</h3>
+                    <h3 className="text-[11px] font-black uppercase tracking-widest text-gray-500 border-l-4 border-yellow-400 pl-4">1. Butuh HP Yang Gimana? Yang Buat Apa?</h3>
                     <div className="grid grid-cols-2 gap-2.5">
                       {activityOptions.map(opt => (
                         <button
@@ -144,7 +144,7 @@ const PhoneMatch: React.FC = () => {
                   </section>
 
                   <section className="space-y-8">
-                    <h3 className="text-[11px] font-black uppercase tracking-widest text-gray-500 border-l-4 border-yellow-400 pl-4">2. Pentingnya Kamera?</h3>
+                    <h3 className="text-[11px] font-black uppercase tracking-widest text-gray-500 border-l-4 border-yellow-400 pl-4">2. Kamera Penting Gak?</h3>
                     <div className="px-1">
                       <div className="relative h-14">
                         <input 
@@ -181,7 +181,7 @@ const PhoneMatch: React.FC = () => {
 
                 <div className="space-y-10 flex flex-col h-full">
                   <section className="space-y-6">
-                    <h3 className="text-[11px] font-black uppercase tracking-widest text-gray-500 border-l-4 border-yellow-400 pl-4">3. Budget Maksimal?</h3>
+                    <h3 className="text-[11px] font-black uppercase tracking-widest text-gray-500 border-l-4 border-yellow-400 pl-4">3. Budget Berapa?</h3>
                     <div className="relative">
                       <select 
                         value={budget}
@@ -196,7 +196,7 @@ const PhoneMatch: React.FC = () => {
                   </section>
 
                   <section className="space-y-6">
-                    <h3 className="text-[11px] font-black uppercase tracking-widest text-gray-500 border-l-4 border-yellow-400 pl-4">4. Preferensi Lain?</h3>
+                    <h3 className="text-[11px] font-black uppercase tracking-widest text-gray-500 border-l-4 border-yellow-400 pl-4">4. Ada Tambahan Lagi? (Opsional)</h3>
                     <input
                       type="text"
                       value={extra}

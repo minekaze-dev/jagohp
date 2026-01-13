@@ -98,7 +98,7 @@ const TopTier: React.FC = () => {
             Top Tier <span className="text-yellow-400">Rank</span>
           </h1>
           <p className="text-gray-400 text-sm md:text-base font-bold italic max-w-xl mx-auto">
-            Top Tier Rank Smartphone per Januari 2026 menurut Jagohp.
+            Top Tier Rank HP per Januari 2026 menurut AI kami.
           </p>
         </div>
 

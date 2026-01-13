@@ -156,7 +156,7 @@ const Blog: React.FC = () => {
           Blog & <span className="text-yellow-400">Berita</span>
         </h1>
         <p className="text-gray-500 text-sm md:text-base font-medium italic">
-          Informasi, wawasan dan tips mendalam seputar dunia Smartphone.
+          Informasi, wawasan dan tips mendalam seputar dunia HP.
         </p>
       </div>
 

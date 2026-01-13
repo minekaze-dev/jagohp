@@ -149,7 +149,7 @@ const Compare: React.FC = () => {
     <div className="max-w-[950px] mx-auto px-4 py-16 space-y-12 pb-32">
       <div className="text-center space-y-4">
         <h1 className="text-2xl md:text-4xl font-black uppercase tracking-tighter italic"><span className="text-yellow-400">Com</span>pare</h1>
-        <p className="text-gray-400 text-sm md:text-base font-medium italic">Head-to-head spesifikasi biar gak salah pilih Smartphone.</p>
+        <p className="text-gray-400 text-sm md:text-base font-medium italic">Head-to-head spesifikasi biar gak salah pilih HP.</p>
       </div>
 
       {!result && !loading && (
@@ -158,7 +158,7 @@ const Compare: React.FC = () => {
             {phones.map((p, i) => (
               <div key={i} className="space-y-4">
                 <div className="flex justify-between items-center">
-                  <label className="text-[11px] font-black text-gray-500 uppercase tracking-widest">Smartphone {i + 1}</label>
+                  <label className="text-[11px] font-black text-gray-500 uppercase tracking-widest">HP Pilihan {i + 1}</label>
                   {i === 2 && (
                     <button 
                       type="button"
@@ -174,7 +174,7 @@ const Compare: React.FC = () => {
                   type="text"
                   value={p}
                   onChange={(e) => updatePhone(i, e.target.value)}
-                  placeholder="Tulis merk dan tipe Smartphone"
+                  placeholder="Tulis merk dan tipe HP"
                   className="w-full bg-white/5 border border-white/20 rounded-xl px-4 py-3.5 text-xs md:text-sm focus:outline-none focus:border-yellow-400 transition-colors font-bold"
                 />
               </div>

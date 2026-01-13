@@ -125,21 +125,21 @@ const Home: React.FC = () => {
   const features = [
     {
       title: 'Smart Review',
-      description: 'Analisis mendalam Smartphone berbasis AI.',
+      description: 'Mengulas HP secara mendalam.',
       path: '/review',
       image: 'https://imgur.com/9BTOC0H.jpg',
       accent: 'Mengulas secara cepat & akurat'
     },
     {
       title: 'Compare',
-      description: 'Bandingkan spesifikasi Smartphone secara instan.',
+      description: 'Bandingkan spesifikasi HP.',
       path: '/compare',
       image: 'https://imgur.com/eHrM8Pd.jpg',
       accent: 'Cek perbedaan spesifikasi'
     },
     {
       title: 'Phone Match',
-      description: 'Cari Smartphone yang sesuai kebutuhan.',
+      description: 'Cari HP yang sesuai kebutuhan.',
       path: '/match',
       image: 'https://imgur.com/IATbhwQ.jpg',
       accent: 'Mencari yang sesuai kebutuhan'
@@ -150,10 +150,10 @@ const Home: React.FC = () => {
     <div className="max-w-[900px] mx-auto px-4 pt-4 space-y-10 pb-20">
       <section className="text-center space-y-4 pt-4">
         <h1 className="text-2xl md:text-4xl font-black tracking-tighter uppercase italic">
-          Platform Rekomendasi<span className="text-yellow-400"> Smartphone Berbasis AI</span>
+          Platform Rekomendasi<span className="text-yellow-400"> HP Berbasis AI</span>
         </h1>
         <p className="text-gray-400 text-lg md:text-base max-w-2xl mx-auto leading-relaxed italic">
-          Dapatkan review objektif dan rekomendasi Smartphone terbaik disini.
+          Dapatkan review objektif dan rekomendasi HP terbaik disini.
         </p>
       </section>
 
@@ -207,7 +207,7 @@ const Home: React.FC = () => {
       {newsItems.length > 0 && (
         <section className="space-y-8 pt-0">
           <div className="flex items-end justify-between border-b border-white/5 pb-2">
-            <h2 className="text-2xl font-black uppercase italic tracking-tighter">Berita Gadget <span className="text-yellow-400">Terbaru</span></h2>
+            <h2 className="text-2xl font-black uppercase italic tracking-tighter">Berita <span className="text-yellow-400">Terbaru</span></h2>
             <Link to="/blog" className="text-gray-500 text-[10px] font-black uppercase hover:text-white border-b border-gray-800 pb-1">Lihat Semua</Link>
           </div>
           

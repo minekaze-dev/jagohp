@@ -11,7 +11,7 @@ interface Message {
 const AIChat: React.FC = () => {
   const navigate = useNavigate();
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'model', content: 'Halo Kak! Saya adalah JAGOBOT AI. Tulis aja yang mau ditanyain ya.' }
+    { role: 'model', content: 'Halo Kak! Saya adalah JAGOBOT AI. Tulis aja yang mau ditanyain ya' }
   ]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -103,7 +103,7 @@ const AIChat: React.FC = () => {
             <img src="https://imgur.com/d3OzP78.jpg" className="w-10 h-10 object-contain rounded-lg" alt="JAGOBOT AI" />
           </div>
           <div className="min-w-0">
-            <h1 className="text-lg font-black uppercase tracking-tighter italic leading-none truncate">JAGOBOT AI</h1>
+            <h1 className="text-lg font-black uppercase tracking-tighter leading-none truncate">JAGOBOT AI</h1>
             <div className="flex items-center gap-1.5 mt-1">
               <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
               <p className="text-[8px] text-gray-500 font-bold tracking-widest uppercase">Sedang Online</p>
