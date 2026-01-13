@@ -74,7 +74,7 @@ const SmartReview: React.FC = () => {
                 type="text"
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
-                placeholder="Tulis merk dan tipe Smartphone (Ex: Samsung S25 Ultra)"
+                placeholder="Tulis merk dan tipe Smartphone (Contoh: Samsung S25)"
                 className="w-full bg-white/5 border border-white/20 rounded-2xl px-6 py-4 text-xs md:text-sm focus:outline-none focus:border-yellow-400 transition-colors pr-32 font-bold shadow-2xl"
               />
               <button
