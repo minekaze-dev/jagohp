@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { getAllCatalogItems } from '../services/geminiService';
 import { CatalogItem } from '../types';
 
@@ -166,7 +166,7 @@ const Catalog: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'Harga' | 'Brand' | 'Kebutuhan'>('Brand');
   const [activeFilter, setActiveFilter] = useState('');
-  const [activeGamingBudget, setActiveGamingBudget] = useState('Semua');
+  const [activeSubBudget, setActiveSubBudget] = useState('Semua');
   const [selectedItem, setSelectedItem] = useState<CatalogItem | null>(null);
 
   const primaryBrands = [
@@ -179,7 +179,7 @@ const Catalog: React.FC = () => {
     Brand: [...primaryBrands, 'Lainnya'],
     Harga: ['1-2 Juta', '2-3 Juta', '3-5 Juta', '5-10 Juta', 'Diatas 10 Juta'],
     Kebutuhan: ['Gaming', 'Harian', 'Fotografi', 'Tahan Air', 'Konten', 'Baterai Awet'],
-    GamingBudgets: ['Semua', '1-2 Juta', '2-5 Juta', '5-7 Juta', 'Diatas 7 Juta']
+    SubBudgets: ['Semua', '1-2 Juta', '2-5 Juta', '5-7 Juta', 'Diatas 7 Juta']
   };
 
   useEffect(() => {
@@ -202,7 +202,7 @@ const Catalog: React.FC = () => {
     if (!activeFilter) return [];
 
     const result = allItems.filter(item => {
-      // Step 1: Check Brand Tab
+      // Logic for Brand Tab
       if (activeTab === 'Brand') {
         if (activeFilter === 'Lainnya') {
           return !primaryBrands.some(b => item.brand.toLowerCase() === b.toLowerCase());
@@ -211,7 +211,7 @@ const Catalog: React.FC = () => {
                item.brand.toLowerCase() === activeFilter.toLowerCase();
       }
       
-      // Step 2: Check Harga Tab
+      // Logic for Harga Tab
       if (activeTab === 'Harga') {
         const firstPricePart = item.price.split('-')[0].split('~')[0].split('(')[0].trim();
         const priceNum = parseInt(firstPricePart.replace(/[^0-9]/g, '')) || 0;
@@ -223,50 +223,43 @@ const Catalog: React.FC = () => {
         if (activeFilter === 'Diatas 10 Juta') return priceNum > 10000000;
       }
 
-      // Step 3: Check Kebutuhan Tab
+      // Logic for Kebutuhan Tab with global sub-budget support
       if (activeTab === 'Kebutuhan') {
         const search = activeFilter.toLowerCase();
         const contentToSearch = `${item.specs.features} ${item.aiNote} ${item.classification.targetAudience} ${item.classification.suitableFor.join(' ')}`.toLowerCase();
         
-        // Specific requirement for "Tahan Air" (IP rated)
+        let matchesCategory = false;
+        
         if (search === 'tahan air') {
-          return contentToSearch.includes('ip68') || contentToSearch.includes('ip67') || contentToSearch.includes('ip69') || contentToSearch.includes('tahan air') || contentToSearch.includes('waterproof');
+          matchesCategory = contentToSearch.includes('ip68') || contentToSearch.includes('ip67') || contentToSearch.includes('ip69') || contentToSearch.includes('tahan air') || contentToSearch.includes('waterproof');
+        } else if (search === 'konten') {
+          matchesCategory = contentToSearch.includes('konten') || contentToSearch.includes('creator') || contentToSearch.includes('vlog') || contentToSearch.includes('videografi');
+        } else if (search === 'baterai awet') {
+          matchesCategory = contentToSearch.includes('baterai awet') || contentToSearch.includes('long battery') || contentToSearch.includes('5000mah') || contentToSearch.includes('6000mah');
+        } else if (search === 'gaming') {
+          matchesCategory = contentToSearch.includes('gaming') || item.segment === 'Flagship' || contentToSearch.includes('performance');
+        } else {
+          // Others: Fotografi, Harian
+          matchesCategory = contentToSearch.includes(search);
         }
 
-        // Specific requirement for "Konten"
-        if (search === 'konten') {
-          return contentToSearch.includes('konten') || contentToSearch.includes('creator') || contentToSearch.includes('vlog') || contentToSearch.includes('videografi');
+        if (!matchesCategory) return false;
+
+        // Apply shared sub-budget logic
+        if (activeSubBudget !== 'Semua') {
+          const firstPricePart = item.price.split('-')[0].split('~')[0].split('(')[0].trim();
+          const priceNum = parseInt(firstPricePart.replace(/[^0-9]/g, '')) || 0;
+          if (activeSubBudget === '1-2 Juta') return priceNum >= 1000000 && priceNum <= 2000000;
+          if (activeSubBudget === '2-5 Juta') return priceNum > 2000000 && priceNum <= 5000000;
+          if (activeSubBudget === '5-7 Juta') return priceNum > 5000000 && priceNum <= 7000000;
+          if (activeSubBudget === 'Diatas 7 Juta') return priceNum > 7000000;
         }
 
-        // Specific requirement for "Baterai Awet"
-        if (search === 'baterai awet') {
-          return contentToSearch.includes('baterai awet') || contentToSearch.includes('long battery') || contentToSearch.includes('5000mah') || contentToSearch.includes('6000mah');
-        }
-
-        // Specific requirement for "Gaming" with optional sub-budget filter
-        if (search === 'gaming') {
-          const isGaming = contentToSearch.includes('gaming') || item.segment === 'Flagship' || contentToSearch.includes('performance');
-          if (!isGaming) return false;
-
-          // If budget sub-filter is active
-          if (activeGamingBudget !== 'Semua') {
-            const firstPricePart = item.price.split('-')[0].split('~')[0].split('(')[0].trim();
-            const priceNum = parseInt(firstPricePart.replace(/[^0-9]/g, '')) || 0;
-            if (activeGamingBudget === '1-2 Juta') return priceNum >= 1000000 && priceNum <= 2000000;
-            if (activeGamingBudget === '2-5 Juta') return priceNum > 2000000 && priceNum <= 5000000;
-            if (activeGamingBudget === '5-7 Juta') return priceNum > 5000000 && priceNum <= 7000000;
-            if (activeGamingBudget === 'Diatas 7 Juta') return priceNum > 7000000;
-          }
-          return true;
-        }
-
-        // Handle others: Fotografi, Harian
-        return contentToSearch.includes(search);
+        return true;
       }
       return false;
     });
 
-    // Sorting by release date (Newest first)
     return result.sort((a, b) => {
       const monthOrder: Record<string, number> = {
         'januari': 0, 'februari': 1, 'maret': 2, 'april': 3, 'mei': 4, 'juni': 5,
@@ -287,7 +280,7 @@ const Catalog: React.FC = () => {
       if (dateB.year !== dateA.year) return dateB.year - dateA.year;
       return dateB.month - dateA.month;
     });
-  }, [allItems, activeTab, activeFilter, activeGamingBudget]);
+  }, [allItems, activeTab, activeFilter, activeSubBudget]);
 
   const renderFilterButton = (f: string, isActive: boolean, onClick: () => void) => (
     <button
@@ -320,7 +313,7 @@ const Catalog: React.FC = () => {
                onClick={() => {
                  setActiveTab(tab as any);
                  setActiveFilter(filters[tab as keyof typeof filters][0]);
-                 if (tab !== 'Kebutuhan') setActiveGamingBudget('Semua');
+                 setActiveSubBudget('Semua');
                }}
                className={`px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
                  activeTab === tab ? 'bg-yellow-400 text-black shadow-lg' : 'text-gray-500 hover:text-white'
@@ -338,7 +331,7 @@ const Catalog: React.FC = () => {
                 {filters.Brand.slice(0, 9).map(f => 
                   renderFilterButton(f, activeFilter === f, () => {
                     setActiveFilter(f);
-                    setActiveGamingBudget('Semua');
+                    setActiveSubBudget('Semua');
                   })
                 )}
               </div>
@@ -346,7 +339,7 @@ const Catalog: React.FC = () => {
                 {filters.Brand.slice(9).map(f => 
                   renderFilterButton(f, activeFilter === f, () => {
                     setActiveFilter(f);
-                    setActiveGamingBudget('Semua');
+                    setActiveSubBudget('Semua');
                   })
                 )}
               </div>
@@ -356,19 +349,19 @@ const Catalog: React.FC = () => {
               {filters[activeTab as keyof typeof filters]?.map(f => 
                 renderFilterButton(f, activeFilter === f, () => {
                   setActiveFilter(f);
-                  if (f !== 'Gaming') setActiveGamingBudget('Semua');
+                  setActiveSubBudget('Semua');
                 })
               )}
             </div>
           )}
 
-          {/* Sub-Filter for Gaming Budget */}
-          {activeTab === 'Kebutuhan' && activeFilter === 'Gaming' && (
+          {/* Dynamic Budget Sub-Filter for all 'Kebutuhan' items */}
+          {activeTab === 'Kebutuhan' && activeFilter && (
             <div className="flex flex-col items-center gap-3 pt-4 border-t border-white/5 w-full max-w-lg">
-              <span className="text-[8px] font-black uppercase text-gray-500 tracking-[0.4em]">Filter Budget Gaming</span>
+              <span className="text-[8px] font-black uppercase text-gray-500 tracking-[0.4em]">Filter Budget {activeFilter}</span>
               <div className="flex flex-wrap justify-center gap-2">
-                {filters.GamingBudgets.map(b => 
-                  renderFilterButton(b, activeGamingBudget === b, () => setActiveGamingBudget(b))
+                {filters.SubBudgets.map(b => 
+                  renderFilterButton(b, activeSubBudget === b, () => setActiveSubBudget(b))
                 )}
               </div>
             </div>
