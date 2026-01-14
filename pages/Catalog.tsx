@@ -180,7 +180,7 @@ const Catalog: React.FC = () => {
       'Lainnya'
     ],
     Harga: ['1-2 Juta', '2-3 Juta', '3-5 Juta', '5-10 Juta', 'Diatas 10 Juta'],
-    Kebutuhan: ['Gaming', 'Harian', 'Fotografi', 'Anti Air', 'Konten Kreator', 'Baterai Awet']
+    Kebutuhan: ['Gaming', 'Harian', 'Fotografi', 'Tahan Air', 'Konten Kreator', 'Baterai Awet']
   };
 
   useEffect(() => {
