@@ -75,12 +75,12 @@ const SmartReview: React.FC = () => {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Tulis merk dan tipe HP (Contoh: Samsung S25 Ultra)"
-                className="w-full bg-white/5 border border-white/20 rounded-2xl px-6 py-4 text-xs md:text-sm focus:outline-none focus:border-yellow-400 transition-colors pr-32 font-bold shadow-2xl"
+                className="w-full bg-white/5 border border-white/20 rounded-2xl px-6 py-4 text-xs md:text-sm focus:outline-none focus:border-yellow-400 transition-colors pr-28 md:pr-32 font-bold shadow-2xl"
               />
               <button
                 type="submit"
                 disabled={loading}
-                className="absolute right-1.5 top-1.5 bottom-1.5 bg-yellow-400 text-black px-6 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-yellow-500 disabled:opacity-50 transition-colors active:scale-95 shadow-lg shadow-yellow-400/20"
+                className="absolute right-1.5 top-1.5 bottom-1.5 bg-yellow-400 text-black px-4 md:px-6 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-yellow-500 disabled:opacity-50 transition-colors active:scale-95 shadow-lg shadow-yellow-400/20"
               >
                 Review
               </button>

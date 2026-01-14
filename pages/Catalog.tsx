@@ -42,9 +42,9 @@ const CatalogCard: React.FC<{ item: CatalogItem; onOpenDetail: (item: CatalogIte
 
 const DetailModal: React.FC<{ item: CatalogItem; onClose: () => void }> = ({ item, onClose }) => {
   const isWaterproof = useMemo(() => {
-    const content = `${item.specs.features} ${item.aiNote} ${item.classification.targetAudience}`.toLowerCase();
+    const content = `${item.specs.features} ${item.aiNote} ${item.classification.targetAudience} ${item.classification.suitableFor.join(' ')}`.toLowerCase();
     const match = content.match(/ip(67|68|69)/);
-    return match ? match[0].toUpperCase() : null;
+    return match ? match[0].toUpperCase() : (content.includes('tahan air') || content.includes('waterproof') ? 'IP RATED' : null);
   }, [item]);
 
   return (
@@ -166,6 +166,7 @@ const Catalog: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'Harga' | 'Brand' | 'Kebutuhan'>('Brand');
   const [activeFilter, setActiveFilter] = useState('');
+  const [activeGamingBudget, setActiveGamingBudget] = useState('Semua');
   const [selectedItem, setSelectedItem] = useState<CatalogItem | null>(null);
 
   const primaryBrands = [
@@ -175,12 +176,10 @@ const Catalog: React.FC = () => {
   ];
 
   const filters = {
-    Brand: [
-      ...primaryBrands,
-      'Lainnya'
-    ],
+    Brand: [...primaryBrands, 'Lainnya'],
     Harga: ['1-2 Juta', '2-3 Juta', '3-5 Juta', '5-10 Juta', 'Diatas 10 Juta'],
-    Kebutuhan: ['Gaming', 'Harian', 'Fotografi', 'Tahan Air', 'Konten', 'Baterai Awet']
+    Kebutuhan: ['Gaming', 'Harian', 'Fotografi', 'Tahan Air', 'Konten', 'Baterai Awet'],
+    GamingBudgets: ['Semua', '1-2 Juta', '2-5 Juta', '5-7 Juta', 'Diatas 7 Juta']
   };
 
   useEffect(() => {
@@ -203,15 +202,16 @@ const Catalog: React.FC = () => {
     if (!activeFilter) return [];
 
     const result = allItems.filter(item => {
+      // Step 1: Check Brand Tab
       if (activeTab === 'Brand') {
         if (activeFilter === 'Lainnya') {
-          // Cari HP yang brand-nya tidak ada dalam daftar primary
           return !primaryBrands.some(b => item.brand.toLowerCase() === b.toLowerCase());
         }
         return item.name.toLowerCase().includes(activeFilter.toLowerCase()) || 
                item.brand.toLowerCase() === activeFilter.toLowerCase();
       }
       
+      // Step 2: Check Harga Tab
       if (activeTab === 'Harga') {
         const firstPricePart = item.price.split('-')[0].split('~')[0].split('(')[0].trim();
         const priceNum = parseInt(firstPricePart.replace(/[^0-9]/g, '')) || 0;
@@ -223,31 +223,50 @@ const Catalog: React.FC = () => {
         if (activeFilter === 'Diatas 10 Juta') return priceNum > 10000000;
       }
 
+      // Step 3: Check Kebutuhan Tab
       if (activeTab === 'Kebutuhan') {
         const search = activeFilter.toLowerCase();
+        const contentToSearch = `${item.specs.features} ${item.aiNote} ${item.classification.targetAudience} ${item.classification.suitableFor.join(' ')}`.toLowerCase();
         
-        // Logic khusus Anti Air
-        if (search === 'anti air') {
-          const contentToSearch = `${item.specs.features} ${item.aiNote} ${item.classification.targetAudience}`.toLowerCase();
-          return (
-            contentToSearch.includes('ip68') || 
-            contentToSearch.includes('ip67') || 
-            contentToSearch.includes('ip69') || 
-            contentToSearch.includes('anti air') || 
-            contentToSearch.includes('waterproof') ||
-            contentToSearch.includes('water resistant')
-          );
+        // Specific requirement for "Tahan Air" (IP rated)
+        if (search === 'tahan air') {
+          return contentToSearch.includes('ip68') || contentToSearch.includes('ip67') || contentToSearch.includes('ip69') || contentToSearch.includes('tahan air') || contentToSearch.includes('waterproof');
         }
 
-        return (
-          item.classification.targetAudience.toLowerCase().includes(search) ||
-          item.classification.suitableFor.some(s => s.toLowerCase().includes(search)) ||
-          item.aiNote.toLowerCase().includes(search)
-        );
+        // Specific requirement for "Konten"
+        if (search === 'konten') {
+          return contentToSearch.includes('konten') || contentToSearch.includes('creator') || contentToSearch.includes('vlog') || contentToSearch.includes('videografi');
+        }
+
+        // Specific requirement for "Baterai Awet"
+        if (search === 'baterai awet') {
+          return contentToSearch.includes('baterai awet') || contentToSearch.includes('long battery') || contentToSearch.includes('5000mah') || contentToSearch.includes('6000mah');
+        }
+
+        // Specific requirement for "Gaming" with optional sub-budget filter
+        if (search === 'gaming') {
+          const isGaming = contentToSearch.includes('gaming') || item.segment === 'Flagship' || contentToSearch.includes('performance');
+          if (!isGaming) return false;
+
+          // If budget sub-filter is active
+          if (activeGamingBudget !== 'Semua') {
+            const firstPricePart = item.price.split('-')[0].split('~')[0].split('(')[0].trim();
+            const priceNum = parseInt(firstPricePart.replace(/[^0-9]/g, '')) || 0;
+            if (activeGamingBudget === '1-2 Juta') return priceNum >= 1000000 && priceNum <= 2000000;
+            if (activeGamingBudget === '2-5 Juta') return priceNum > 2000000 && priceNum <= 5000000;
+            if (activeGamingBudget === '5-7 Juta') return priceNum > 5000000 && priceNum <= 7000000;
+            if (activeGamingBudget === 'Diatas 7 Juta') return priceNum > 7000000;
+          }
+          return true;
+        }
+
+        // Handle others: Fotografi, Harian
+        return contentToSearch.includes(search);
       }
       return false;
     });
 
+    // Sorting by release date (Newest first)
     return result.sort((a, b) => {
       const monthOrder: Record<string, number> = {
         'januari': 0, 'februari': 1, 'maret': 2, 'april': 3, 'mei': 4, 'juni': 5,
@@ -268,14 +287,14 @@ const Catalog: React.FC = () => {
       if (dateB.year !== dateA.year) return dateB.year - dateA.year;
       return dateB.month - dateA.month;
     });
-  }, [allItems, activeTab, activeFilter]);
+  }, [allItems, activeTab, activeFilter, activeGamingBudget]);
 
-  const renderFilterButton = (f: string) => (
+  const renderFilterButton = (f: string, isActive: boolean, onClick: () => void) => (
     <button
       key={f}
-      onClick={() => { setActiveFilter(f); }}
+      onClick={onClick}
       className={`px-4 py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all border ${
-        activeFilter === f ? 'bg-white/10 border-white/20 text-yellow-400 shadow-[0_0_15px_rgba(250,204,21,0.1)]' : 'bg-transparent border-white/5 text-gray-600 hover:border-white/10 hover:text-gray-400'
+        isActive ? 'bg-white/10 border-white/20 text-yellow-400 shadow-[0_0_15px_rgba(250,204,21,0.1)]' : 'bg-transparent border-white/5 text-gray-600 hover:border-white/10 hover:text-gray-400'
       }`}
     >
       {f}
@@ -301,6 +320,7 @@ const Catalog: React.FC = () => {
                onClick={() => {
                  setActiveTab(tab as any);
                  setActiveFilter(filters[tab as keyof typeof filters][0]);
+                 if (tab !== 'Kebutuhan') setActiveGamingBudget('Semua');
                }}
                className={`px-6 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${
                  activeTab === tab ? 'bg-yellow-400 text-black shadow-lg' : 'text-gray-500 hover:text-white'
@@ -311,21 +331,46 @@ const Catalog: React.FC = () => {
            ))}
         </div>
 
-        <div className="w-full flex justify-center">
+        <div className="w-full flex flex-col items-center gap-4">
           {activeTab === 'Brand' ? (
             <div className="flex flex-col items-center gap-2 w-full animate-in fade-in duration-500">
               <div className="flex flex-wrap justify-center gap-2">
-                {/* Baris Atas: 9 Brand (Termasuk Asus) */}
-                {filters.Brand.slice(0, 9).map(f => renderFilterButton(f))}
+                {filters.Brand.slice(0, 9).map(f => 
+                  renderFilterButton(f, activeFilter === f, () => {
+                    setActiveFilter(f);
+                    setActiveGamingBudget('Semua');
+                  })
+                )}
               </div>
               <div className="flex flex-wrap justify-center gap-2">
-                {/* Baris Bawah: 8 Brand (Termasuk Lainnya) */}
-                {filters.Brand.slice(9).map(f => renderFilterButton(f))}
+                {filters.Brand.slice(9).map(f => 
+                  renderFilterButton(f, activeFilter === f, () => {
+                    setActiveFilter(f);
+                    setActiveGamingBudget('Semua');
+                  })
+                )}
               </div>
             </div>
           ) : (
             <div className="flex flex-wrap justify-center gap-2 animate-in fade-in duration-500">
-              {filters[activeTab].map(f => renderFilterButton(f))}
+              {filters[activeTab as keyof typeof filters]?.map(f => 
+                renderFilterButton(f, activeFilter === f, () => {
+                  setActiveFilter(f);
+                  if (f !== 'Gaming') setActiveGamingBudget('Semua');
+                })
+              )}
+            </div>
+          )}
+
+          {/* Sub-Filter for Gaming Budget */}
+          {activeTab === 'Kebutuhan' && activeFilter === 'Gaming' && (
+            <div className="flex flex-col items-center gap-3 pt-4 border-t border-white/5 w-full max-w-lg">
+              <span className="text-[8px] font-black uppercase text-gray-500 tracking-[0.4em]">Filter Budget Gaming</span>
+              <div className="flex flex-wrap justify-center gap-2">
+                {filters.GamingBudgets.map(b => 
+                  renderFilterButton(b, activeGamingBudget === b, () => setActiveGamingBudget(b))
+                )}
+              </div>
             </div>
           )}
         </div>

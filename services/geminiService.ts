@@ -139,11 +139,14 @@ export const getSmartReview = async (phoneName: string): Promise<{review: PhoneR
     contents: `${REAL_WORLD_DATA_INSTRUCTION}
     Lakukan riset mendalam untuk smartphone: ${phoneName}.
     
-    INSTRUKSI KHUSUS:
-    - Jika smartphone ini sudah rilis resmi di Indonesia, WAJIB menggunakan data spesifikasi dan harga resmi Indonesia.
-    - Sertifikasi IP: Cari informasi apakah HP ini memiliki sertifikasi IP67, IP68, atau IP69. Jika ada, WAJIB masukkan ke dalam daftar 'pros' (Kelebihan) dan sebutkan di bagian ringkasan/highlight.
-    - Bagian 'specs.releaseDate' WAJIB menggunakan format 'Bulan Tahun' (Contoh: Januari 2025). JANGAN gunakan Q1/Q2/dst.
-    - Pastikan bagian 'highlight' ditulis dalam bahasa Indonesia yang sangat meyakinkan dan berbasis fakta retail terbaru.`,
+    INSTRUKSI KHUSUS KLASIFIKASI KATALOG:
+    - Sertifikasi IP: Cari informasi apakah HP ini memiliki sertifikasi IP67, IP68, atau IP69. Jika ada, WAJIB masukkan ke dalam daftar 'pros' (Kelebihan) dan sebutkan di bagian ringkasan/highlight. Gunakan kata "Tahan Air" pada field 'targetAudience'.
+    - Baterai: Jika kapasitas >= 5000mAh dengan daya tahan teruji, tambahkan tag "Baterai Awet" di targetAudience.
+    - Konten: Jika kamera & fitur mendukung pembuatan konten (seperti AI Video, stabilizer bagus, mic jernih), tambahkan tag "Konten" di targetAudience.
+    - Fotografi: Jika skor DXOMark tinggi atau sensor kamera besar, tambahkan tag "Fotografi".
+    - Harian: Jika nyaman untuk penggunaan standar (sosmed, chat, browsing), tambahkan tag "Harian".
+    - Gaming: Jika chipset kuat (Snapdragon 8 Gen series, Dimensity 9 series), tambahkan tag "Gaming".
+    - Tanggal: Bagian 'specs.releaseDate' WAJIB menggunakan format 'Bulan Tahun' (Contoh: Januari 2025).`,
     config: {
       tools: [{googleSearch: {}}],
       responseMimeType: "application/json",

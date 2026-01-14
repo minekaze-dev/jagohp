@@ -34,6 +34,12 @@
         .custom-scrollbar::-webkit-scrollbar {
             width: 4px;
         }
+        /* Ellipsis for placeholder on mobile */
+        input::placeholder {
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
+        }
     </style>
 <script type="importmap">
 {
