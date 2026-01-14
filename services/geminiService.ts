@@ -4,11 +4,13 @@ import { PhoneReview, ComparisonResult, RecommendationResponse, TopTierResponse,
 import { supabase, generateSlug } from "./blogService";
 
 const REAL_WORLD_DATA_INSTRUCTION = `
-  PENTING: Anda adalah Ahli Reviewer Gadget Senior.
-  PENGETAHUAN: Data harus bersumber dari riset web terbaru (GSMArena, DXOMark, AnTuTu).
-  BAHASA: WAJIB menggunakan Bahasa Indonesia yang profesional dan lugas.
-  NETRALITAS: Hindari kata subjektif (terbaik, worth it, recommended). Fokus pada spesifikasi teknis dan klasifikasi objektif.
-  PENTING: Selalu cari detail IP Rating (Ketahanan Air & Debu) untuk HP Midrange dan Flagship. Berikan detail kedalaman dan durasi jika tersedia (misal: IP68, 1.5m selama 30 menit).
+  PENTING: Anda adalah Ahli Reviewer Gadget Senior dan Perancang Katalog Smartphone Profesional.
+  PENGETAHUAN: Data harus bersumber dari riset web terbaru (GSMArena, DXOMark, AnTuTu, serta situs resmi brand di Indonesia).
+  AKURASI STATUS: Prioritaskan status RESMI di Indonesia. Jika sebuah smartphone sudah rilis resmi (contoh: Samsung Galaxy A56 5G), berikan data retail resmi Indonesia. HINDARI memberikan data rumor, bocoran, atau spekulasi jika produk sudah tersedia di pasar.
+  FORMAT TANGGAL RILIS: Gunakan format 'Nama Bulan Tahun' (Contoh: 'Maret 2025'). DILARANG KERAS menggunakan format kuartal (Q1, Q2, Q3, Q4) atau 'Segera Hadir' jika data bulanan sudah tersedia.
+  BAHASA: WAJIB menggunakan Bahasa Indonesia yang profesional, lugas, dan teknis namun mudah dipahami.
+  NETRALITAS: Fokus pada spesifikasi teknis dan klasifikasi objektif.
+  PENTING: Selalu cari detail IP Rating (Ketahanan Air & Debu). Berikan detail kedalaman dan durasi jika tersedia (misal: IP68, 1.5m selama 30 menit).
 `;
 
 /**
@@ -34,7 +36,7 @@ export const getAllCatalogItems = async (): Promise<CatalogItem[]> => {
     if (priceNum < 3000000) segment = 'Entry';
     else if (priceNum >= 9000000) segment = 'Flagship';
 
-    // Ekstraksi brand yang lebih robust (menghindari kesalahan pada brand multi-word atau case sensitive)
+    // Ekstraksi brand yang lebih robust
     const brandName = r.name.trim().split(' ')[0];
 
     return {
@@ -53,7 +55,7 @@ export const getAllCatalogItems = async (): Promise<CatalogItem[]> => {
         selfieCamera: r.specs.selfieCamera,
         audio: r.specs.sound,
         batteryCharging: r.specs.battery,
-        features: `${r.specs.connectivity} ${r.specs.connectivityReview}`
+        features: `${r.specs.connectivity} ${r.specs.connectivityReview} ${r.specs.bodyReview}`
       },
       classification: {
         suitableFor: r.targetAudience.split(',').slice(0, 3).map(s => s.trim()),
@@ -70,7 +72,7 @@ export const getTopTierRankings = async (category: string): Promise<TopTierRespo
     model: 'gemini-3-flash-preview',
     contents: `${REAL_WORLD_DATA_INSTRUCTION}
     Berikan HANYA 1 smartphone terbaik mutlak (Peringkat #1) untuk kategori: ${category}.
-    Gunakan harga pasar Indonesia terbaru.`,
+    Gunakan harga pasar Indonesia terbaru dan pastikan statusnya sudah resmi jika sudah rilis.`,
     config: {
       tools: [{googleSearch: {}}],
       responseMimeType: "application/json",
@@ -136,16 +138,12 @@ export const getSmartReview = async (phoneName: string): Promise<{review: PhoneR
     model: 'gemini-3-flash-preview',
     contents: `${REAL_WORLD_DATA_INSTRUCTION}
     Lakukan riset mendalam untuk smartphone: ${phoneName}.
-    PASTIKAN BAGIAN 'HIGHLIGHT' DITULIS DALAM BAHASA INDONESIA YANG MENARIK.
     
-    Cari detail:
-    1. Jaringan & Sistem Operasi (OS saat ini & janji update).
-    2. Material Body (Bahan frame/belakang) & Kualitas Layar.
-    3. Chipset (Processor) & Penyimpanan (Internal Storage).
-    4. Kamera Utama & Kamera Depan (Selfie).
-    5. Kapasitas RAM & Konektivitas (Wi-Fi, NFC, Bluetooth, IP Rating/Anti Air).
-    6. Kualitas Audio & Daya Tahan Baterai.
-    7. Sertifikasi IP (IP67/IP68) & Ketahanan dalam air (meter/menit) jika ada.`,
+    INSTRUKSI KHUSUS:
+    - Jika smartphone ini sudah rilis resmi di Indonesia, WAJIB menggunakan data spesifikasi dan harga resmi Indonesia.
+    - Sertifikasi IP: Cari informasi apakah HP ini memiliki sertifikasi IP67, IP68, atau IP69. Jika ada, WAJIB masukkan ke dalam daftar 'pros' (Kelebihan) dan sebutkan di bagian ringkasan/highlight.
+    - Bagian 'specs.releaseDate' WAJIB menggunakan format 'Bulan Tahun' (Contoh: Januari 2025). JANGAN gunakan Q1/Q2/dst.
+    - Pastikan bagian 'highlight' ditulis dalam bahasa Indonesia yang sangat meyakinkan dan berbasis fakta retail terbaru.`,
     config: {
       tools: [{googleSearch: {}}],
       responseMimeType: "application/json",
@@ -270,7 +268,7 @@ export const getComparison = async (phones: string[]): Promise<ComparisonResult>
   const response = await ai.models.generateContent({
     model: 'gemini-3-flash-preview',
     contents: `${REAL_WORLD_DATA_INSTRUCTION}
-    Bandingkan secara objektif: ${phones.join(", ")}.`,
+    Bandingkan secara objektif: ${phones.join(", ")}. Pastikan data yang dibandingkan adalah data resmi retail jika produk sudah rilis.`,
     config: {
       tools: [{googleSearch: {}}],
       responseMimeType: "application/json",
@@ -351,7 +349,8 @@ export const getMatch = async (criteria: any): Promise<RecommendationResponse> =
     contents: `${REAL_WORLD_DATA_INSTRUCTION}
     Cari smartphone terbaik untuk kebutuhan:
     - Aktivitas: ${criteria.activities?.join(", ")}
-    - Budget: ${criteria.budget}`,
+    - Budget: ${criteria.budget}
+    Pastikan rekomendasi memprioritaskan HP yang sudah resmi rilis di Indonesia dengan format tanggal rilis 'Bulan Tahun'.`,
     config: {
       tools: [{googleSearch: {}}],
       responseMimeType: "application/json",

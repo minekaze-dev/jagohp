@@ -40,113 +40,126 @@ const CatalogCard: React.FC<{ item: CatalogItem; onOpenDetail: (item: CatalogIte
   </div>
 );
 
-const DetailModal: React.FC<{ item: CatalogItem; onClose: () => void }> = ({ item, onClose }) => (
-  <div className="fixed inset-0 z-[1000] flex items-center justify-center p-2 md:p-4">
-    <div className="absolute inset-0 bg-black/95 backdrop-blur-2xl" onClick={onClose}></div>
-    <div className="bg-[#0a0a0a] border border-white/10 w-full max-w-6xl max-h-[92vh] rounded-[2rem] md:rounded-[3rem] p-5 md:p-8 relative overflow-y-auto custom-scrollbar shadow-[0_0_100px_rgba(0,0,0,0.5)] animate-in zoom-in duration-300">
-      
-      <div className="flex justify-between items-start mb-6 border-b border-white/5 pb-4 sticky top-0 bg-[#0a0a0a] z-20">
-        <div className="flex items-start gap-3 md:gap-5">
-          <div className="bg-yellow-400 text-black w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl flex items-center justify-center font-black italic text-lg md:text-xl shadow-lg shrink-0">
-            {item.brand.charAt(0)}
-          </div>
-          <div className="space-y-1">
-            <div className="flex items-center gap-2">
-               <span className="text-yellow-400 text-[8px] md:text-[9px] font-black uppercase tracking-[0.3em]">{item.brand}</span>
-               <span className="w-1 h-1 bg-white/20 rounded-full"></span>
-               <span className="text-gray-500 text-[8px] md:text-[9px] font-black uppercase tracking-[0.3em]">{item.year}</span>
+const DetailModal: React.FC<{ item: CatalogItem; onClose: () => void }> = ({ item, onClose }) => {
+  const isWaterproof = useMemo(() => {
+    const content = `${item.specs.features} ${item.aiNote} ${item.classification.targetAudience}`.toLowerCase();
+    const match = content.match(/ip(67|68|69)/);
+    return match ? match[0].toUpperCase() : null;
+  }, [item]);
+
+  return (
+    <div className="fixed inset-0 z-[1000] flex items-center justify-center p-2 md:p-4">
+      <div className="absolute inset-0 bg-black/95 backdrop-blur-2xl" onClick={onClose}></div>
+      <div className="bg-[#0a0a0a] border border-white/10 w-full max-w-6xl max-h-[92vh] rounded-[2rem] md:rounded-[3rem] p-5 md:p-8 relative overflow-y-auto custom-scrollbar shadow-[0_0_100px_rgba(0,0,0,0.5)] animate-in zoom-in duration-300">
+        
+        <div className="flex justify-between items-start mb-6 border-b border-white/5 pb-4 sticky top-0 bg-[#0a0a0a] z-20">
+          <div className="flex items-start gap-3 md:gap-5">
+            <div className="bg-yellow-400 text-black w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl flex items-center justify-center font-black italic text-lg md:text-xl shadow-lg shrink-0">
+              {item.brand.charAt(0)}
             </div>
-            <h2 className="text-base md:text-2xl font-black text-white uppercase italic tracking-tighter leading-tight line-clamp-2 md:line-clamp-none">
-              {item.name}
-            </h2>
-          </div>
-        </div>
-        <div className="flex items-center gap-4 md:gap-6 pt-1">
-          <div className="text-right hidden sm:block">
-            <div className="text-[7px] md:text-[8px] font-black text-gray-500 uppercase tracking-widest mb-1">Estimasi Harga</div>
-            <div className="text-sm md:text-lg font-black text-yellow-400 leading-none">{item.price}</div>
-          </div>
-          <button onClick={onClose} className="w-9 h-9 md:w-10 md:h-10 flex items-center justify-center bg-white/5 rounded-xl text-gray-500 hover:text-white hover:bg-white/10 transition-all shrink-0">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"/></svg>
-          </button>
-        </div>
-      </div>
-
-      <div className="sm:hidden mb-6 bg-yellow-400/5 border border-yellow-400/10 p-4 rounded-2xl flex justify-between items-center">
-         <span className="text-[8px] font-black text-gray-500 uppercase tracking-widest">Estimasi Harga</span>
-         <span className="text-sm font-black text-yellow-400 tracking-tight">{item.price}</span>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 relative z-10">
-        <div className="lg:col-span-1 bg-white/[0.02] p-5 rounded-[2rem] border border-white/5">
-          <h4 className="text-[10px] font-black uppercase text-gray-500 tracking-[0.3em] mb-4 border-l-2 border-yellow-400 pl-3">Spesifikasi Teknis</h4>
-          <div className="grid grid-cols-1 gap-y-2.5">
-            {[
-              { label: 'Jaringan', val: item.specs.network },
-              { label: 'Chipset', val: item.specs.chipset },
-              { label: 'RAM/ROM', val: item.specs.ramStorage },
-              { label: 'Layar', val: item.specs.screen },
-              { label: 'Kamera', val: item.specs.mainCamera },
-              { label: 'Selfie', val: item.specs.selfieCamera },
-              { label: 'Baterai', val: item.specs.batteryCharging },
-              { label: 'OS/Fitur', val: item.specs.features },
-            ].map((s, idx) => (
-              <div key={idx} className="flex flex-col gap-0.5 border-b border-white/5 pb-1.5">
-                <span className="text-[8px] font-black text-gray-600 uppercase tracking-widest">{s.label}</span>
-                <span className="text-[10px] font-bold text-gray-300 truncate" title={s.val}>{s.val}</span>
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                 <span className="text-yellow-400 text-[8px] md:text-[9px] font-black uppercase tracking-[0.3em]">{item.brand}</span>
+                 <span className="w-1 h-1 bg-white/20 rounded-full"></span>
+                 <span className="text-gray-500 text-[8px] md:text-[9px] font-black uppercase tracking-[0.3em]">{item.year}</span>
+                 {isWaterproof && (
+                   <span className="ml-2 bg-blue-500/10 text-blue-400 text-[7px] font-black uppercase px-2 py-0.5 rounded border border-blue-500/20">
+                     💧 {isWaterproof}
+                   </span>
+                 )}
               </div>
-            ))}
+              <h2 className="text-base md:text-2xl font-black text-white uppercase italic tracking-tighter leading-tight line-clamp-2 md:line-clamp-none">
+                {item.name}
+              </h2>
+            </div>
+          </div>
+          <div className="flex items-center gap-4 md:gap-6 pt-1">
+            <div className="text-right hidden sm:block">
+              <div className="text-[7px] md:text-[8px] font-black text-gray-500 uppercase tracking-widest mb-1">Estimasi Harga</div>
+              <div className="text-sm md:text-lg font-black text-yellow-400 leading-none">{item.price}</div>
+            </div>
+            <button onClick={onClose} className="w-9 h-9 md:w-10 md:h-10 flex items-center justify-center bg-white/5 rounded-xl text-gray-500 hover:text-white hover:bg-white/10 transition-all shrink-0">
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            </button>
           </div>
         </div>
 
-        <div className="lg:col-span-1 space-y-4">
-           <div className="bg-yellow-400 text-black p-5 rounded-[2rem] shadow-xl h-full flex flex-col justify-between">
-              <div className="space-y-4">
-                <h4 className="text-[10px] font-black uppercase tracking-[0.3em] opacity-50">Klasifikasi Smart AI</h4>
-                <div className="space-y-3">
-                   <div className="space-y-1.5">
-                      <span className="text-[9px] font-black uppercase block opacity-40">Kebutuhan:</span>
-                      <div className="flex flex-wrap gap-1.5">
-                         {item.classification.suitableFor.map((s, i) => (
-                           <span key={i} className="bg-black/10 border border-black/10 px-2.5 py-1 rounded-lg text-[9px] font-black uppercase italic">{s}</span>
-                         ))}
-                      </div>
-                   </div>
-                   <div className="space-y-1.5 pt-2">
-                      <span className="text-[9px] font-black uppercase block opacity-40">Target Pengguna:</span>
-                      <p className="text-[11px] font-black italic leading-tight">"{item.classification.targetAudience}"</p>
+        <div className="sm:hidden mb-6 bg-yellow-400/5 border border-yellow-400/10 p-4 rounded-2xl flex justify-between items-center">
+           <span className="text-[8px] font-black text-gray-500 uppercase tracking-widest">Estimasi Harga</span>
+           <span className="text-sm font-black text-yellow-400 tracking-tight">{item.price}</span>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 relative z-10">
+          <div className="lg:col-span-1 bg-white/[0.02] p-5 rounded-[2rem] border border-white/5">
+            <h4 className="text-[10px] font-black uppercase text-gray-500 tracking-[0.3em] mb-4 border-l-2 border-yellow-400 pl-3">Spesifikasi Teknis</h4>
+            <div className="grid grid-cols-1 gap-y-2.5">
+              {[
+                { label: 'Jaringan', val: item.specs.network },
+                { label: 'Chipset', val: item.specs.chipset },
+                { label: 'RAM/ROM', val: item.specs.ramStorage },
+                { label: 'Layar', val: item.specs.screen },
+                { label: 'Kamera', val: item.specs.mainCamera },
+                { label: 'Selfie', val: item.specs.selfieCamera },
+                { label: 'Baterai', val: item.specs.batteryCharging },
+                { label: 'OS/Fitur', val: item.specs.features },
+              ].map((s, idx) => (
+                <div key={idx} className="flex flex-col gap-0.5 border-b border-white/5 pb-1.5">
+                  <span className="text-[8px] font-black text-gray-600 uppercase tracking-widest">{s.label}</span>
+                  <span className="text-[10px] font-bold text-gray-300 truncate" title={s.val}>{s.val}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="lg:col-span-1 space-y-4">
+             <div className="bg-yellow-400 text-black p-5 rounded-[2rem] shadow-xl h-full flex flex-col justify-between">
+                <div className="space-y-4">
+                  <h4 className="text-[10px] font-black uppercase tracking-[0.3em] opacity-50">Klasifikasi Smart AI</h4>
+                  <div className="space-y-3">
+                     <div className="space-y-1.5">
+                        <span className="text-[9px] font-black uppercase block opacity-40">Kebutuhan:</span>
+                        <div className="flex flex-wrap gap-1.5">
+                           {item.classification.suitableFor.map((s, i) => (
+                             <span key={i} className="bg-black/10 border border-black/10 px-2.5 py-1 rounded-lg text-[9px] font-black uppercase italic">{s}</span>
+                           ))}
+                        </div>
+                     </div>
+                     <div className="space-y-1.5 pt-2">
+                        <span className="text-[9px] font-black uppercase block opacity-40">Target Pengguna:</span>
+                        <p className="text-[11px] font-black italic leading-tight">"{item.classification.targetAudience}"</p>
+                     </div>
+                  </div>
+                </div>
+                <div className="pt-4 mt-4 border-t border-black/10">
+                   <div className="flex items-center gap-2">
+                      <span className="w-1.5 h-1.5 bg-black rounded-full"></span>
+                      <span className="text-[8px] font-black uppercase tracking-widest">Kasta: {item.segment} Device</span>
                    </div>
                 </div>
-              </div>
-              <div className="pt-4 mt-4 border-t border-black/10">
-                 <div className="flex items-center gap-2">
-                    <span className="w-1.5 h-1.5 bg-black rounded-full"></span>
-                    <span className="text-[8px] font-black uppercase tracking-widest">Kasta: {item.segment} Device</span>
-                 </div>
-              </div>
-           </div>
-        </div>
+             </div>
+          </div>
 
-        <div className="lg:col-span-1 flex flex-col justify-between space-y-4">
-           <div className="bg-[#050505] p-5 rounded-[2rem] border border-white/5 flex-1 relative overflow-hidden group">
-              <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
-                 <svg className="w-20 h-20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
-              </div>
-              <h4 className="text-[10px] font-black uppercase text-yellow-400 tracking-[0.3em] mb-4">JagoHP Insight</h4>
-              <p className="text-xs text-gray-400 italic font-medium leading-relaxed text-justify relative z-10">
-                "{item.aiNote}"
-              </p>
-           </div>
-           <div className="bg-white/5 p-4 rounded-2xl border border-white/5">
-              <p className="text-[8px] font-black text-gray-700 uppercase tracking-[0.3em] text-center leading-relaxed">
-                DATA GENERATED BY JAGOHP 
-              </p>
-           </div>
+          <div className="lg:col-span-1 flex flex-col justify-between space-y-4">
+             <div className="bg-[#050505] p-5 rounded-[2rem] border border-white/5 flex-1 relative overflow-hidden group">
+                <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+                   <svg className="w-20 h-20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+                </div>
+                <h4 className="text-[10px] font-black uppercase text-yellow-400 tracking-[0.3em] mb-4">JagoHP Insight</h4>
+                <p className="text-xs text-gray-400 italic font-medium leading-relaxed text-justify relative z-10">
+                  "{item.aiNote}"
+                </p>
+             </div>
+             <div className="bg-white/5 p-4 rounded-2xl border border-white/5">
+                <p className="text-[8px] font-black text-gray-700 uppercase tracking-[0.3em] text-center leading-relaxed">
+                  DATA GENERATED BY JAGOHP 
+                </p>
+             </div>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 const Catalog: React.FC = () => {
   const [allItems, setAllItems] = useState<CatalogItem[]>([]);
@@ -331,7 +344,7 @@ const Catalog: React.FC = () => {
           {filteredItems.length === 0 && (
             <div className="col-span-full py-20 text-center border-2 border-dashed border-white/5 rounded-[3rem] space-y-4">
               <div className="w-16 h-16 bg-white/5 rounded-full flex items-center justify-center mx-auto">
-                 <svg className="w-8 h-8 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                 <svg className="w-8 h-8 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
               </div>
               <p className="text-gray-600 font-black uppercase text-[10px] tracking-[0.5em] italic">Data Belum Tersedia di Database</p>
               <p className="text-gray-700 text-[10px] max-w-xs mx-auto italic">Silakan ulas di "Smart Review" pada HP incaran lo agar datanya masuk ke katalog.</p>
