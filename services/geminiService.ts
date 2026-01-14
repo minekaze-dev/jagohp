@@ -8,6 +8,7 @@ const REAL_WORLD_DATA_INSTRUCTION = `
   PENGETAHUAN: Data harus bersumber dari riset web terbaru (GSMArena, DXOMark, AnTuTu).
   BAHASA: WAJIB menggunakan Bahasa Indonesia yang profesional dan lugas.
   NETRALITAS: Hindari kata subjektif (terbaik, worth it, recommended). Fokus pada spesifikasi teknis dan klasifikasi objektif.
+  PENTING: Selalu cari detail IP Rating (Ketahanan Air & Debu) untuk HP Midrange dan Flagship. Berikan detail kedalaman dan durasi jika tersedia (misal: IP68, 1.5m selama 30 menit).
 `;
 
 /**
@@ -33,7 +34,8 @@ export const getAllCatalogItems = async (): Promise<CatalogItem[]> => {
     if (priceNum < 3000000) segment = 'Entry';
     else if (priceNum >= 9000000) segment = 'Flagship';
 
-    const brandName = r.name.split(' ')[0];
+    // Ekstraksi brand yang lebih robust (menghindari kesalahan pada brand multi-word atau case sensitive)
+    const brandName = r.name.trim().split(' ')[0];
 
     return {
       name: r.name,
@@ -51,7 +53,7 @@ export const getAllCatalogItems = async (): Promise<CatalogItem[]> => {
         selfieCamera: r.specs.selfieCamera,
         audio: r.specs.sound,
         batteryCharging: r.specs.battery,
-        features: r.specs.connectivity
+        features: `${r.specs.connectivity} ${r.specs.connectivityReview}`
       },
       classification: {
         suitableFor: r.targetAudience.split(',').slice(0, 3).map(s => s.trim()),
@@ -141,8 +143,9 @@ export const getSmartReview = async (phoneName: string): Promise<{review: PhoneR
     2. Material Body (Bahan frame/belakang) & Kualitas Layar.
     3. Chipset (Processor) & Penyimpanan (Internal Storage).
     4. Kamera Utama & Kamera Depan (Selfie).
-    5. Kapasitas RAM & Konektivitas (Wi-Fi, NFC, Bluetooth).
-    6. Kualitas Audio & Daya Tahan Baterai.`,
+    5. Kapasitas RAM & Konektivitas (Wi-Fi, NFC, Bluetooth, IP Rating/Anti Air).
+    6. Kualitas Audio & Daya Tahan Baterai.
+    7. Sertifikasi IP (IP67/IP68) & Ketahanan dalam air (meter/menit) jika ada.`,
     config: {
       tools: [{googleSearch: {}}],
       responseMimeType: "application/json",
@@ -263,6 +266,7 @@ export const getSmartReview = async (phoneName: string): Promise<{review: PhoneR
 
 export const getComparison = async (phones: string[]): Promise<ComparisonResult> => {
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  
   const response = await ai.models.generateContent({
     model: 'gemini-3-flash-preview',
     contents: `${REAL_WORLD_DATA_INSTRUCTION}
@@ -283,6 +287,7 @@ export const getComparison = async (phones: string[]): Promise<ComparisonResult>
                 feature: { type: Type.STRING },
                 phone1: { type: Type.STRING },
                 phone2: { type: Type.STRING },
+                phone3: { type: Type.STRING },
                 winnerIndex: { type: Type.NUMBER }
               },
               required: ["feature", "phone1", "phone2", "winnerIndex"]
@@ -291,11 +296,47 @@ export const getComparison = async (phones: string[]): Promise<ComparisonResult>
           performanceScores: {
             type: Type.OBJECT,
             properties: {
-              phone1: { type: Type.OBJECT },
-              phone2: { type: Type.OBJECT }
-            }
+              phone1: {
+                type: Type.OBJECT,
+                properties: {
+                  chipset: { type: Type.NUMBER },
+                  memory: { type: Type.NUMBER },
+                  camera: { type: Type.NUMBER },
+                  gaming: { type: Type.NUMBER },
+                  battery: { type: Type.NUMBER },
+                  charging: { type: Type.NUMBER }
+                },
+                required: ["chipset", "memory", "camera", "gaming", "battery", "charging"]
+              },
+              phone2: {
+                type: Type.OBJECT,
+                properties: {
+                  chipset: { type: Type.NUMBER },
+                  memory: { type: Type.NUMBER },
+                  camera: { type: Type.NUMBER },
+                  gaming: { type: Type.NUMBER },
+                  battery: { type: Type.NUMBER },
+                  charging: { type: Type.NUMBER }
+                },
+                required: ["chipset", "memory", "camera", "gaming", "battery", "charging"]
+              },
+              phone3: {
+                type: Type.OBJECT,
+                properties: {
+                  chipset: { type: Type.NUMBER },
+                  memory: { type: Type.NUMBER },
+                  camera: { type: Type.NUMBER },
+                  gaming: { type: Type.NUMBER },
+                  battery: { type: Type.NUMBER },
+                  charging: { type: Type.NUMBER }
+                },
+                required: ["chipset", "memory", "camera", "gaming", "battery", "charging"]
+              }
+            },
+            required: ["phone1", "phone2"]
           }
-        }
+        },
+        required: ["conclusion", "recommendation", "tableData", "performanceScores"]
       }
     }
   });
@@ -304,6 +345,7 @@ export const getComparison = async (phones: string[]): Promise<ComparisonResult>
 
 export const getMatch = async (criteria: any): Promise<RecommendationResponse> => {
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  
   const response = await ai.models.generateContent({
     model: 'gemini-3-flash-preview',
     contents: `${REAL_WORLD_DATA_INSTRUCTION}
@@ -316,9 +358,89 @@ export const getMatch = async (criteria: any): Promise<RecommendationResponse> =
       responseSchema: {
         type: Type.OBJECT,
         properties: {
-          primary: { type: Type.OBJECT },
-          alternatives: { type: Type.ARRAY, items: { type: Type.OBJECT } }
-        }
+          primary: {
+            type: Type.OBJECT,
+            properties: {
+              name: { type: Type.STRING },
+              reason: { type: Type.STRING },
+              price: { type: Type.STRING },
+              specs: {
+                type: Type.OBJECT,
+                properties: {
+                  processor: { type: Type.STRING },
+                  ram: { type: Type.STRING },
+                  storage: { type: Type.STRING },
+                  battery: { type: Type.STRING },
+                  charging: { type: Type.STRING },
+                  screen: { type: Type.STRING },
+                  cameraSummary: { type: Type.STRING },
+                  network: { type: Type.STRING },
+                  connectivity: { type: Type.STRING },
+                  releaseDate: { type: Type.STRING }
+                },
+                required: ["processor", "ram", "storage", "battery", "charging", "screen", "cameraSummary", "network", "connectivity", "releaseDate"]
+              },
+              performance: {
+                type: Type.OBJECT,
+                properties: {
+                  antutu: { type: Type.STRING }
+                },
+                required: ["antutu"]
+              },
+              camera: {
+                type: Type.OBJECT,
+                properties: {
+                  score: { type: Type.STRING }
+                },
+                required: ["score"]
+              }
+            },
+            required: ["name", "reason", "price", "specs", "performance", "camera"]
+          },
+          alternatives: {
+            type: Type.ARRAY,
+            items: {
+              type: Type.OBJECT,
+              properties: {
+                name: { type: Type.STRING },
+                reason: { type: Type.STRING },
+                price: { type: Type.STRING },
+                specs: {
+                  type: Type.OBJECT,
+                  properties: {
+                    processor: { type: Type.STRING },
+                    ram: { type: Type.STRING },
+                    storage: { type: Type.STRING },
+                    battery: { type: Type.STRING },
+                    charging: { type: Type.STRING },
+                    screen: { type: Type.STRING },
+                    cameraSummary: { type: Type.STRING },
+                    network: { type: Type.STRING },
+                    connectivity: { type: Type.STRING },
+                    releaseDate: { type: Type.STRING }
+                  },
+                  required: ["processor", "ram", "storage", "battery", "charging", "screen", "cameraSummary", "network", "connectivity", "releaseDate"]
+                },
+                performance: {
+                  type: Type.OBJECT,
+                  properties: {
+                    antutu: { type: Type.STRING }
+                  },
+                  required: ["antutu"]
+                },
+                camera: {
+                  type: Type.OBJECT,
+                  properties: {
+                    score: { type: Type.STRING }
+                  },
+                  required: ["score"]
+                }
+              },
+              required: ["name", "reason", "price", "specs", "performance", "camera"]
+            }
+          }
+        },
+        required: ["primary", "alternatives"]
       }
     }
   });
