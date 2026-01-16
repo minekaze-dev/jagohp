@@ -125,7 +125,7 @@ const Home: React.FC = () => {
   const features = [
     {
       title: 'Smart Review',
-      description: 'Mengulas HP secara mendalam.',
+      description: 'Mengulas HP secara dalam.',
       path: '/review',
       image: 'https://imgur.com/9BTOC0H.jpg',
       accent: 'Mengulas secara cepat & akurat'
