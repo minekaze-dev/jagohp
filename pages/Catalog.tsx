@@ -1,5 +1,5 @@
 
-import { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { getAllCatalogItems } from '../services/geminiService';
 import { CatalogItem } from '../types';
 
@@ -307,7 +307,8 @@ const Catalog: React.FC = () => {
 
       <div className="flex flex-col items-center gap-6">
         <div className="flex bg-white/5 p-1.5 rounded-2xl border border-white/10">
-           {['Brand', 'Harga', 'Kebutuhan'].map((tab) => (
+           {/* 'Kebutuhan' tab is intentionally hidden from the UI buttons while preserving its state for logic consistency */}
+           {['Brand', 'Harga'].map((tab) => (
              <button
                key={tab}
                onClick={() => {
@@ -355,7 +356,7 @@ const Catalog: React.FC = () => {
             </div>
           )}
 
-          {/* Dynamic Budget Sub-Filter for all 'Kebutuhan' items */}
+          {/* Dynamic Budget Sub-Filter for all 'Kebutuhan' items - hidden from menu, this only shows if activeTab is 'Kebutuhan' */}
           {activeTab === 'Kebutuhan' && activeFilter && (
             <div className="flex flex-col items-center gap-3 pt-4 border-t border-white/5 w-full max-w-lg">
               <span className="text-[8px] font-black uppercase text-gray-500 tracking-[0.4em]">Filter Budget {activeFilter}</span>
