@@ -95,24 +95,24 @@ const AIChat: React.FC = () => {
   };
 
   return (
-    <div className="max-w-[800px] mx-auto px-4 flex flex-col h-[calc(100dvh-165px)] md:h-[calc(100vh-100px)] pt-4">
+    <div className="max-w-[800px] mx-auto px-4 flex flex-col h-[calc(100dvh-165px)] md:h-[calc(100vh-100px)] pt-4 theme-transition">
       {/* Chat Header */}
-      <div className="flex items-center justify-between mb-4 border-b border-white/10 pb-4 shrink-0">
+      <div className="flex items-center justify-between mb-4 border-b border-black/10 dark:border-white/10 pb-4 shrink-0">
         <div className="flex items-center gap-3">
           <div className="bg-yellow-400 p-1 rounded-xl shadow-xl shadow-yellow-400/20 shrink-0">
             <img src="https://imgur.com/d3OzP78.jpg" className="w-10 h-10 object-contain rounded-lg" alt="JAGOBOT AI" />
           </div>
           <div className="min-w-0">
-            <h1 className="text-lg font-black uppercase tracking-tighter leading-none truncate">JAGOBOT AI</h1>
+            <h1 className="text-lg font-black uppercase tracking-tighter leading-none truncate text-black dark:text-white">JAGOBOT AI</h1>
             <div className="flex items-center gap-1.5 mt-1">
               <span className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></span>
-              <p className="text-[8px] text-gray-500 font-bold tracking-widest uppercase">Sedang Online</p>
+              <p className="text-[8px] text-gray-500 dark:text-gray-500 font-bold tracking-widest uppercase">Sedang Online</p>
             </div>
           </div>
         </div>
         <button 
           onClick={() => setMessages([{ role: 'model', content: 'Halo Kak! Ada yang bisa saya bantu lagi soal gadget terbaru?' }])}
-          className="text-[8px] font-black text-gray-600 uppercase tracking-widest hover:text-white transition-colors"
+          className="text-[8px] font-black text-gray-400 dark:text-gray-600 uppercase tracking-widest hover:text-black dark:hover:text-white transition-colors"
         >
           Reset
         </button>
@@ -128,7 +128,7 @@ const AIChat: React.FC = () => {
             <div className={`max-w-[88%] p-3.5 rounded-2xl text-xs md:text-sm leading-relaxed shadow-sm ${
               msg.role === 'user' 
                 ? 'bg-yellow-400 text-black font-bold rounded-tr-none' 
-                : 'bg-neutral-900 text-gray-200 font-medium rounded-tl-none border border-white/5'
+                : 'bg-black/5 dark:bg-neutral-900 text-black dark:text-gray-200 font-medium rounded-tl-none border border-black/5 dark:border-white/5'
             }`}>
               <div className="whitespace-pre-wrap">
                 {msg.content}
@@ -138,7 +138,7 @@ const AIChat: React.FC = () => {
         ))}
         {loading && (
           <div className="flex justify-start">
-            <div className="bg-neutral-900 p-3 rounded-2xl border border-white/5 flex gap-1 items-center">
+            <div className="bg-black/5 dark:bg-neutral-900 p-3 rounded-2xl border border-black/5 dark:border-white/5 flex gap-1 items-center">
               <span className="w-1 h-1 bg-yellow-400 rounded-full animate-bounce"></span>
               <span className="w-1 h-1 bg-yellow-400 rounded-full animate-bounce delay-75"></span>
               <span className="w-1 h-1 bg-yellow-400 rounded-full animate-bounce delay-150"></span>
@@ -147,15 +147,15 @@ const AIChat: React.FC = () => {
         )}
       </div>
 
-      {/* Input Form - Mobile Optimized Flex Layout */}
+      {/* Input Form */}
       <form onSubmit={handleSend} className="shrink-0 mb-4 md:mb-6">
-        <div className="bg-[#0c0c0c] border border-white/10 rounded-2xl p-1.5 flex gap-2 items-center group focus-within:border-yellow-400/50 transition-all shadow-2xl">
+        <div className="bg-white dark:bg-[#0c0c0c] border border-black/10 dark:border-white/10 rounded-2xl p-1.5 flex gap-2 items-center group focus-within:border-yellow-400/50 transition-all shadow-2xl theme-transition">
           <input
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Tanya soal gadget..."
-            className="flex-1 bg-transparent px-4 py-3 text-xs md:text-sm focus:outline-none text-white placeholder:text-gray-700 font-medium"
+            className="flex-1 bg-transparent px-4 py-3 text-xs md:text-sm focus:outline-none text-black dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-700 font-medium"
           />
           <button
             type="submit"

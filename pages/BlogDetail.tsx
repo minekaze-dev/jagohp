@@ -112,19 +112,19 @@ const BlogDetail: React.FC = () => {
   };
 
   if (loading) return (
-    <div className="min-h-screen py-40 text-center bg-black flex flex-col items-center justify-center">
+    <div className="min-h-screen py-40 text-center bg-white dark:bg-black flex flex-col items-center justify-center theme-transition">
       <div className="w-16 h-16 border-4 border-yellow-400 border-t-transparent rounded-full animate-spin mb-6"></div>
       <p className="text-gray-500 font-black uppercase tracking-[0.4em] italic text-xs">Menyusun Berita Terbaru...</p>
     </div>
   );
 
   if (!post) return (
-    <div className="min-h-screen py-40 text-center bg-black flex flex-col items-center justify-center px-4">
-      <div className="bg-[#0a0a0a] border border-white/10 rounded-[2.5rem] p-12 max-w-md w-full space-y-6">
+    <div className="min-h-screen py-40 text-center bg-white dark:bg-black flex flex-col items-center justify-center px-4 theme-transition">
+      <div className="bg-gray-50 dark:bg-[#0a0a0a] border border-black/5 dark:border-white/10 rounded-[2.5rem] p-12 max-w-md w-full space-y-6 shadow-xl theme-transition">
         <div className="w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center mx-auto">
           <svg className="w-10 h-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
         </div>
-        <h2 className="text-xl font-black text-white uppercase italic tracking-tighter">Artikel Tidak Ditemukan</h2>
+        <h2 className="text-xl font-black text-black dark:text-white uppercase italic tracking-tighter">Artikel Tidak Ditemukan</h2>
         <Link to="/blog" className="block w-full bg-yellow-400 text-black py-4 rounded-2xl font-black uppercase tracking-widest text-[10px] shadow-lg shadow-yellow-400/20 active:scale-95 transition-all">
           Kembali ke Blog Utama
         </Link>
@@ -133,9 +133,9 @@ const BlogDetail: React.FC = () => {
   );
 
   return (
-    <div className="min-h-screen bg-black text-white selection:bg-yellow-400/30">
+    <div className="min-h-screen bg-white dark:bg-black text-black dark:text-white selection:bg-yellow-400/30 theme-transition">
       <div className="max-w-[800px] mx-auto px-4 py-16 space-y-12 pb-32">
-        <Link to="/blog" className="inline-flex items-center gap-2 text-gray-500 hover:text-yellow-400 transition-colors text-[10px] font-black uppercase tracking-widest group">
+        <Link to="/blog" className="inline-flex items-center gap-2 text-gray-400 dark:text-gray-500 hover:text-yellow-400 transition-colors text-[10px] font-black uppercase tracking-widest group theme-transition">
           <svg className="w-4 h-4 transition-transform group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M15 19l-7-7 7-7"/></svg>
           Kembali ke Halaman Blog
         </Link>
@@ -146,46 +146,45 @@ const BlogDetail: React.FC = () => {
               <span className="bg-yellow-400 text-black px-4 py-1.5 rounded-xl text-[9px] font-black uppercase tracking-widest">
                 {post.category}
               </span>
-              <span className="text-gray-600 text-[9px] font-black uppercase tracking-widest flex items-center gap-1.5 ml-2">
+              <span className="text-gray-400 dark:text-gray-600 text-[9px] font-black uppercase tracking-widest flex items-center gap-1.5 ml-2 theme-transition">
                  {new Date(post.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
               </span>
             </div>
-            <h1 className="text-2xl md:text-4xl font-black text-white italic uppercase tracking-tighter leading-[0.9]">{post.title}</h1>
-            <p className="text-gray-500 italic text-[13px] md:text-base font-medium border-l-4 border-yellow-400/20 pl-6 leading-relaxed">"{post.excerpt}"</p>
+            <h1 className="text-2xl md:text-4xl font-black text-black dark:text-white uppercase italic tracking-tighter leading-[0.9] theme-transition">{post.title}</h1>
+            <p className="text-gray-500 dark:text-gray-400 italic text-[13px] md:text-base font-medium border-l-4 border-yellow-400/20 pl-6 leading-relaxed theme-transition">"{post.excerpt}"</p>
           </div>
 
-          <div className="relative aspect-video rounded-[2.5rem] overflow-hidden shadow-2xl border border-white/10 bg-neutral-900">
+          <div className="relative aspect-video rounded-[2.5rem] overflow-hidden shadow-2xl border border-black/5 dark:border-white/10 bg-gray-100 dark:bg-neutral-900 theme-transition">
             {post.imageUrl && <img src={post.imageUrl} className="w-full h-full object-cover" alt={post.title} />}
           </div>
 
           <div 
-            className="text-gray-300 text-sm md:text-base leading-relaxed prose prose-invert max-w-none 
-            prose-h1:text-white prose-h1:text-2xl prose-h1:font-black prose-h1:italic prose-h1:uppercase 
+            className="text-gray-600 dark:text-gray-300 text-sm md:text-base leading-relaxed prose prose-neutral dark:prose-invert max-w-none 
+            prose-h1:text-black dark:prose-h1:text-white prose-h1:text-2xl prose-h1:font-black prose-h1:italic prose-h1:uppercase 
             prose-p:mb-6 prose-p:italic prose-p:font-medium prose-p:text-justify
-            prose-img:rounded-3xl prose-img:shadow-2xl prose-img:my-10 prose-img:border prose-img:border-white/5
-            prose-ul:italic prose-ol:italic prose-li:mb-2 prose-strong:text-yellow-400"
+            prose-img:rounded-3xl prose-img:shadow-2xl prose-img:my-10 prose-img:border prose-img:border-black/5 dark:prose-img:border-white/5
+            prose-ul:italic prose-ol:italic prose-li:mb-2 prose-strong:text-yellow-500 dark:prose-strong:text-yellow-400 theme-transition"
             dangerouslySetInnerHTML={{ __html: post.content || '' }}
           />
 
-          {/* SECTION BAGIKAN - Jarak diperdekat */}
-          <div className="pt-8 pb-4 border-t border-white/5 space-y-4">
+          <div className="pt-8 pb-4 border-t border-black/5 dark:border-white/5 space-y-4 theme-transition">
             <div className="flex items-center gap-4">
-               <h3 className="text-[10px] font-black text-white italic uppercase tracking-[0.3em]">Bagikan Artikel</h3>
-               <div className="h-[1px] flex-1 bg-white/5"></div>
+               <h3 className="text-[10px] font-black text-black dark:text-white italic uppercase tracking-[0.3em] theme-transition">Bagikan Artikel</h3>
+               <div className="h-[1px] flex-1 bg-black/5 dark:bg-white/5 theme-transition"></div>
             </div>
             <div className="flex flex-wrap gap-3">
               <a 
                 href={`https://wa.me/?text=${encodeURIComponent(post.title + '\n' + window.location.href)}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-3 bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 px-5 py-2.5 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-emerald-500 hover:text-white transition-all shadow-lg active:scale-95"
+                className="flex items-center gap-3 bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 px-5 py-2.5 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-emerald-500 hover:text-white transition-all shadow-lg active:scale-95 theme-transition"
               >
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662c1.72 0.94 3.659 1.437 5.634 1.437h.005c6.558 0 11.894-5.335 11.897-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87(0.01)-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L0 24l6.335-1.662c1.72 0.94 3.659 1.437 5.634 1.437h.005c6.558 0 11.894-5.335 11.897-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
                 WhatsApp
               </a>
               <button 
                 onClick={handleCopy}
-                className={`flex items-center gap-3 px-5 py-2.5 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all shadow-lg active:scale-95 ${copied ? 'bg-yellow-400 text-black border-yellow-400' : 'bg-white/5 border border-white/10 text-white hover:text-yellow-400 hover:border-yellow-400'}`}
+                className={`flex items-center gap-3 px-5 py-2.5 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all shadow-lg active:scale-95 theme-transition ${copied ? 'bg-yellow-400 text-black border-yellow-400' : 'bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/10 text-black dark:text-white hover:text-yellow-500 dark:hover:text-yellow-400 hover:border-yellow-400'}`}
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
                 {copied ? 'Tersalin!' : 'Salin Tautan'}
@@ -193,36 +192,35 @@ const BlogDetail: React.FC = () => {
             </div>
           </div>
 
-          <div className="py-4 flex items-center justify-between border-t border-white/5">
-             <p className="text-gray-500 font-black italic text-[11px] uppercase tracking-tight">
-                Oleh <span className="text-white/80">{post.author}</span>
+          <div className="py-4 flex items-center justify-between border-t border-black/5 dark:border-white/5 theme-transition">
+             <p className="text-gray-400 dark:text-gray-500 font-black italic text-[11px] uppercase tracking-tight theme-transition">
+                Oleh <span className="text-black/80 dark:text-white/80">{post.author}</span>
              </p>
-             <div className="flex gap-4 text-gray-700 text-[9px] font-black uppercase tracking-widest">
+             <div className="flex gap-4 text-gray-300 dark:text-gray-700 text-[9px] font-black uppercase tracking-widest theme-transition">
                 <span>{post.views} Dilihat</span>
                 <span>{comments.length} Komentar</span>
              </div>
           </div>
 
-          {/* SECTION KOMENTAR - Jarak diperdekat */}
           <div className="pt-12 space-y-8">
              <div className="flex items-center gap-4">
-               <h3 className="text-lg md:text-xl font-black text-white italic uppercase tracking-tighter">Komentar</h3>
-               <div className="h-[1px] flex-1 bg-white/5"></div>
+               <h3 className="text-lg md:text-xl font-black text-black dark:text-white italic uppercase tracking-tighter theme-transition">Komentar</h3>
+               <div className="h-[1px] flex-1 bg-black/5 dark:bg-white/5 theme-transition"></div>
              </div>
 
-             <form onSubmit={handleCommentSubmit} className="bg-[#0a0a0a] border border-white/5 rounded-[2rem] p-6 md:p-8 space-y-5 shadow-2xl">
+             <form onSubmit={handleCommentSubmit} className="bg-gray-50 dark:bg-[#0a0a0a] border border-black/5 dark:border-white/5 rounded-[2rem] p-6 md:p-8 space-y-5 shadow-2xl theme-transition">
                 <input 
                   type="text" 
                   value={newAuthor}
                   onChange={(e) => setNewAuthor(e.target.value)}
                   placeholder="Nama lo..." 
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-xs font-bold text-white focus:border-yellow-400 outline-none transition-all"
+                  className="w-full bg-white dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-xl px-4 py-3 text-xs font-bold text-black dark:text-white focus:border-yellow-400 outline-none transition-all theme-transition"
                 />
                 <textarea 
                   value={newContent}
                   onChange={(e) => setNewContent(e.target.value)}
                   placeholder="Tulis pendapat lo..." 
-                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-4 text-xs font-medium italic text-gray-300 h-28 focus:border-yellow-400 outline-none resize-none transition-all"
+                  className="w-full bg-white dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-xl px-4 py-4 text-xs font-medium italic text-gray-500 dark:text-gray-300 h-28 focus:border-yellow-400 outline-none resize-none transition-all theme-transition"
                 />
                 <button 
                   type="submit"
@@ -235,30 +233,30 @@ const BlogDetail: React.FC = () => {
 
              <div className="space-y-4">
                 {comments.length > 0 ? comments.map((comment) => (
-                  <div key={comment.id} className="bg-white/5 border border-white/5 p-5 rounded-2xl space-y-3 hover:border-white/10 transition-all group shadow-md">
+                  <div key={comment.id} className="bg-black/[0.02] dark:bg-white/5 border border-black/5 dark:border-white/5 p-5 rounded-2xl space-y-3 hover:border-black/10 dark:hover:border-white/10 transition-all group shadow-md theme-transition">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-3">
                          <div className="w-8 h-8 bg-yellow-400 rounded-lg flex items-center justify-center text-black font-black text-[10px] uppercase italic">
                            {comment.author.charAt(0)}
                          </div>
                          <div>
-                            <h4 className="text-[11px] font-black text-white uppercase italic tracking-tighter leading-none">{comment.author}</h4>
-                            <p className="text-[7px] text-gray-700 font-bold uppercase tracking-widest mt-1 leading-none">
+                            <h4 className="text-[11px] font-black text-black dark:text-white uppercase italic tracking-tighter leading-none theme-transition">{comment.author}</h4>
+                            <p className="text-[7px] text-gray-400 dark:text-gray-700 font-bold uppercase tracking-widest mt-1 leading-none theme-transition">
                                {new Date(comment.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
                             </p>
                          </div>
                       </div>
                       {(comment.authorId === guestId || isAdmin) && (
-                        <button onClick={() => handleDeleteComment(comment.id)} className="text-red-500/20 hover:text-red-500 p-1.5 transition-colors">
+                        <button onClick={() => handleDeleteComment(comment.id)} className="text-red-500/20 hover:text-red-500 p-1.5 transition-colors theme-transition">
                           <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg>
                         </button>
                       )}
                     </div>
-                    <p className="text-gray-400 text-[12px] italic font-medium leading-relaxed">"{comment.content}"</p>
+                    <p className="text-gray-500 dark:text-gray-400 text-[12px] italic font-medium leading-relaxed theme-transition">"{comment.content}"</p>
                   </div>
                 )) : (
                   <div className="text-center py-8">
-                    <p className="text-gray-800 text-[9px] font-black uppercase tracking-widest italic">Belum ada diskusi. Jadilah yang pertama!</p>
+                    <p className="text-gray-300 dark:text-gray-800 text-[9px] font-black uppercase tracking-widest italic theme-transition">Belum ada diskusi. Jadilah yang pertama!</p>
                   </div>
                 )}
              </div>

@@ -4,13 +4,13 @@ import { getMatch } from '../services/geminiService';
 import { RecommendationResponse, RecommendedPhone } from '../types';
 
 const SpecCard = ({ label, value, icon }: { label: string, value: string, icon: React.ReactNode }) => (
-  <div className="bg-[#151515] p-2 md:p-2.5 rounded-xl flex items-center gap-2.5 border border-white/5 shadow-2xl">
-    <div className="bg-black w-7 h-7 md:w-8 md:h-8 rounded-lg flex items-center justify-center shrink-0 border border-white/10">
+  <div className="bg-white/10 dark:bg-[#151515] p-2 md:p-2.5 rounded-xl flex items-center gap-2.5 border border-black/5 dark:border-white/5 shadow-2xl">
+    <div className="bg-white/20 dark:bg-black w-7 h-7 md:w-8 md:h-8 rounded-lg flex items-center justify-center shrink-0 border border-black/10 dark:border-white/10">
       {React.isValidElement(icon) ? React.cloneElement(icon as React.ReactElement<any>, { className: "w-3.5 h-3.5 text-yellow-500" }) : icon}
     </div>
     <div className="flex flex-col min-w-0">
       <span className="text-orange-500 text-[6px] md:text-[7px] font-black uppercase tracking-wider mb-0.5">{label}</span>
-      <span className="text-white text-[9px] md:text-[11px] font-bold truncate leading-tight" title={value}>{value}</span>
+      <span className="text-black dark:text-white text-[9px] md:text-[11px] font-bold truncate leading-tight" title={value}>{value}</span>
     </div>
   </div>
 );
@@ -104,26 +104,29 @@ const PhoneMatch: React.FC = () => {
   const activeRecommendation = allPhones[activeIndex];
   const otherOptions = allPhones.filter((_, idx) => idx !== activeIndex);
 
+  const logoDark = "https://imgur.com/oaPHidZ.jpg";
+  const logoLight = "https://imgur.com/8QS4UJ0.jpg";
+
   return (
-    <div className="max-w-[1000px] mx-auto px-4 pt-16 pb-10 md:py-16">
+    <div className="max-w-[1000px] mx-auto px-4 pt-16 pb-10 md:py-16 theme-transition">
       <div className="space-y-8 mb-12">
         <div className="text-center space-y-4">
-          <h1 className="text-2xl md:text-4xl font-black uppercase tracking-tighter italic text-white leading-none">
+          <h1 className="text-2xl md:text-4xl font-black uppercase tracking-tighter italic text-black dark:text-white leading-none">
             <span className="text-yellow-400">Phone</span> Match
           </h1>
-          <p className="text-gray-400 text-sm md:text-base font-medium italic">
+          <p className="text-gray-500 dark:text-gray-400 text-sm md:text-base font-medium italic">
             Cari HP terbaik sesuai kebutuhan dan budget.
           </p>
         </div>
 
         {allPhones.length === 0 && !loading && (
-          <form onSubmit={handleSearch} className="bg-[#0a0a0a] border border-white/10 rounded-[2.5rem] p-6 md:p-12 shadow-2xl relative overflow-hidden group animate-in fade-in duration-500">
+          <form onSubmit={handleSearch} className="bg-white dark:bg-[#0a0a0a] border border-black/10 dark:border-white/10 rounded-[2.5rem] p-6 md:p-12 shadow-2xl relative overflow-hidden group animate-in fade-in duration-500 theme-transition">
             <div className="relative z-10">
               <div className="grid md:grid-cols-2 gap-10 md:gap-16 items-start">
                 
                 <div className="space-y-10">
                   <section className="space-y-6">
-                    <h3 className="text-[11px] font-black uppercase tracking-widest text-gray-500 border-l-4 border-yellow-400 pl-4">1. Butuh HP Yang Gimana? Yang Buat Apa?</h3>
+                    <h3 className="text-[11px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-500 border-l-4 border-yellow-400 pl-4">1. Butuh HP Yang Gimana? Yang Buat Apa?</h3>
                     <div className="grid grid-cols-2 gap-2.5">
                       {activityOptions.map(opt => (
                         <button
@@ -133,10 +136,10 @@ const PhoneMatch: React.FC = () => {
                           className={`text-left p-2.5 md:p-3.5 rounded-xl border transition-all text-[9px] md:text-[10px] font-bold uppercase tracking-tight leading-tight flex items-center gap-2.5 ${
                             activities.includes(opt) 
                             ? 'bg-yellow-400 border-yellow-400 text-black shadow-lg shadow-yellow-400/20' 
-                            : 'bg-white/5 border-white/10 text-gray-400 hover:border-white/20'
+                            : 'bg-black/5 dark:bg-white/5 border-black/5 dark:border-white/10 text-gray-600 dark:text-gray-400 hover:border-black/10 dark:hover:border-white/20'
                           }`}
                         >
-                          <div className={`w-2.5 h-2.5 rounded-full border shrink-0 transition-all ${activities.includes(opt) ? 'bg-black border-black scale-110' : 'border-gray-700'}`}></div>
+                          <div className={`w-2.5 h-2.5 rounded-full border shrink-0 transition-all ${activities.includes(opt) ? 'bg-black border-black scale-110' : 'border-gray-300 dark:border-gray-700'}`}></div>
                           {opt}
                         </button>
                       ))}
@@ -144,7 +147,7 @@ const PhoneMatch: React.FC = () => {
                   </section>
 
                   <section className="space-y-8">
-                    <h3 className="text-[11px] font-black uppercase tracking-widest text-gray-500 border-l-4 border-yellow-400 pl-4">2. Kamera Penting Gak?</h3>
+                    <h3 className="text-[11px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-500 border-l-4 border-yellow-400 pl-4">2. Kamera Penting Gak?</h3>
                     <div className="px-1">
                       <div className="relative h-14">
                         <input 
@@ -154,7 +157,7 @@ const PhoneMatch: React.FC = () => {
                           step="1"
                           value={cameraPrio}
                           onChange={(e) => setCameraPrio(parseInt(e.target.value))}
-                          className="absolute w-full h-1.5 bg-white/10 rounded-lg appearance-none cursor-pointer accent-yellow-400 z-20 top-0"
+                          className="absolute w-full h-1.5 bg-black/10 dark:bg-white/10 rounded-lg appearance-none cursor-pointer accent-yellow-400 z-20 top-0"
                         />
                         <div className="absolute top-7 left-0 right-0 h-6">
                           {cameraLabels.map((label, idx) => {
@@ -164,7 +167,7 @@ const PhoneMatch: React.FC = () => {
                               <span 
                                 key={label} 
                                 className={`absolute top-0 transition-all duration-300 text-[8px] md:text-[9px] font-black uppercase tracking-widest whitespace-nowrap
-                                  ${isActive ? 'text-yellow-400 scale-110' : 'text-gray-700'}
+                                  ${isActive ? 'text-yellow-400 scale-110' : 'text-gray-400 dark:text-gray-700'}
                                   ${idx === 0 ? 'left-0' : idx === cameraLabels.length - 1 ? 'right-0' : ''}
                                 `}
                                 style={idx !== 0 && idx !== cameraLabels.length - 1 ? { left: `${position}%`, transform: 'translateX(-50%)' } : {}}
@@ -181,28 +184,28 @@ const PhoneMatch: React.FC = () => {
 
                 <div className="space-y-10 flex flex-col h-full">
                   <section className="space-y-6">
-                    <h3 className="text-[11px] font-black uppercase tracking-widest text-gray-500 border-l-4 border-yellow-400 pl-4">3. Budget Berapa?</h3>
+                    <h3 className="text-[11px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-500 border-l-4 border-yellow-400 pl-4">3. Budget Berapa?</h3>
                     <div className="relative">
                       <select 
                         value={budget}
                         onChange={(e) => setBudget(e.target.value)}
-                        className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-[11px] md:text-xs font-black uppercase tracking-widest focus:outline-none focus:border-yellow-400 appearance-none text-white cursor-pointer shadow-inner"
+                        className="w-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-2xl px-6 py-4 text-[11px] md:text-xs font-black uppercase tracking-widest focus:outline-none focus:border-yellow-400 appearance-none text-black dark:text-white cursor-pointer shadow-inner theme-transition"
                       >
                         {budgetOptions.map(opt => (
-                          <option key={opt} value={opt} className="bg-neutral-900">{opt}</option>
+                          <option key={opt} value={opt} className="bg-white dark:bg-neutral-900 text-black dark:text-white">{opt}</option>
                         ))}
                       </select>
                     </div>
                   </section>
 
                   <section className="space-y-6">
-                    <h3 className="text-[11px] font-black uppercase tracking-widest text-gray-500 border-l-4 border-yellow-400 pl-4">4. Ada Tambahan Lagi? (Opsional)</h3>
+                    <h3 className="text-[11px] font-black uppercase tracking-widest text-gray-500 dark:text-gray-500 border-l-4 border-yellow-400 pl-4">4. Ada Tambahan Lagi? (Opsional)</h3>
                     <input
                       type="text"
                       value={extra}
                       onChange={(e) => setExtra(e.target.value)}
                       placeholder="Contoh: Harus ada charger..."
-                      className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-[11px] md:text-xs font-bold focus:outline-none focus:border-yellow-400 text-white placeholder:text-gray-700 shadow-inner"
+                      className="w-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-2xl px-6 py-4 text-[11px] md:text-xs font-bold focus:outline-none focus:border-yellow-400 text-black dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-700 shadow-inner theme-transition"
                     />
                   </section>
 
@@ -225,12 +228,13 @@ const PhoneMatch: React.FC = () => {
       <div ref={resultRef} className="scroll-mt-24"></div>
 
       {loading && (
-        <div className="text-center py-20 space-y-8 animate-in fade-in duration-500 border-t border-white/5">
+        <div className="text-center py-20 space-y-8 animate-in fade-in duration-500 border-t border-black/5 dark:border-white/5">
           <div className="relative inline-block">
             <div className="w-24 h-24 border-2 border-yellow-400/20 rounded-full animate-ping absolute inset-0" />
-            <img src="https://imgur.com/oaPHidZ.jpg" className="w-20 h-20 object-contain relative z-10 animate-pulse" alt="JAGOHP Loading" />
+            <img src={logoDark} className="w-20 h-20 object-contain relative z-10 animate-pulse hidden dark:block" alt="JAGOHP Loading" />
+            <img src={logoLight} className="w-20 h-20 object-contain relative z-10 animate-pulse block dark:hidden" alt="JAGOHP Loading" />
           </div>
-          <p className="text-gray-500 text-[10px] font-black tracking-[0.5em]">Mohon Tunggu, AI sedang mencarikan spek tercocok...</p>
+          <p className="text-gray-500 dark:text-gray-500 text-[10px] font-black tracking-[0.5em]">Mohon Tunggu, AI sedang mencarikan spek tercocok...</p>
         </div>
       )}
 
@@ -241,11 +245,11 @@ const PhoneMatch: React.FC = () => {
       )}
 
       {allPhones.length > 0 && activeRecommendation && !loading && (
-        <div className="space-y-12 animate-in fade-in slide-in-from-bottom-6 duration-700 pt-10 border-t border-white/5">
+        <div className="space-y-12 animate-in fade-in slide-in-from-bottom-6 duration-700 pt-10 border-t border-black/5 dark:border-white/5">
           <div className="flex justify-end">
             <button 
               onClick={() => {setAllPhones([]);}}
-              className="text-gray-600 hover:text-yellow-400 transition-colors text-[9px] font-black uppercase tracking-widest border-b border-gray-800 pb-1"
+              className="text-gray-400 dark:text-gray-600 hover:text-yellow-400 transition-colors text-[9px] font-black uppercase tracking-widest border-b border-black/10 dark:border-gray-800 pb-1"
             >
               Ubah Preferensi
             </button>
@@ -266,7 +270,7 @@ const PhoneMatch: React.FC = () => {
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5 relative z-10">
-              <SpecCard label="CHIPSET" value={activeRecommendation.specs.processor} icon={<svg fill="currentColor" viewBox="0 0 24 24"><path d="M11 15h2v2h-2v-2m0-8h2v6h-2V7m1-5C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2m0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8Z"/></svg>} />
+              <SpecCard label="CHIPSET" value={activeRecommendation.specs.processor} icon={<svg fill="currentColor" viewBox="0 0 24 24"><path d="M11 15h2v2h-2v-2m0-8h2v6h-2V7m1-5C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.48 10-10S17.53 2 12 2m0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8Z"/></svg>} />
               <SpecCard label="CAMERA" value={activeRecommendation.specs.cameraSummary} icon={<svg fill="currentColor" viewBox="0 0 24 24"><path d="M4 4h3l2-2h6l2 2h3c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2m8 3c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5m0 2c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3Z"/></svg>} />
               <SpecCard label="SCREEN" value={activeRecommendation.specs.screen} icon={<svg fill="currentColor" viewBox="0 0 24 24"><path d="M17 1H7c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-2-2-2m0 18H7V5h10v14Z"/></svg>} />
               <SpecCard label="MEMORY" value={activeRecommendation.specs.ram} icon={<svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9-4.03-9-9-9m0 16c-3.86 0-7-3.14-7-7s3.14-7 7-7 7 3.14 7 7-3.14 7-7 7Z"/></svg>} />
@@ -292,7 +296,7 @@ const PhoneMatch: React.FC = () => {
 
           {otherOptions.length > 0 && (
             <div className="space-y-5">
-              <h3 className="text-[9px] font-black uppercase text-gray-500 tracking-[0.5em] pl-4 italic">Opsi Rekomendasi Lainnya</h3>
+              <h3 className="text-[9px] font-black uppercase text-gray-400 dark:text-gray-500 tracking-[0.5em] pl-4 italic">Opsi Rekomendasi Lainnya</h3>
               <div className="grid md:grid-cols-2 gap-4">
                 {allPhones.map((phone, i) => (
                   i !== activeIndex && (
@@ -302,10 +306,10 @@ const PhoneMatch: React.FC = () => {
                         setActiveIndex(i);
                         resultRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
                       }}
-                      className="p-6 text-left rounded-2xl border border-white/5 bg-white/5 hover:bg-white/10 hover:border-yellow-400/50 transition-all group space-y-4 shadow-2xl backdrop-blur-sm"
+                      className="p-6 text-left rounded-2xl border border-black/5 dark:border-white/5 bg-black/5 dark:bg-white/5 hover:bg-black/10 dark:hover:bg-white/10 hover:border-yellow-400/50 transition-all group space-y-4 shadow-2xl backdrop-blur-sm theme-transition"
                     >
                       <div className="flex justify-between items-center">
-                        <span className={`text-[8px] font-black uppercase tracking-widest border-l-2 pl-2 ${i === 0 ? 'text-yellow-400 border-yellow-400' : 'text-gray-600 border-white/20'}`}>
+                        <span className={`text-[8px] font-black uppercase tracking-widest border-l-2 pl-2 ${i === 0 ? 'text-yellow-400 border-yellow-400' : 'text-gray-400 dark:text-gray-600 border-black/10 dark:border-white/20'}`}>
                           {i === 0 ? 'Pilihan Utama' : 'Alternatif'}
                         </span>
                         <div className="bg-yellow-400/10 text-yellow-400 text-[7px] font-black px-2 py-0.5 rounded-full uppercase tracking-tighter opacity-0 group-hover:opacity-100 transition-opacity">
@@ -313,8 +317,8 @@ const PhoneMatch: React.FC = () => {
                         </div>
                       </div>
                       <div className="space-y-2">
-                        <h4 className="text-lg md:text-xl font-black text-white uppercase italic tracking-tighter group-hover:text-yellow-400 transition-colors leading-none">{phone.name}</h4>
-                        <p className="text-[10px] md:text-[11px] text-gray-500 leading-relaxed line-clamp-2 italic font-medium">"{phone.reason}"</p>
+                        <h4 className="text-lg md:text-xl font-black text-black dark:text-white uppercase italic tracking-tighter group-hover:text-yellow-400 transition-colors leading-none">{phone.name}</h4>
+                        <p className="text-[10px] md:text-[11px] text-gray-500 dark:text-gray-500 leading-relaxed line-clamp-2 italic font-medium">"{phone.reason}"</p>
                       </div>
                     </button>
                   )
@@ -324,7 +328,7 @@ const PhoneMatch: React.FC = () => {
           )}
 
           <div className="flex justify-center pt-10 pb-20">
-            <button onClick={reset} className="text-gray-600 hover:text-yellow-400 font-black text-[10px] uppercase tracking-[0.6em] border-b-2 border-transparent hover:border-yellow-400 transition-all pb-2 italic">
+            <button onClick={reset} className="text-gray-400 dark:text-gray-600 hover:text-yellow-400 font-black text-[10px] uppercase tracking-[0.6em] border-b-2 border-transparent hover:border-yellow-400 transition-all pb-2 italic">
               Reset & Cari Ulang
             </button>
           </div>

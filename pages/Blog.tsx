@@ -35,7 +35,7 @@ const BlogCard: React.FC<{ post: BlogPostExtended }> = ({ post }) => {
   };
 
   return (
-    <article className="group bg-[#0a0a0a] border border-white/5 rounded-[2rem] overflow-hidden flex flex-col md:flex-row transition-all duration-300 hover:border-yellow-400/20 shadow-2xl">
+    <article className="group bg-white dark:bg-[#0a0a0a] border border-black/5 dark:border-white/5 rounded-[2rem] overflow-hidden flex flex-col md:flex-row transition-all duration-300 hover:border-yellow-400/20 shadow-2xl theme-transition">
       <div className="w-full md:w-[35%] aspect-video md:aspect-auto overflow-hidden relative">
         <Link to={`/blog/${post.slug}`} className="block w-full h-full">
           <img 
@@ -53,33 +53,33 @@ const BlogCard: React.FC<{ post: BlogPostExtended }> = ({ post }) => {
             <span className="text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-lg bg-yellow-400 text-black">
               {post.category}
             </span>
-            <span className="text-[9px] font-bold text-gray-600 uppercase tracking-widest">
+            <span className="text-[9px] font-bold text-gray-400 dark:text-gray-600 uppercase tracking-widest">
               {new Date(post.date).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}
             </span>
           </div>
 
           <div className="space-y-2">
             <Link to={`/blog/${post.slug}`}>
-              <h2 className="text-lg md:text-xl font-black text-white uppercase italic tracking-tighter leading-tight group-hover:text-yellow-400 transition-colors">
+              <h2 className="text-lg md:text-xl font-black text-black dark:text-white uppercase italic tracking-tighter leading-tight group-hover:text-yellow-400 transition-colors">
                 {post.title}
               </h2>
             </Link>
-            <p className="text-gray-500 text-[11px] md:text-xs leading-relaxed line-clamp-2 md:line-clamp-3 italic font-medium">
+            <p className="text-gray-500 dark:text-gray-500 text-[11px] md:text-xs leading-relaxed line-clamp-2 md:line-clamp-3 italic font-medium">
               {post.excerpt}
             </p>
           </div>
         </div>
 
-        <div className="pt-6 border-t border-white/5 flex flex-col xs:flex-row items-start xs:items-center justify-between gap-4">
+        <div className="pt-6 border-t border-black/5 dark:border-white/5 flex flex-col xs:flex-row items-start xs:items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <Link to={`/blog/${post.slug}`} className="bg-transparent border border-white/10 text-white hover:bg-yellow-400 hover:text-black hover:border-yellow-400 px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 whitespace-nowrap">
+            <Link to={`/blog/${post.slug}`} className="bg-transparent border border-black/10 dark:border-white/10 text-black dark:text-white hover:bg-yellow-400 hover:text-black hover:border-yellow-400 px-5 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all active:scale-95 whitespace-nowrap">
               Baca Selengkapnya
             </Link>
             
             <div className="relative" ref={shareMenuRef}>
               <button 
                 onClick={(e) => { e.preventDefault(); setShowShare(!showShare); }}
-                className={`w-10 h-10 flex items-center justify-center rounded-xl border transition-all active:scale-90 ${showShare ? 'bg-yellow-400 border-yellow-400 text-black' : 'bg-white/5 border-white/10 text-gray-400 hover:text-white hover:border-white/20'}`}
+                className={`w-10 h-10 flex items-center justify-center rounded-xl border transition-all active:scale-90 ${showShare ? 'bg-yellow-400 border-yellow-400 text-black' : 'bg-black/5 dark:bg-white/5 border-black/10 dark:border-white/10 text-gray-400 hover:text-black dark:hover:text-white hover:border-black/20 dark:hover:border-white/20'}`}
               >
                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
@@ -87,7 +87,7 @@ const BlogCard: React.FC<{ post: BlogPostExtended }> = ({ post }) => {
               </button>
 
               {showShare && (
-                <div className="absolute bottom-full mb-3 left-0 bg-neutral-900/95 backdrop-blur-xl border border-white/10 p-2 rounded-2xl flex gap-2 shadow-2xl animate-in fade-in slide-in-from-bottom-2 duration-200 z-50">
+                <div className="absolute bottom-full mb-3 left-0 bg-white dark:bg-neutral-900/95 backdrop-blur-xl border border-black/10 dark:border-white/10 p-2 rounded-2xl flex gap-2 shadow-2xl animate-in fade-in slide-in-from-bottom-2 duration-200 z-50">
                   <a 
                     href={`https://wa.me/?text=${shareText}${shareUrl}`}
                     target="_blank"
@@ -99,7 +99,7 @@ const BlogCard: React.FC<{ post: BlogPostExtended }> = ({ post }) => {
                   </a>
                   <button 
                     onClick={handleCopy}
-                    className={`w-10 h-10 flex items-center justify-center border rounded-xl transition-all ${copied ? 'bg-yellow-400 border-yellow-400 text-black' : 'bg-white/5 border-white/10 text-gray-400 hover:text-white'}`}
+                    className={`w-10 h-10 flex items-center justify-center border rounded-xl transition-all ${copied ? 'bg-yellow-400 border-yellow-400 text-black' : 'bg-black/5 dark:bg-white/5 border-black/10 dark:border-white/10 text-gray-400 hover:text-black dark:hover:text-white'}`}
                   >
                     {copied ? (
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M5 13l4 4L19 7"/></svg>
@@ -112,7 +112,7 @@ const BlogCard: React.FC<{ post: BlogPostExtended }> = ({ post }) => {
             </div>
           </div>
 
-          <div className="flex items-center gap-4 text-gray-600 border-t xs:border-t-0 border-white/5 pt-3 xs:pt-0 w-full xs:w-auto">
+          <div className="flex items-center gap-4 text-gray-400 dark:text-gray-600 border-t xs:border-t-0 border-black/5 dark:border-white/5 pt-3 xs:pt-0 w-full xs:w-auto theme-transition">
             <div className="flex items-center gap-1.5">
               <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -147,22 +147,22 @@ const Blog: React.FC = () => {
   }, []);
 
   return (
-    <div className="max-w-[1000px] mx-auto px-4 py-16 space-y-12">
+    <div className="max-w-[1000px] mx-auto px-4 py-16 space-y-12 pb-32 theme-transition">
       <div className="space-y-3 text-center md:text-left">
         <div className="inline-block bg-yellow-400 text-black px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-[0.3em] italic mb-2">
           Update Mingguan
         </div>
-        <h1 className="text-2xl md:text-4xl font-black uppercase italic tracking-tighter">
+        <h1 className="text-2xl md:text-4xl font-black uppercase italic tracking-tighter text-black dark:text-white">
           Blog & <span className="text-yellow-400">Berita</span>
         </h1>
-        <p className="text-gray-500 text-sm md:text-base font-medium italic">
+        <p className="text-gray-500 dark:text-gray-400 text-sm md:text-base font-medium italic">
           Informasi, wawasan dan tips mendalam seputar dunia HP.
         </p>
       </div>
 
       {loading ? (
         <div className="py-20 text-center animate-pulse">
-          <p className="text-gray-600 font-black uppercase tracking-widest italic">Menarik berita terbaru...</p>
+          <p className="text-gray-400 dark:text-gray-600 font-black uppercase tracking-widest italic">Menarik berita terbaru...</p>
         </div>
       ) : (
         <div className="grid gap-8">
@@ -170,7 +170,7 @@ const Blog: React.FC = () => {
             posts.map(post => <BlogCard key={post.id} post={post} />)
           ) : (
             <div className="py-20 text-center">
-              <p className="text-gray-600 text-[10px] md:text-xs font-black uppercase tracking-widest italic">Belum ada berita dipublikasikan.</p>
+              <p className="text-gray-400 dark:text-gray-600 text-[10px] md:text-xs font-black uppercase tracking-widest italic">Belum ada berita dipublikasikan.</p>
             </div>
           )}
         </div>

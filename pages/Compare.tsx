@@ -175,18 +175,18 @@ const Compare: React.FC = () => {
                   value={p}
                   onChange={(e) => updatePhone(i, e.target.value)}
                   placeholder="Tulis merk dan tipe HP"
-                  className="w-full bg-white/5 border border-white/20 rounded-xl px-4 py-3.5 text-xs md:text-sm focus:outline-none focus:border-yellow-400 transition-colors font-bold"
+                  className="w-full bg-gray-50 dark:bg-white/5 border border-black/10 dark:border-white/20 rounded-xl px-4 py-3.5 text-xs md:text-sm focus:outline-none focus:border-yellow-400 transition-all font-bold text-black dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-600 shadow-sm"
                 />
               </div>
             ))}
             {phones.length < 3 && (
-              <div className="space-y-4 flex flex-col items-center justify-center h-[100px]">
+              <div className="space-y-4 flex flex-col items-center justify-center h-[100px] border-2 border-dashed border-black/5 dark:border-white/5 rounded-2xl bg-black/[0.02] dark:bg-white/[0.01]">
                 <button
                   type="button"
                   onClick={addPhoneSlot}
-                  className="text-gray-600 hover:text-yellow-400 transition-all font-black flex items-center gap-3 group"
+                  className="text-gray-400 dark:text-gray-600 hover:text-yellow-400 transition-all font-black flex items-center gap-3 group"
                 >
-                  <div className="w-7 h-7 flex items-center justify-center bg-white/5 rounded-lg group-hover:bg-yellow-400 group-hover:text-black transition-all shadow-lg">
+                  <div className="w-8 h-8 flex items-center justify-center bg-white dark:bg-white/5 rounded-xl border border-black/5 dark:border-white/10 group-hover:bg-yellow-400 group-hover:text-black group-hover:border-yellow-400 transition-all shadow-sm">
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M12 4v16m8-8H4"/></svg>
                   </div>
                   <span className="uppercase tracking-[0.2em] text-[10px]">Tambah HP</span>
@@ -211,7 +211,8 @@ const Compare: React.FC = () => {
         <div className="text-center py-20 space-y-6 animate-in fade-in duration-500">
           <div className="relative inline-block">
             <div className="w-24 h-24 border-2 border-yellow-400/20 rounded-full animate-ping absolute inset-0" />
-            <img src="https://imgur.com/oaPHidZ.jpg" className="w-20 h-20 object-contain relative z-10 animate-pulse" alt="JAGOHP Loading" />
+            <img src="https://imgur.com/oaPHidZ.jpg" className="w-20 h-20 object-contain relative z-10 animate-pulse hidden dark:block" alt="JAGOHP Loading" />
+            <img src="https://imgur.com/8QS4UJ0.jpg" className="w-20 h-20 object-contain relative z-10 animate-pulse block dark:hidden" alt="JAGOHP Loading" />
           </div>
           <p className="text-gray-500 text-[10px] font-black tracking-[0.3em]">Mohon Tunggu, AI sedang membedah antar perangkat...</p>
         </div>
@@ -224,41 +225,41 @@ const Compare: React.FC = () => {
           <div className="flex justify-end mb-4">
             <button 
               onClick={() => {setResult(null); setPhones(['','']);}}
-              className="text-gray-600 hover:text-yellow-400 transition-colors text-[9px] font-black uppercase tracking-widest border-b border-gray-800 pb-1"
+              className="text-gray-400 hover:text-yellow-400 transition-colors text-[9px] font-black uppercase tracking-widest border-b border-black/10 dark:border-gray-800 pb-1"
             >
               Bandingkan Lainnya
             </button>
           </div>
 
-          <div className="overflow-x-auto bg-[#0c0c0c] rounded-3xl border border-white/10 p-4 md:p-10 shadow-2xl">
+          <div className="overflow-x-auto bg-white dark:bg-[#0c0c0c] rounded-3xl border border-black/5 dark:border-white/10 p-4 md:p-10 shadow-2xl theme-transition">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-white/10">
-                  <th className="text-left py-6 pr-4 text-gray-600 uppercase tracking-[0.3em] font-black text-[8px] w-[20%]">Parameter Teknis</th>
-                  <th className="text-left py-6 px-4 text-white font-black uppercase italic tracking-tighter text-sm md:text-lg min-w-[200px]">{activePhonesHeader(0, phones)}</th>
-                  <th className="text-left py-6 px-4 text-white font-black uppercase italic tracking-tighter text-sm md:text-lg min-w-[200px]">{activePhonesHeader(1, phones)}</th>
-                  {phones.filter(p=>p.trim()!=='').length === 3 && <th className="text-left py-6 px-4 text-white font-black uppercase italic tracking-tighter text-sm md:text-lg min-w-[200px]">{activePhonesHeader(2, phones)}</th>}
+                <tr className="border-b border-black/5 dark:border-white/10">
+                  <th className="text-left py-6 pr-4 text-gray-400 dark:text-gray-600 uppercase tracking-[0.3em] font-black text-[8px] w-[20%]">Parameter Teknis</th>
+                  <th className="text-left py-6 px-4 text-black dark:text-white font-black uppercase italic tracking-tighter text-sm md:text-lg min-w-[200px]">{activePhonesHeader(0, phones)}</th>
+                  <th className="text-left py-6 px-4 text-black dark:text-white font-black uppercase italic tracking-tighter text-sm md:text-lg min-w-[200px]">{activePhonesHeader(1, phones)}</th>
+                  {phones.filter(p=>p.trim()!=='').length === 3 && <th className="text-left py-6 px-4 text-black dark:text-white font-black uppercase italic tracking-tighter text-sm md:text-lg min-w-[200px]">{activePhonesHeader(2, phones)}</th>}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-white/5">
+              <tbody className="divide-y divide-black/5 dark:divide-white/5">
                 {result.tableData.map((row, i) => {
                   const isPriceRow = row.feature.toLowerCase().includes('harga');
                   return (
-                    <tr key={i} className={`transition-colors group ${isPriceRow ? 'bg-yellow-400/[0.03]' : 'hover:bg-white/[0.02]'}`}>
-                      <td className={`py-6 pr-4 font-black uppercase text-[8px] tracking-[0.2em] transition-colors flex items-start gap-2.5 ${isPriceRow ? 'text-yellow-400' : 'text-gray-500 group-hover:text-gray-300'}`}>
+                    <tr key={i} className={`transition-colors group ${isPriceRow ? 'bg-yellow-400/[0.03]' : 'hover:bg-black/[0.02] dark:hover:bg-white/[0.02]'}`}>
+                      <td className={`py-6 pr-4 font-black uppercase text-[8px] tracking-[0.2em] transition-colors flex items-start gap-2.5 ${isPriceRow ? 'text-yellow-500' : 'text-gray-400 dark:text-gray-500 group-hover:text-black dark:group-hover:text-gray-300'}`}>
                         <div className="mt-[-2px] shrink-0 opacity-40 group-hover:opacity-100 transition-opacity">
                           <FeatureIcon feature={row.feature} />
                         </div>
                         {row.feature}
                       </td>
-                      <td className={`py-6 px-4 font-bold text-[10px] md:text-[14px] leading-relaxed tracking-tight ${isPriceRow ? 'text-white bg-yellow-400/10' : 'text-gray-300'}`}>
+                      <td className={`py-6 px-4 font-bold text-[10px] md:text-[14px] leading-relaxed tracking-tight ${isPriceRow ? 'text-black dark:text-white bg-yellow-400/10' : 'text-gray-600 dark:text-gray-300'}`}>
                         {row.phone1}
                       </td>
-                      <td className={`py-6 px-4 font-bold text-[10px] md:text-[14px] leading-relaxed tracking-tight ${isPriceRow ? 'text-white bg-yellow-400/10' : 'text-gray-300'}`}>
+                      <td className={`py-6 px-4 font-bold text-[10px] md:text-[14px] leading-relaxed tracking-tight ${isPriceRow ? 'text-black dark:text-white bg-yellow-400/10' : 'text-gray-600 dark:text-gray-300'}`}>
                         {row.phone2}
                       </td>
                       {phones.filter(p=>p.trim()!=='').length === 3 && (
-                        <td className={`py-6 px-4 font-bold text-[10px] md:text-[14px] leading-relaxed tracking-tight ${isPriceRow ? 'text-white bg-yellow-400/10' : 'text-gray-300'}`}>
+                        <td className={`py-6 px-4 font-bold text-[10px] md:text-[14px] leading-relaxed tracking-tight ${isPriceRow ? 'text-black dark:text-white bg-yellow-400/10' : 'text-gray-600 dark:text-gray-300'}`}>
                           {row.phone3}
                         </td>
                       )}
@@ -271,8 +272,8 @@ const Compare: React.FC = () => {
 
           <div className="space-y-8">
             <div className="flex items-center gap-4">
-               <h3 className="text-xl md:text-2xl font-black uppercase text-white italic tracking-tighter">Skor Performa AI</h3>
-               <div className="h-[1px] flex-1 bg-white/10"></div>
+               <h3 className="text-xl md:text-2xl font-black uppercase text-black dark:text-white italic tracking-tighter">Skor Performa AI</h3>
+               <div className="h-[1px] flex-1 bg-black/5 dark:bg-white/10"></div>
             </div>
             
             <div className="grid md:grid-cols-2 gap-6">
@@ -290,11 +291,11 @@ const Compare: React.FC = () => {
               {parseAnalysis(result.conclusion).phonePoints.map((pointText, idx) => {
                 const { header, content } = getUnifiedText(pointText);
                 return (
-                  <div key={idx} className="bg-[#0a0a0a] border border-white/5 rounded-2xl p-6 md:p-8 space-y-5 shadow-xl">
-                    <div className="flex items-center justify-between border-b border-white/5 pb-4">
-                      <span className="text-white font-black uppercase italic tracking-widest text-xs md:text-sm">{header}</span>
+                  <div key={idx} className="bg-white dark:bg-[#0a0a0a] border border-black/5 dark:border-white/5 rounded-2xl p-6 md:p-8 space-y-5 shadow-xl theme-transition">
+                    <div className="flex items-center justify-between border-b border-black/5 dark:border-white/5 pb-4">
+                      <span className="text-black dark:text-white font-black uppercase italic tracking-widest text-xs md:text-sm">{header}</span>
                     </div>
-                    <div className="text-gray-400 text-sm md:text-base leading-relaxed italic font-medium text-justify">
+                    <div className="text-gray-500 dark:text-gray-400 text-sm md:text-base leading-relaxed italic font-medium text-justify">
                       {content}
                     </div>
                   </div>
@@ -316,7 +317,7 @@ const Compare: React.FC = () => {
           </div>
           
           <div className="flex justify-center pb-20">
-             <button onClick={() => {setResult(null); setPhones(['','']); window.scrollTo({top:0, behavior:'smooth'})}} className="text-gray-600 hover:text-white text-[10px] font-black uppercase tracking-widest border-b border-transparent hover:border-white transition-all pb-1 italic">Reset & Bandingkan Lainnya</button>
+             <button onClick={() => {setResult(null); setPhones(['','']); window.scrollTo({top:0, behavior:'smooth'})}} className="text-gray-400 hover:text-black dark:hover:text-white text-[10px] font-black uppercase tracking-widest border-b border-transparent hover:border-black dark:hover:border-white transition-all pb-1 italic">Reset & Bandingkan Lainnya</button>
           </div>
         </div>
       )}

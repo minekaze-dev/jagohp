@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { HashRouter as Router, Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
 import Home from './pages/Home';
 import SmartReview from './pages/SmartReview';
 import Compare from './pages/Compare';
@@ -26,7 +26,12 @@ const ScrollToTop = () => {
   return null;
 };
 
-const Header: React.FC = () => {
+interface HeaderProps {
+  isDark: boolean;
+  toggleTheme: () => void;
+}
+
+const Header: React.FC<HeaderProps> = ({ isDark, toggleTheme }) => {
   const location = useLocation();
   const isAdmin = sessionStorage.getItem('admin_token') === 'granted';
   const isActive = (path: string) => location.pathname === path;
@@ -53,15 +58,23 @@ const Header: React.FC = () => {
         { name: 'Blog', path: '/blog' },
       ];
 
+  const logoDark = "https://imgur.com/oaPHidZ.jpg";
+  const logoLight = "https://imgur.com/8QS4UJ0.jpg";
+
   return (
-    <header className="sticky top-0 z-[100] bg-gradient-to-b from-neutral-900 via-black/95 to-black backdrop-blur-md border-b border-white/10">
+    <header className="sticky top-0 z-[2000] bg-white dark:bg-gradient-to-b dark:from-neutral-800 dark:to-black backdrop-blur-md border-b border-black/5 dark:border-white/10 theme-transition">
       <div className="max-w-[1000px] mx-auto px-4 h-20 flex items-center justify-between relative">
-        <div className="flex-shrink-0 relative z-[110]">
+        <div className="flex-shrink-0 relative z-[2110]">
           <Link to="/" className="flex items-center group">
             <img 
-              src="https://imgur.com/oaPHidZ.jpg" 
+              src={logoDark} 
               alt="JAGOHP Logo" 
-              className="h-8 md:h-10 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
+              className="h-8 md:h-10 w-auto object-contain transition-transform duration-300 group-hover:scale-105 hidden dark:block"
+            />
+            <img 
+              src={logoLight} 
+              alt="JAGOHP Logo" 
+              className="h-8 md:h-10 w-auto object-contain transition-transform duration-300 group-hover:scale-105 block dark:hidden"
             />
             {isAdmin && <span className="ml-2 bg-yellow-400 text-black text-[7px] font-black px-1.5 py-0.5 rounded uppercase">ADMIN</span>}
           </Link>
@@ -81,17 +94,20 @@ const Header: React.FC = () => {
           ))}
         </nav>
 
-        <div className="flex items-center gap-2 relative z-[110]">
+        <div className="flex items-center gap-2 relative z-[2110]">
           {!isAdmin && (
             <>
-              <Link 
-                to="/blog" 
-                className={`lg:hidden text-[9px] font-black uppercase tracking-widest px-3 py-2 rounded-xl border transition-all ${
-                  isActive('/blog') ? 'bg-white/10 border-white/20 text-yellow-400' : 'border-white/5 text-gray-400'
-                }`}
+              <button 
+                onClick={toggleTheme}
+                className="p-2 rounded-xl border border-black/5 dark:border-white/10 text-black dark:text-white hover:bg-black/5 dark:hover:bg-white/5 transition-all"
+                title={isDark ? "Ganti Mode Terang" : "Ganti Mode Gelap"}
               >
-                Blog
-              </Link>
+                {isDark ? (
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.364 17.636l-.707.707M6.364 6.364l.707.707m11.314 11.314l.707.707M12 8a4 4 0 100 8 4 4 0 000-8z"/></svg>
+                ) : (
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+                )}
+              </button>
               <Link 
                 to="/top-tier" 
                 className="bg-yellow-400 text-black px-3 py-2 md:px-4 md:py-2.5 rounded-xl text-[8px] md:text-[9px] font-black uppercase tracking-widest hover:bg-yellow-500 transition-all flex items-center gap-2 shadow-lg shadow-yellow-400/20"
@@ -146,16 +162,16 @@ const BottomNavbar: React.FC = () => {
   const currentNav = isAdmin ? adminNavItems : userNavItems;
 
   return (
-    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-[200] bg-black/90 backdrop-blur-2xl border-t border-white/10 px-1 pb-safe pt-2">
+    <nav className="md:hidden fixed bottom-0 left-0 right-0 z-[1200] bg-white/90 dark:bg-black/90 backdrop-blur-2xl border-t border-black/5 dark:border-white/10 px-1 pb-safe pt-2 theme-transition">
       <div className="flex items-center justify-around">
         {currentNav.map((item) => (
           item.path === '#logout' ? (
-            <button key={item.path} onClick={handleLogout} className="flex flex-col items-center gap-1 py-2 px-1 text-gray-500 flex-1">
+            <button key={item.path} onClick={handleLogout} className="flex flex-col items-center gap-1 py-2 px-1 text-gray-400 flex-1">
               {item.icon}
               <span className="text-[7px] font-black uppercase tracking-widest leading-none">{item.name}</span>
             </button>
           ) : (
-            <Link key={item.path} to={item.path} className={`flex flex-col items-center gap-1 py-2 px-1 flex-1 ${isActive(item.path) ? 'text-yellow-400' : 'text-gray-500'}`}>
+            <Link key={item.path} to={item.path} className={`flex flex-col items-center gap-1 py-2 px-1 flex-1 ${isActive(item.path) ? 'text-yellow-400' : 'text-gray-400'}`}>
               {item.icon}
               <span className="text-[7px] font-black uppercase tracking-widest leading-none">{item.name}</span>
             </Link>
@@ -168,12 +184,28 @@ const BottomNavbar: React.FC = () => {
 
 const App: React.FC = () => {
   const [showDonate, setShowDonate] = useState(false);
+  const [isDark, setIsDark] = useState(() => {
+    const saved = localStorage.getItem('jagohp_theme');
+    return saved === 'light' ? false : true;
+  });
+
+  useEffect(() => {
+    if (isDark) {
+      document.documentElement.classList.add('dark');
+      document.body.classList.add('dark');
+      localStorage.setItem('jagohp_theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      document.body.classList.remove('dark');
+      localStorage.setItem('jagohp_theme', 'light');
+    }
+  }, [isDark]);
 
   return (
     <Router>
       <ScrollToTop />
-      <div className="min-h-screen flex flex-col bg-black">
-        <Header />
+      <div className="min-h-screen flex flex-col bg-white dark:bg-black theme-transition">
+        <Header isDark={isDark} toggleTheme={() => setIsDark(!isDark)} />
         <main className="flex-1">
           <Routes>
             <Route path="/" element={<Home />} />
@@ -203,42 +235,49 @@ const App: React.FC = () => {
   );
 };
 
-const Footer = ({ onDonateClick }: { onDonateClick: () => void }) => (
-  <footer className="border-t border-white/10 mt-10 py-16 bg-black/40 backdrop-blur-sm mb-20 md:mb-0">
-    <div className="max-w-[900px] mx-auto px-4 text-center space-y-10">
-      <img src="https://imgur.com/oaPHidZ.jpg" className="h-12 w-auto mx-auto opacity-80" alt="" />
-      
-      {/* Social Media Section */}
-      <div className="flex justify-center gap-4">
-        <a 
-          href="https://instagram.com/jagohp" 
-          target="_blank" 
-          rel="noopener noreferrer"
-          className="w-10 h-10 flex items-center justify-center bg-white/5 border border-white/10 rounded-xl text-gray-400 hover:text-black hover:bg-yellow-400 hover:border-yellow-400 transition-all active:scale-95 shadow-lg"
-          title="Follow Instagram JAGOHP"
-        >
-          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
-          </svg>
-        </a>
-      </div>
+const Footer = ({ onDonateClick }: { onDonateClick: () => void }) => {
+  const logoDark = "https://imgur.com/oaPHidZ.jpg";
+  const logoLight = "https://imgur.com/8QS4UJ0.jpg";
 
-      <nav className="flex flex-wrap justify-center gap-8">
-        <button onClick={onDonateClick} className="text-[10px] font-black uppercase text-gray-500 hover:text-yellow-400">Dukung Kami</button>
-        <Link to="/faq" className="text-[10px] font-black uppercase text-gray-500 hover:text-yellow-400">FAQ</Link>
-        <Link to="/privacy" className="text-[10px] font-black uppercase text-gray-500 hover:text-yellow-400">Kebijakan Privasi</Link>
-        <Link to="/terms" className="text-[10px] font-black uppercase text-gray-500 hover:text-yellow-400">Syarat & Ketentuan</Link>
-      </nav>
-      <p className="text-gray-600 text-[10px] uppercase font-black tracking-widest">© 2026 JAGOHP | Platform Rekomendasi HP Berbasis AI</p>
-    </div>
-  </footer>
-);
+  return (
+    <footer className="border-t border-black/5 dark:border-white/10 mt-10 py-16 bg-white/40 dark:bg-black/40 backdrop-blur-sm mb-20 md:mb-0 theme-transition">
+      <div className="max-w-[900px] mx-auto px-4 text-center space-y-10">
+        <div className="relative h-12 flex justify-center items-center">
+           <img src={logoDark} className="h-12 w-auto opacity-80 hidden dark:block" alt="JAGOHP Logo" />
+           <img src={logoLight} className="h-12 w-auto opacity-80 block dark:hidden" alt="JAGOHP Logo" />
+        </div>
+        
+        <div className="flex justify-center gap-4">
+          <a 
+            href="https://instagram.com/jagohp" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="w-10 h-10 flex items-center justify-center bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/10 rounded-xl text-gray-400 hover:text-black hover:bg-yellow-400 hover:border-yellow-400 transition-all active:scale-95 shadow-lg"
+            title="Follow Instagram JAGOHP"
+          >
+            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+            </svg>
+          </a>
+        </div>
+
+        <nav className="flex flex-wrap justify-center gap-8">
+          <button onClick={onDonateClick} className="text-[10px] font-black uppercase text-gray-500 hover:text-yellow-400 transition-colors">Dukung Kami</button>
+          <Link to="/faq" className="text-[10px] font-black uppercase text-gray-500 hover:text-yellow-400 transition-colors">FAQ</Link>
+          <Link to="/privacy" className="text-[10px] font-black uppercase text-gray-500 hover:text-yellow-400 transition-colors">Kebijakan Privasi</Link>
+          <Link to="/terms" className="text-[10px] font-black uppercase text-gray-500 hover:text-yellow-400 transition-colors">Syarat & Ketentuan</Link>
+        </nav>
+        <p className="text-gray-600 text-[10px] uppercase font-black tracking-widest">© 2026 JAGOHP | Platform Rekomendasi HP Berbasis AI</p>
+      </div>
+    </footer>
+  );
+};
 
 const DonationModal = ({ onClose }: { onClose: () => void }) => (
   <div className="fixed inset-0 z-[10000] flex items-center justify-center px-4">
     <div className="absolute inset-0 bg-black/90 backdrop-blur-2xl" onClick={onClose}></div>
-    <div className="relative bg-[#0a0a0a] border border-yellow-400/30 w-full max-w-sm rounded-[2.5rem] p-10 text-center">
-      <h3 className="text-2xl font-black text-white uppercase italic">Support <span className="text-yellow-400">JAGOHP</span></h3>
+    <div className="relative bg-white dark:bg-[#0a0a0a] border border-yellow-400/30 w-full max-w-sm rounded-[2.5rem] p-10 text-center theme-transition">
+      <h3 className="text-2xl font-black text-black dark:text-white uppercase italic">Support <span className="text-yellow-400">JAGOHP</span></h3>
       <a href="https://saweria.co/minekaze" target="_blank" className="block mt-8 bg-yellow-400 text-black py-4 rounded-2xl font-black uppercase text-xs">Donasi via Saweria</a>
     </div>
   </div>
