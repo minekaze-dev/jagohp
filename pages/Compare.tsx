@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { getComparison } from '../services/geminiService';
-import { ComparisonResult } from '../types';
+import { ComparisonResult, ComparisonScores } from '../types';
 
 const FeatureIcon = ({ feature }: { feature: string }) => {
   const f = feature.toLowerCase();
@@ -16,7 +16,8 @@ const FeatureIcon = ({ feature }: { feature: string }) => {
 };
 
 const PerformanceBar = ({ label, scores, phones }: { label: string, scores: number[], phones: string[] }) => {
-  const maxScore = Math.max(...scores);
+  const validScores = scores.map(s => (typeof s === 'number' && !isNaN(s) ? s : 0));
+  const maxScore = validScores.length > 0 ? Math.max(...validScores) : 0;
   
   return (
     <div className="space-y-4 bg-[#0a0a0a] border border-white/5 p-6 rounded-3xl shadow-xl hover:border-white/10 transition-all">
@@ -25,8 +26,9 @@ const PerformanceBar = ({ label, scores, phones }: { label: string, scores: numb
         {label}
       </h4>
       <div className="space-y-6">
-        {scores.map((score, idx) => {
-          const isWinner = score === maxScore && score > 0;
+        {validScores.map((score, idx) => {
+          const s = score;
+          const isWinner = s === maxScore && s > 0;
           return (
             <div key={idx} className={`space-y-2 relative p-4 rounded-2xl transition-all ${isWinner ? 'bg-yellow-400/5 border border-yellow-400/30 ring-1 ring-yellow-400/10' : 'bg-transparent'}`}>
               <div className="flex justify-between items-center mb-1">
@@ -40,14 +42,14 @@ const PerformanceBar = ({ label, scores, phones }: { label: string, scores: numb
                     </span>
                   )}
                   <span className={`text-xs font-black ${isWinner ? 'text-yellow-400' : 'text-white'}`}>
-                    {score}/10
+                    {s}/10
                   </span>
                 </div>
               </div>
               <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden">
                 <div 
                   className={`h-full rounded-full transition-all duration-1000 ease-out ${isWinner ? 'bg-gradient-to-r from-yellow-600 to-yellow-400' : 'bg-gray-800'}`}
-                  style={{ width: `${score * 10}%` }}
+                  style={{ width: `${s * 10}%` }}
                 ></div>
               </div>
             </div>
@@ -95,7 +97,11 @@ const Compare: React.FC = () => {
     setError('');
     try {
       const res = await getComparison(activePhones);
-      setResult(res);
+      if (res && res.tableData) {
+        setResult(res);
+      } else {
+        setError('AI memberikan respon tidak valid. Coba bandingkan HP lain.');
+      }
     } catch (err) {
       console.error(err);
       setError('Gagal membandingkan. Silakan coba lagi.');
@@ -110,7 +116,7 @@ const Compare: React.FC = () => {
   };
 
   const parseAnalysis = (text: string) => {
-    const cleanedText = text.replace(/\\n/g, ' ').replace(/\n/g, ' ').replace(/\s\s+/g, ' ');
+    const cleanedText = (text || "").replace(/\\n/g, ' ').replace(/\n/g, ' ').replace(/\s\s+/g, ' ');
     const sections = cleanedText.split(/KESIMPULAN:|POIN PENTING:/i);
     let pointsRaw = "";
     let conclusion = "";
@@ -136,19 +142,25 @@ const Compare: React.FC = () => {
     return { header, content };
   };
 
-  const getMetricScores = (metric: keyof typeof result.performanceScores.phone1) => {
-    const activePhones = phones.filter(p => p.trim() !== '');
-    const s = [result?.performanceScores.phone1[metric], result?.performanceScores.phone2[metric]];
-    if (activePhones.length === 3 && result?.performanceScores.phone3) {
-      s.push(result.performanceScores.phone3[metric]);
+  const getMetricScores = (metric: keyof ComparisonScores) => {
+    if (!result || !result.performanceScores) return [0, 0];
+    const activePhonesCount = phones.filter(p => p.trim() !== '').length;
+    const s: number[] = [
+        result.performanceScores.phone1?.[metric] || 0, 
+        result.performanceScores.phone2?.[metric] || 0
+    ];
+    if (activePhonesCount === 3 && result.performanceScores.phone3) {
+      s.push(result.performanceScores.phone3[metric] || 0);
     }
-    return s as number[];
+    return s;
   };
 
   return (
     <div className="max-w-[950px] mx-auto px-4 py-16 space-y-12 pb-32">
       <div className="text-center space-y-4">
-        <h1 className="text-2xl md:text-4xl font-black uppercase tracking-tighter italic"><span className="text-yellow-400">Com</span>pare</h1>
+        <h1 className="text-2xl md:text-4xl font-black uppercase tracking-tighter italic text-black dark:text-white">
+          <span className="text-yellow-400">Com</span>pare
+        </h1>
         <p className="text-gray-400 text-sm md:text-base font-medium italic">Head-to-head spesifikasi biar gak salah pilih HP.</p>
       </div>
 
@@ -242,7 +254,7 @@ const Compare: React.FC = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-black/5 dark:divide-white/5">
-                {result.tableData.map((row, i) => {
+                {result.tableData && result.tableData.map((row, i) => {
                   const isPriceRow = row.feature.toLowerCase().includes('harga');
                   return (
                     <tr key={i} className={`transition-colors group ${isPriceRow ? 'bg-yellow-400/[0.03]' : 'hover:bg-black/[0.02] dark:hover:bg-white/[0.02]'}`}>
@@ -270,21 +282,23 @@ const Compare: React.FC = () => {
             </table>
           </div>
 
-          <div className="space-y-8">
-            <div className="flex items-center gap-4">
-               <h3 className="text-xl md:text-2xl font-black uppercase text-black dark:text-white italic tracking-tighter">Skor Performa AI</h3>
-               <div className="h-[1px] flex-1 bg-black/5 dark:bg-white/10"></div>
+          {result.performanceScores && (
+            <div className="space-y-8">
+              <div className="flex items-center gap-4">
+                 <h3 className="text-xl md:text-2xl font-black uppercase text-black dark:text-white italic tracking-tighter">Skor Performa AI</h3>
+                 <div className="h-[1px] flex-1 bg-black/5 dark:bg-white/10"></div>
+              </div>
+              
+              <div className="grid md:grid-cols-2 gap-6">
+                <PerformanceBar label="Chipset & Raw Power" scores={getMetricScores('chipset')} phones={phones.filter(p=>p.trim()!=='')} />
+                <PerformanceBar label="Multitasking (Memory)" scores={getMetricScores('memory')} phones={phones.filter(p=>p.trim()!=='')} />
+                <PerformanceBar label="Photography & Video" scores={getMetricScores('camera')} phones={phones.filter(p=>p.trim()!=='')} />
+                <PerformanceBar label="Gaming Experience" scores={getMetricScores('gaming')} phones={phones.filter(p=>p.trim()!=='')} />
+                <PerformanceBar label="Battery Endurance" scores={getMetricScores('battery')} phones={phones.filter(p=>p.trim()!=='')} />
+                <PerformanceBar label="Charging Speed" scores={getMetricScores('charging')} phones={phones.filter(p=>p.trim()!=='')} />
+              </div>
             </div>
-            
-            <div className="grid md:grid-cols-2 gap-6">
-              <PerformanceBar label="Chipset & Raw Power" scores={getMetricScores('chipset')} phones={phones.filter(p=>p.trim()!=='')} />
-              <PerformanceBar label="Multitasking (Memory)" scores={getMetricScores('memory')} phones={phones.filter(p=>p.trim()!=='')} />
-              <PerformanceBar label="Photography & Video" scores={getMetricScores('camera')} phones={phones.filter(p=>p.trim()!=='')} />
-              <PerformanceBar label="Gaming Experience" scores={getMetricScores('gaming')} phones={phones.filter(p=>p.trim()!=='')} />
-              <PerformanceBar label="Battery Endurance" scores={getMetricScores('battery')} phones={phones.filter(p=>p.trim()!=='')} />
-              <PerformanceBar label="Charging Speed" scores={getMetricScores('charging')} phones={phones.filter(p=>p.trim()!=='')} />
-            </div>
-          </div>
+          )}
 
           <div className="space-y-10">
             <div className="grid gap-6">

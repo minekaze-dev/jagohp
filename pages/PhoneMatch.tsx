@@ -1,4 +1,3 @@
-
 import React, { useState, useRef } from 'react';
 import { getMatch } from '../services/geminiService';
 import { RecommendationResponse, RecommendedPhone } from '../types';
@@ -281,11 +280,11 @@ const PhoneMatch: React.FC = () => {
             <div className="flex flex-wrap gap-6 md:gap-10 pt-6 border-t border-black/10 relative z-10">
               <div className="space-y-0.5">
                 <div className="text-[7px] md:text-[8px] font-black opacity-40 uppercase tracking-[0.3em]">EST. ANTUTU</div>
-                <div className="text-lg md:text-xl font-black italic tracking-tighter">{activeRecommendation.performance.antutu}</div>
+                <div className="text-lg md:text-xl font-black italic tracking-tighter">{activeRecommendation.performance?.antutu || "N/A"}</div>
               </div>
               <div className="space-y-0.5">
                 <div className="text-[7px] md:text-[8px] font-black opacity-40 uppercase tracking-[0.3em]">DXOMARK</div>
-                <div className="text-lg md:text-xl font-black italic tracking-tighter">{activeRecommendation.camera.score}</div>
+                <div className="text-lg md:text-xl font-black italic tracking-tighter">{activeRecommendation.camera?.score || "N/A"}</div>
               </div>
               <div className="space-y-0.5">
                 <div className="text-[7px] md:text-[8px] font-black opacity-40 uppercase tracking-[0.3em]">EST. HARGA</div>

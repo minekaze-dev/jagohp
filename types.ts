@@ -162,6 +162,7 @@ export interface BlogPost {
   content?: string;
   date: string;
   category: string;
+  tags?: string;
   status: 'draft' | 'published';
   publishDate: string;
 }

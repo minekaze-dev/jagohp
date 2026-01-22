@@ -1,5 +1,5 @@
-
 import React, { useState, useEffect, useMemo } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { getAllCatalogItems } from '../services/geminiService';
 import { CatalogItem } from '../types';
 
@@ -48,51 +48,52 @@ const DetailModal: React.FC<{ item: CatalogItem; onClose: () => void }> = ({ ite
   }, [item]);
 
   return (
-    <div className="fixed inset-0 z-[1000] flex items-center justify-center p-2 md:p-4 mt-20">
-      <div className="absolute inset-0 bg-gray-100/70 dark:bg-black/95 backdrop-blur-2xl theme-transition" onClick={onClose}></div>
-      <div className="bg-white dark:bg-[#0a0a0a] border border-black/5 dark:border-white/10 w-full max-w-6xl max-h-[85vh] rounded-[2rem] md:rounded-[3rem] p-5 md:p-8 relative overflow-y-auto custom-scrollbar shadow-[0_0_100px_rgba(0,0,0,0.3)] animate-in zoom-in duration-300 theme-transition">
+    <div className="fixed inset-0 z-[1500] flex items-center justify-center p-2 md:p-6">
+      <div className="absolute inset-0 bg-black/10 dark:bg-black/40 backdrop-blur-sm theme-transition" onClick={onClose}></div>
+      
+      <div className="bg-white dark:bg-[#0a0a0a] border border-black/10 dark:border-white/10 w-full max-w-6xl max-h-[90vh] rounded-[2.5rem] md:rounded-[3.5rem] p-5 md:p-10 relative overflow-y-auto custom-scrollbar shadow-[0_30px_100px_rgba(0,0,0,0.5)] animate-in zoom-in duration-300 theme-transition">
         
-        <div className="flex justify-between items-start mb-6 border-b border-black/5 dark:border-white/5 pb-4 sticky top-0 bg-white dark:bg-[#0a0a0a] z-20 theme-transition">
-          <div className="flex items-start gap-3 md:gap-5">
-            <div className="bg-yellow-400 text-black w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl flex items-center justify-center font-black italic text-lg md:text-xl shadow-lg shrink-0">
+        <div className="flex justify-between items-start mb-8 border-b border-black/5 dark:border-white/5 pb-6 sticky top-0 bg-white dark:bg-[#0a0a0a] z-20 theme-transition">
+          <div className="flex items-start gap-4 md:gap-6">
+            <div className="bg-yellow-400 text-black w-12 h-12 md:w-14 md:h-14 rounded-2xl flex items-center justify-center font-black italic text-xl md:text-2xl shadow-xl shrink-0">
               {item.brand.charAt(0)}
             </div>
             <div className="space-y-1">
               <div className="flex items-center gap-2">
-                 <span className="text-yellow-500 dark:text-yellow-400 text-[8px] md:text-[9px] font-black uppercase tracking-[0.3em]">{item.brand}</span>
+                 <span className="text-yellow-500 dark:text-yellow-400 text-[9px] md:text-[10px] font-black uppercase tracking-[0.3em]">{item.brand}</span>
                  <span className="w-1 h-1 bg-black/10 dark:bg-white/20 rounded-full"></span>
-                 <span className="text-gray-400 dark:text-gray-500 text-[8px] md:text-[9px] font-black uppercase tracking-[0.3em]">{item.year}</span>
+                 <span className="text-gray-400 dark:text-gray-500 text-[9px] md:text-[10px] font-black uppercase tracking-[0.3em]">{item.year}</span>
                  {isWaterproof && (
-                   <span className="ml-2 bg-blue-500/10 text-blue-600 dark:text-blue-400 text-[7px] font-black uppercase px-2 py-0.5 rounded border border-blue-500/20">
+                   <span className="ml-2 bg-blue-500/10 text-blue-600 dark:text-blue-400 text-[8px] font-black uppercase px-2 py-0.5 rounded border border-blue-500/20">
                      💧 {isWaterproof}
                    </span>
                  )}
               </div>
-              <h2 className="text-base md:text-2xl font-black text-black dark:text-white uppercase italic tracking-tighter leading-tight line-clamp-2 md:line-clamp-none">
+              <h2 className="text-xl md:text-3xl font-black text-black dark:text-white uppercase italic tracking-tighter leading-none line-clamp-2 md:line-clamp-none">
                 {item.name}
               </h2>
             </div>
           </div>
-          <div className="flex items-center gap-4 md:gap-6 pt-1">
+          <div className="flex items-center gap-4 md:gap-8 pt-1">
             <div className="text-right hidden sm:block">
-              <div className="text-[7px] md:text-[8px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1">Estimasi Harga</div>
-              <div className="text-sm md:text-lg font-black text-yellow-500 dark:text-yellow-400 leading-none">{item.price}</div>
+              <div className="text-[8px] md:text-[9px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest mb-1">Estimasi Harga</div>
+              <div className="text-base md:text-2xl font-black text-yellow-500 dark:text-yellow-400 leading-none">{item.price}</div>
             </div>
-            <button onClick={onClose} className="w-9 h-9 md:w-10 md:h-10 flex items-center justify-center bg-black/5 dark:bg-white/5 rounded-xl text-gray-400 hover:text-black dark:hover:text-white hover:bg-black/10 dark:hover:bg-white/10 transition-all shrink-0">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"/></svg>
+            <button onClick={onClose} className="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center bg-black/5 dark:bg-white/5 rounded-2xl text-gray-400 hover:text-black dark:hover:text-white hover:bg-black/10 dark:hover:bg-white/10 transition-all shrink-0 shadow-inner">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
             </button>
           </div>
         </div>
 
-        <div className="sm:hidden mb-6 bg-yellow-400/5 border border-yellow-400/10 p-4 rounded-2xl flex justify-between items-center">
-           <span className="text-[8px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Estimasi Harga</span>
-           <span className="text-sm font-black text-yellow-500 dark:text-yellow-400 tracking-tight">{item.price}</span>
+        <div className="sm:hidden mb-6 bg-yellow-400/5 border border-yellow-400/10 p-5 rounded-2xl flex justify-between items-center">
+           <span className="text-[9px] font-black text-gray-400 dark:text-gray-500 uppercase tracking-widest">Estimasi Harga</span>
+           <span className="text-base font-black text-yellow-500 dark:text-yellow-400 tracking-tight">{item.price}</span>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 relative z-10">
-          <div className="lg:col-span-1 bg-black/[0.01] dark:bg-white/[0.02] p-5 rounded-[2rem] border border-black/5 dark:border-white/5 theme-transition">
-            <h4 className="text-[10px] font-black uppercase text-gray-400 dark:text-gray-500 tracking-[0.3em] mb-4 border-l-2 border-yellow-400 pl-3">Spesifikasi Teknis</h4>
-            <div className="grid grid-cols-1 gap-y-2.5">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 relative z-10">
+          <div className="lg:col-span-1 bg-black/[0.01] dark:bg-white/[0.02] p-6 md:p-8 rounded-[2.5rem] border border-black/5 dark:border-white/5 theme-transition">
+            <h4 className="text-[11px] font-black uppercase text-gray-400 dark:text-gray-500 tracking-[0.4em] mb-6 border-l-4 border-yellow-400 pl-4">Spesifikasi Teknis</h4>
+            <div className="grid grid-cols-1 gap-y-4">
               {[
                 { label: 'Jaringan', val: item.specs.network },
                 { label: 'Chipset', val: item.specs.chipset },
@@ -103,55 +104,55 @@ const DetailModal: React.FC<{ item: CatalogItem; onClose: () => void }> = ({ ite
                 { label: 'Baterai', val: item.specs.batteryCharging },
                 { label: 'OS/Fitur', val: item.specs.features },
               ].map((s, idx) => (
-                <div key={idx} className="flex flex-col gap-0.5 border-b border-black/5 dark:border-white/5 pb-1.5 theme-transition">
-                  <span className="text-[8px] font-black text-gray-300 dark:text-gray-600 uppercase tracking-widest">{s.label}</span>
-                  <span className="text-[10px] font-bold text-gray-600 dark:text-gray-300 truncate" title={s.val}>{s.val}</span>
+                <div key={idx} className="flex flex-col gap-1 border-b border-black/5 dark:border-white/5 pb-2 theme-transition">
+                  <span className="text-[9px] font-black text-gray-300 dark:text-gray-600 uppercase tracking-widest">{s.label}</span>
+                  <span className="text-[11px] md:text-xs font-bold text-gray-700 dark:text-gray-300 truncate" title={s.val}>{s.val}</span>
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="lg:col-span-1 space-y-4">
-             <div className="bg-yellow-400 text-black p-5 rounded-[2rem] shadow-xl h-full flex flex-col justify-between">
-                <div className="space-y-4">
-                  <h4 className="text-[10px] font-black uppercase tracking-[0.3em] opacity-50">Klasifikasi Smart AI</h4>
-                  <div className="space-y-3">
-                     <div className="space-y-1.5">
-                        <span className="text-[9px] font-black uppercase block opacity-40">Kebutuhan:</span>
-                        <div className="flex flex-wrap gap-1.5">
+          <div className="lg:col-span-1 space-y-6">
+             <div className="bg-yellow-400 text-black p-6 md:p-8 rounded-[2.5rem] shadow-2xl h-full flex flex-col justify-between">
+                <div className="space-y-6">
+                  <h4 className="text-[11px] font-black uppercase tracking-[0.4em] opacity-50">Klasifikasi Smart AI</h4>
+                  <div className="space-y-4">
+                     <div className="space-y-2">
+                        <span className="text-[10px] font-black uppercase block opacity-40">Kebutuhan:</span>
+                        <div className="flex flex-wrap gap-2">
                            {item.classification.suitableFor.map((s, i) => (
-                             <span key={i} className="bg-black/10 border border-black/10 px-2.5 py-1 rounded-lg text-[9px] font-black uppercase italic">{s}</span>
+                             <span key={i} className="bg-black/10 border border-black/10 px-3 py-1.5 rounded-xl text-[10px] font-black uppercase italic">{s}</span>
                            ))}
                         </div>
                      </div>
-                     <div className="space-y-1.5 pt-2">
-                        <span className="text-[9px] font-black uppercase block opacity-40">Target Pengguna:</span>
-                        <p className="text-[11px] font-black italic leading-tight">"{item.classification.targetAudience}"</p>
+                     <div className="space-y-2 pt-4">
+                        <span className="text-[10px] font-black uppercase block opacity-40">Target Pengguna:</span>
+                        <p className="text-xs md:text-sm font-black italic leading-tight">"{item.classification.targetAudience}"</p>
                      </div>
                   </div>
                 </div>
-                <div className="pt-4 mt-4 border-t border-black/10">
+                <div className="pt-6 mt-6 border-t border-black/10">
                    <div className="flex items-center gap-2">
-                      <span className="w-1.5 h-1.5 bg-black rounded-full"></span>
-                      <span className="text-[8px] font-black uppercase tracking-widest">Kasta: {item.segment} Device</span>
+                      <div className="w-2 h-2 bg-black rounded-full animate-pulse"></div>
+                      <span className="text-[10px] font-black uppercase tracking-widest">Kasta: {item.segment} Device</span>
                    </div>
                 </div>
              </div>
           </div>
 
-          <div className="lg:col-span-1 flex flex-col justify-between space-y-4">
-             <div className="bg-gray-50 dark:bg-[#050505] p-5 rounded-[2rem] border border-black/5 dark:border-white/5 flex-1 relative overflow-hidden group theme-transition">
-                <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
-                   <svg className="w-20 h-20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+          <div className="lg:col-span-1 flex flex-col justify-between space-y-6">
+             <div className="bg-gray-50 dark:bg-[#050505] p-6 md:p-8 rounded-[2.5rem] border border-black/5 dark:border-white/5 flex-1 relative overflow-hidden group theme-transition">
+                <div className="absolute top-0 right-0 p-6 opacity-5 group-hover:opacity-10 transition-opacity">
+                   <svg className="w-24 h-24" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
                 </div>
-                <h4 className="text-[10px] font-black uppercase text-yellow-500 dark:text-yellow-400 tracking-[0.3em] mb-4">JagoHP Insight</h4>
-                <p className="text-xs text-gray-500 dark:text-gray-400 italic font-medium leading-relaxed text-justify relative z-10">
+                <h4 className="text-[11px] font-black uppercase text-yellow-500 dark:text-yellow-400 tracking-[0.4em] mb-6">JagoHP Insight</h4>
+                <p className="text-xs md:text-sm text-gray-500 dark:text-gray-400 italic font-medium leading-relaxed text-justify relative z-10">
                   "{item.aiNote}"
                 </p>
              </div>
-             <div className="bg-black/5 dark:bg-white/5 p-4 rounded-2xl border border-black/5 dark:border-white/5 theme-transition">
-                <p className="text-[8px] font-black text-gray-300 dark:text-gray-700 uppercase tracking-[0.3em] text-center leading-relaxed">
-                  DATA GENERATED BY JAGOHP 
+             <div className="bg-black/5 dark:bg-white/5 p-5 rounded-3xl border border-black/5 dark:border-white/5 theme-transition">
+                <p className="text-[9px] font-black text-gray-300 dark:text-gray-700 uppercase tracking-[0.4em] text-center leading-relaxed italic">
+                  DATA GENERATED BY JAGOHP ENGINE
                 </p>
              </div>
           </div>
@@ -162,12 +163,15 @@ const DetailModal: React.FC<{ item: CatalogItem; onClose: () => void }> = ({ ite
 };
 
 const Catalog: React.FC = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [allItems, setAllItems] = useState<CatalogItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'Harga' | 'Brand' | 'Kebutuhan'>('Brand');
   const [activeFilter, setActiveFilter] = useState('');
   const [activeSubBudget, setActiveSubBudget] = useState('Semua');
   const [selectedItem, setSelectedItem] = useState<CatalogItem | null>(null);
+
+  const modelParam = searchParams.get('model');
 
   const primaryBrands = [
     'Samsung', 'Xiaomi', 'iPhone', 'Poco', 'IQOO', 
@@ -189,6 +193,12 @@ const Catalog: React.FC = () => {
         const data = await getAllCatalogItems();
         setAllItems(data);
         setActiveFilter(filters.Brand[0]);
+        
+        // Cek jika ada parameter model untuk auto-open
+        if (modelParam) {
+          const found = data.find(item => item.name.toLowerCase().includes(modelParam.toLowerCase()));
+          if (found) setSelectedItem(found);
+        }
       } catch (err) {
         console.error(err);
       } finally {
@@ -196,7 +206,7 @@ const Catalog: React.FC = () => {
       }
     };
     loadData();
-  }, []);
+  }, [modelParam]);
 
   const filteredItems = useMemo(() => {
     if (!activeFilter) return [];
@@ -289,6 +299,11 @@ const Catalog: React.FC = () => {
     </button>
   );
 
+  const closeDetail = () => {
+    setSelectedItem(null);
+    setSearchParams({}); // Bersihkan parameter model saat modal ditutup
+  };
+
   return (
     <div className="max-w-[1000px] mx-auto px-4 py-16 space-y-12 pb-32 theme-transition">
       <div className="text-center space-y-4">
@@ -349,17 +364,6 @@ const Catalog: React.FC = () => {
               )}
             </div>
           )}
-
-          {activeTab === 'Kebutuhan' && activeFilter && (
-            <div className="flex flex-col items-center gap-3 pt-4 border-t border-black/5 dark:border-white/5 w-full max-w-lg theme-transition">
-              <span className="text-[8px] font-black uppercase text-gray-400 dark:text-gray-500 tracking-[0.4em]">Filter Budget {activeFilter}</span>
-              <div className="flex flex-wrap justify-center gap-2">
-                {filters.SubBudgets.map(b => 
-                  renderFilterButton(b, activeSubBudget === b, () => setActiveSubBudget(b))
-                )}
-              </div>
-            </div>
-          )}
         </div>
       </div>
 
@@ -385,7 +389,7 @@ const Catalog: React.FC = () => {
         </div>
       )}
 
-      {selectedItem && <DetailModal item={selectedItem} onClose={() => setSelectedItem(null)} />}
+      {selectedItem && <DetailModal item={selectedItem} onClose={closeDetail} />}
     </div>
   );
 };

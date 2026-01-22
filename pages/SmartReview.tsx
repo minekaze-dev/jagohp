@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { getSmartReview } from '../services/geminiService';
 import { PhoneReview } from '../types';
@@ -66,7 +65,7 @@ const SmartReview: React.FC = () => {
     <div className="max-w-[850px] mx-auto px-4 pt-16 pb-40 space-y-10 theme-transition">
       <div className="text-center space-y-4">
         <h1 className="text-2xl md:text-4xl font-black uppercase tracking-tighter italic text-black dark:text-white"><span className="text-yellow-400">Smart</span> Review</h1>
-        <p className="text-gray-500 dark:text-gray-400 text-sm md:text-base max-w-xl mx-auto leading-relaxed font-medium italic">
+        <p className="text-gray-500 dark:text-gray-400 text-sm md:text-base font-medium italic">
           Analisis spesifikasi secara cepat dan akurat.
         </p>
         
@@ -164,7 +163,7 @@ const SmartReview: React.FC = () => {
               <SpecCard label="SISTEM OPERASI (OS)" value={review.specs?.os} review={review.specs?.osReview} icon={<svg fill="currentColor" viewBox="0 0 24 24"><path d="M3 13h12v-2H3v2zm0 4h12v-2H3v2zm0-8h12V7H3v2zm14 8h2v-2h-2v2zm0-4h2v-2h-2v2zm0-8v2h2V5h-2z"/></svg>} />
               <SpecCard label="MATERIAL BODY" value={review.specs?.body} review={review.specs?.bodyReview} icon={<svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 18h-2v-2h2v2zm3-4H8v-2h8v2zm0-4H8v-2h8v2zm0-4H8V6h8v2z"/></svg>} />
               <SpecCard label="DISPLAY / LAYAR" value={review.specs?.screen} review={review.specs?.screenReview} icon={<svg fill="currentColor" viewBox="0 0 24 24"><path d="M17 1H7c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-2-2-2m0 18H7V5h10v14Z"/></svg>} />
-              <SpecCard label="CHIPSET / PROCESSOR" value={review.specs?.processor} review={review.specs?.processorReview} icon={<svg fill="currentColor" viewBox="0 0 24 24"><path d="M11 15h2v2h-2v-2m0-8h2v6h-2V7m1-5C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2m0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8Z"/></svg>} />
+              <SpecCard label="CHIPSET / PROCESSOR" value={review.specs?.processor} review={review.specs?.processorReview} icon={<svg fill="currentColor" viewBox="0 0 24 24"><path d="M11 15h2v2h-2v-2m0-8h2v6h-2V7m1-5C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.48 10-10S17.53 2 12 2m0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8Z"/></svg>} />
               <SpecCard label="STORAGE / PENYIMPANAN" value={review.specs?.storage} review={review.specs?.storageReview} icon={<svg fill="currentColor" viewBox="0 0 24 24"><path d="M18 2H10L4 8v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2M9 4v4H6l3-4m9 16H6V9h4c1.1 0 2-.9 2-2V4h6v16Z"/></svg>} />
               <SpecCard label="KAMERA UTAMA" value={review.specs?.mainCamera} review={review.specs?.mainCameraReview} icon={<svg fill="currentColor" viewBox="0 0 24 24"><path d="M4 4h3l2-2h6l2 2h3c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2m8 3c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5m0 2c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3Z"/></svg>} />
               <SpecCard label="KAMERA DEPAN (SELFIE)" value={review.specs?.selfieCamera} review={review.specs?.selfieCameraReview} icon={<svg fill="currentColor" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>} />
@@ -191,7 +190,7 @@ const SmartReview: React.FC = () => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-black/5 dark:divide-white/5">
-                  {(review.gamingPerformance || []).map((g, i) => (
+                  {Array.isArray(review.gamingPerformance) && review.gamingPerformance.map((g, i) => (
                     <tr key={i} className="group hover:bg-black/5 dark:hover:bg-white/5 transition-colors">
                       <td className="py-5 font-black text-black dark:text-white text-xs md:text-base uppercase italic tracking-tighter">{g.game}</td>
                       <td className="py-5 px-4">
@@ -202,6 +201,11 @@ const SmartReview: React.FC = () => {
                       <td className="py-5 text-gray-500 dark:text-gray-500 text-[10px] md:text-xs leading-relaxed italic font-medium">"{g.experience}"</td>
                     </tr>
                   ))}
+                  {(!Array.isArray(review.gamingPerformance) || review.gamingPerformance.length === 0) && (
+                    <tr>
+                      <td colSpan={3} className="py-10 text-center text-[10px] text-gray-400 font-bold uppercase tracking-widest italic">Data gaming belum tersedia</td>
+                    </tr>
+                  )}
                 </tbody>
               </table>
             </div>
@@ -222,21 +226,24 @@ const SmartReview: React.FC = () => {
               <div className="space-y-6">
                 <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-gray-400 dark:text-gray-500">Benchmark Performa</h4>
                 <div className="space-y-1">
-                  <div className="text-[10px] text-gray-400 dark:text-gray-400 font-black uppercase tracking-widest">ANTUTU V10</div>
-                  <div className="text-3xl font-black text-yellow-500 dark:text-yellow-400 italic tracking-tighter">{review.performance?.antutu}</div>
+                  <div className="text-[10px] text-gray-400 dark:text-gray-400 font-black uppercase tracking-widest">ANTUTU V11</div>
+                  <div className="text-3xl font-black text-yellow-500 dark:text-yellow-400 italic tracking-tighter">{review.performance?.antutu || "N/A"}</div>
                 </div>
-                <p className="text-[11px] md:text-xs text-gray-500 dark:text-gray-500 leading-relaxed font-medium italic">"{review.performance?.description}"</p>
+                <p className="text-[11px] md:text-xs text-gray-500 dark:text-gray-500 leading-relaxed font-medium italic">"{review.performance?.description || "Belum ada analisis benchmark mendalam."}"</p>
               </div>
               
               <div className="bg-gray-50 dark:bg-black/40 p-6 rounded-2xl border border-black/5 dark:border-white/5 space-y-4">
                 <h5 className="text-[9px] font-black text-gray-300 dark:text-gray-700 uppercase tracking-widest border-b border-black/5 dark:border-white/5 pb-2">Smartphone Rival</h5>
                 <div className="space-y-3">
-                  {(review.performance?.rivals || []).map((rival, i) => (
+                  {Array.isArray(review.performance?.rivals) && review.performance?.rivals.map((rival, i) => (
                     <div key={i} className="flex justify-between items-center">
                       <span className="text-xs font-black text-black dark:text-gray-300 uppercase italic">{rival.name}</span>
                       <span className="text-yellow-500 dark:text-yellow-400 font-black text-xs">{rival.score}</span>
                     </div>
                   ))}
+                  {(!Array.isArray(review.performance?.rivals) || review.performance?.rivals.length === 0) && (
+                     <div className="text-[9px] text-gray-600 uppercase font-black tracking-widest text-center italic">Rival data not available</div>
+                  )}
                 </div>
               </div>
             </div>
@@ -246,14 +253,14 @@ const SmartReview: React.FC = () => {
               <div className="flex flex-col items-center gap-6 py-4">
                 <div className="space-y-1 text-center">
                   <div className="text-[10px] font-black text-gray-400 dark:text-gray-400 uppercase tracking-[0.3em]">DXOMARK SCORE</div>
-                  <div className="text-4xl font-black text-yellow-500 dark:text-yellow-400 tracking-tighter italic leading-none">{review.camera?.score}</div>
+                  <div className="text-4xl font-black text-yellow-500 dark:text-yellow-400 tracking-tighter italic leading-none">{review.camera?.score || "N/A"}</div>
                 </div>
                 <div className="bg-gray-100 dark:bg-[#151515] text-black dark:text-white text-[10px] px-6 py-2.5 rounded-full font-black tracking-widest uppercase border border-black/5 dark:border-white/10 theme-transition">
-                  {review.camera?.dxoMarkClass}
+                  {review.camera?.dxoMarkClass || "UNRANKED"}
                 </div>
               </div>
               <div className="pt-4 border-t border-black/5 dark:border-white/5">
-                <p className="text-[11px] md:text-xs text-gray-500 dark:text-gray-500 leading-relaxed italic font-medium">"{review.camera?.description}"</p>
+                <p className="text-[11px] md:text-xs text-gray-500 dark:text-gray-500 leading-relaxed italic font-medium">"{review.camera?.description || "Belum ada analisis kamera mendalam."}"</p>
               </div>
             </div>
           </div>
@@ -263,13 +270,13 @@ const SmartReview: React.FC = () => {
               <div className="space-y-4">
                 <h3 className="text-[10px] font-black uppercase tracking-prop-4em opacity-40">Kelebihan</h3>
                 <ul className="space-y-2 text-xs md:text-base font-black italic tracking-tight leading-snug">
-                  {(review.pros || []).map((p, i) => <li key={i} className="flex gap-2"><span>+</span> {p}</li>)}
+                  {Array.isArray(review.pros) && review.pros.map((p, i) => <li key={i} className="flex gap-2"><span>+</span> {p}</li>)}
                 </ul>
               </div>
               <div className="space-y-4">
                 <h3 className="text-[10px] font-black uppercase tracking-prop-4em opacity-40">Kekurangan</h3>
                 <ul className="space-y-2 text-xs md:text-base font-black italic tracking-tight opacity-70 leading-snug">
-                  {(review.cons || []).map((c, i) => <li key={i} className="flex gap-2"><span>-</span> {c}</li>)}
+                  {Array.isArray(review.cons) && review.cons.map((c, i) => <li key={i} className="flex gap-2"><span>-</span> {c}</li>)}
                 </ul>
               </div>
             </div>

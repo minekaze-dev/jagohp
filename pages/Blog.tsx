@@ -1,6 +1,5 @@
-
-import React, { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import { getBlogPosts, BlogPostExtended } from '../services/blogService';
 
 const BlogCard: React.FC<{ post: BlogPostExtended }> = ({ post }) => {
@@ -10,6 +9,9 @@ const BlogCard: React.FC<{ post: BlogPostExtended }> = ({ post }) => {
   
   const shareUrl = `${window.location.origin}/#/blog/${post.slug}`;
   const shareText = encodeURIComponent(`${post.title}\nBaca selengkapnya di JAGOHP: `);
+
+  // Parse tags for display
+  const tagsArray = post.tags ? post.tags.split(',').map(t => t.trim()).filter(t => t !== '') : [];
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -58,7 +60,7 @@ const BlogCard: React.FC<{ post: BlogPostExtended }> = ({ post }) => {
             </span>
           </div>
 
-          <div className="space-y-2">
+          <div className="space-y-3">
             <Link to={`/blog/${post.slug}`}>
               <h2 className="text-lg md:text-xl font-black text-black dark:text-white uppercase italic tracking-tighter leading-tight group-hover:text-yellow-400 transition-colors">
                 {post.title}
@@ -67,6 +69,21 @@ const BlogCard: React.FC<{ post: BlogPostExtended }> = ({ post }) => {
             <p className="text-gray-500 dark:text-gray-500 text-[11px] md:text-xs leading-relaxed line-clamp-2 md:line-clamp-3 italic font-medium">
               {post.excerpt}
             </p>
+            
+            {/* TAG LIST PREVIEW */}
+            {tagsArray.length > 0 && (
+              <div className="flex flex-wrap gap-2 pt-1">
+                {tagsArray.map((tag, idx) => (
+                  <Link 
+                    key={idx} 
+                    to={`/blog?tag=${tag.replace(/^#/, '')}`}
+                    className="text-[8px] font-black text-gray-400 dark:text-gray-600 uppercase tracking-tighter hover:text-yellow-400 transition-colors"
+                  >
+                    #{tag.replace(/^#/, '')}
+                  </Link>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 
@@ -134,11 +151,16 @@ const BlogCard: React.FC<{ post: BlogPostExtended }> = ({ post }) => {
 };
 
 const Blog: React.FC = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [posts, setPosts] = useState<BlogPostExtended[]>([]);
   const [loading, setLoading] = useState(true);
+  
+  const tagFilter = searchParams.get('tag');
+  const qFilter = searchParams.get('q');
 
   useEffect(() => {
     const fetchPosts = async () => {
+      setLoading(true);
       const data = await getBlogPosts(false);
       setPosts(data);
       setLoading(false);
@@ -146,18 +168,66 @@ const Blog: React.FC = () => {
     fetchPosts();
   }, []);
 
+  const filteredPosts = useMemo(() => {
+    let result = posts;
+
+    if (tagFilter) {
+      const searchTag = tagFilter.toLowerCase().trim().replace(/^#/, '');
+      result = result.filter(p => {
+        if (!p.tags) return false;
+        const pTags = p.tags.toLowerCase().split(',').map(t => t.trim().replace(/^#/, ''));
+        return pTags.includes(searchTag);
+      });
+    }
+
+    if (qFilter) {
+      const query = qFilter.toLowerCase().trim();
+      result = result.filter(p => 
+        p.title.toLowerCase().includes(query) || 
+        p.excerpt.toLowerCase().includes(query) ||
+        (p.tags && p.tags.toLowerCase().includes(query))
+      );
+    }
+
+    return result;
+  }, [posts, tagFilter, qFilter]);
+
+  const clearFilter = () => {
+    setSearchParams({});
+  };
+
   return (
     <div className="max-w-[1000px] mx-auto px-4 py-16 space-y-12 pb-32 theme-transition">
-      <div className="space-y-3 text-center md:text-left">
-        <div className="inline-block bg-yellow-400 text-black px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-[0.3em] italic mb-2">
-          Update Mingguan
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+        <div className="space-y-3 text-center md:text-left">
+          <div className="inline-block bg-yellow-400 text-black px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-[0.3em] italic mb-2">
+            Update Mingguan
+          </div>
+          <h1 className="text-2xl md:text-4xl font-black uppercase italic tracking-tighter text-black dark:text-white">
+            Blog & <span className="text-yellow-400">Berita</span>
+          </h1>
+          <p className="text-gray-500 dark:text-gray-400 text-sm md:text-base font-medium italic">
+            Informasi, wawasan dan tips mendalam seputar dunia HP.
+          </p>
         </div>
-        <h1 className="text-2xl md:text-4xl font-black uppercase italic tracking-tighter text-black dark:text-white">
-          Blog & <span className="text-yellow-400">Berita</span>
-        </h1>
-        <p className="text-gray-500 dark:text-gray-400 text-sm md:text-base font-medium italic">
-          Informasi, wawasan dan tips mendalam seputar dunia HP.
-        </p>
+
+        {(tagFilter || qFilter) && (
+          <div className="flex items-center justify-center md:justify-end gap-3 animate-in fade-in slide-in-from-right-4 duration-500">
+             <div className="bg-white/5 border border-yellow-400/20 px-4 py-2 rounded-2xl flex items-center gap-3 shadow-xl backdrop-blur-md">
+                <span className="text-[10px] font-black text-gray-500 uppercase tracking-widest italic">Filtering:</span>
+                <span className="text-[11px] font-black text-yellow-400 uppercase italic">
+                  {tagFilter ? `#${tagFilter.replace(/^#/, '')}` : qFilter}
+                </span>
+                <button 
+                  onClick={clearFilter}
+                  className="w-6 h-6 flex items-center justify-center bg-white/5 hover:bg-red-500/20 hover:text-red-500 rounded-lg transition-all"
+                  title="Hapus Filter"
+                >
+                  <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+             </div>
+          </div>
+        )}
       </div>
 
       {loading ? (
@@ -166,11 +236,17 @@ const Blog: React.FC = () => {
         </div>
       ) : (
         <div className="grid gap-8">
-          {posts.length > 0 ? (
-            posts.map(post => <BlogCard key={post.id} post={post} />)
+          {filteredPosts.length > 0 ? (
+            filteredPosts.map(post => <BlogCard key={post.id} post={post} />)
           ) : (
-            <div className="py-20 text-center">
-              <p className="text-gray-400 dark:text-gray-600 text-[10px] md:text-xs font-black uppercase tracking-widest italic">Belum ada berita dipublikasikan.</p>
+            <div className="py-32 text-center border-2 border-dashed border-black/5 dark:border-white/5 rounded-[3rem] space-y-6 theme-transition">
+              <div className="w-20 h-20 bg-black/5 dark:bg-white/5 rounded-full flex items-center justify-center mx-auto opacity-20">
+                <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.022.547l2.387.477a6 6 0 003.86-.517l.318-.158a6 6 0 013.86-.517l2.387.477zM9 9h.01M15 9h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              </div>
+              <div className="space-y-2">
+                <p className="text-gray-400 dark:text-gray-600 text-[11px] font-black uppercase tracking-[0.5em] italic">Tidak ada berita yang cocok.</p>
+                <button onClick={clearFilter} className="text-yellow-400 text-[10px] font-black uppercase tracking-widest border-b border-yellow-400/30 hover:border-yellow-400 transition-all pb-1">Lihat Semua Berita</button>
+              </div>
             </div>
           )}
         </div>

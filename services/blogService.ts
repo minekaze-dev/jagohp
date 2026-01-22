@@ -25,9 +25,6 @@ export const generateSlug = (title: string): string => {
     .replace(/^-+|-+$/g, '');
 };
 
-/**
- * Fungsi untuk mengunggah gambar ke Supabase Storage
- */
 export const uploadImage = async (file: File): Promise<string> => {
   const fileExt = file.name.split('.').pop();
   const fileName = `${Math.random().toString(36).substring(2)}_${Date.now()}.${fileExt}`;
@@ -37,10 +34,7 @@ export const uploadImage = async (file: File): Promise<string> => {
     .from('IMAGES')
     .upload(filePath, file);
 
-  if (uploadError) {
-    console.error("Upload Error detail:", uploadError);
-    throw uploadError;
-  }
+  if (uploadError) throw uploadError;
 
   const { data: { publicUrl } } = supabase.storage
     .from('IMAGES')
@@ -58,7 +52,7 @@ export const getBlogPosts = async (includeDrafts: boolean = true): Promise<BlogP
         authors (name),
         categories (name)
       `)
-      .order('publish_date', { ascending: false }); // Urutkan berdasarkan tanggal publikasi
+      .order('publish_date', { ascending: false });
 
     if (!includeDrafts) {
       const today = new Date().toISOString().split('T')[0];
@@ -76,7 +70,8 @@ export const getBlogPosts = async (includeDrafts: boolean = true): Promise<BlogP
       author_id: p.author_id,
       excerpt: p.excerpt,
       content: p.content,
-      date: p.publish_date || p.created_at, // Menggunakan tanggal pilihan editor
+      tags: p.tags || '',
+      date: p.publish_date || p.created_at,
       publishDate: p.publish_date,
       status: p.status,
       category: p.categories?.name || 'Uncategorized',
@@ -104,36 +99,31 @@ export const getBlogPostBySlug = async (slug: string): Promise<BlogPostExtended 
       .eq('slug', slug)
       .maybeSingle();
 
-    if (error) {
-      console.error("Query Error detail slug:", error);
-      return null;
-    }
-
-    if (!data) return null;
+    if (error || !data) return null;
     await supabase.rpc('increment_views', { post_id: data.id });
-    return mapToExtended(data);
+    
+    return {
+      id: data.id,
+      slug: data.slug,
+      title: data.title,
+      excerpt: data.excerpt,
+      content: data.content,
+      tags: data.tags || '',
+      date: data.publish_date || data.created_at,
+      status: data.status,
+      publishDate: data.publish_date,
+      views: data.views || 0,
+      imageUrl: data.image_url,
+      author: data.authors?.name || 'Admin JAGOHP',
+      category: data.categories?.name || 'Berita Gadget',
+      categories: [data.categories?.name || 'Tech'],
+      comments: 0
+    };
   } catch (err) {
     console.error("System Error getBlogPostBySlug:", err);
     return null;
   }
 };
-
-const mapToExtended = (data: any): BlogPostExtended => ({
-  id: data.id,
-  slug: data.slug,
-  title: data.title,
-  excerpt: data.excerpt,
-  content: data.content,
-  date: data.publish_date || data.created_at, // Menggunakan tanggal pilihan editor
-  status: data.status,
-  publishDate: data.publish_date,
-  views: data.views || 0,
-  imageUrl: data.image_url,
-  author: data.authors?.name || 'Admin JAGOHP',
-  category: data.categories?.name || 'Berita Gadget',
-  categories: [data.categories?.name || 'Tech'],
-  comments: 0
-});
 
 export const saveBlogPost = async (post: any) => {
   const payload = {
@@ -141,6 +131,7 @@ export const saveBlogPost = async (post: any) => {
     title: post.title,
     excerpt: post.excerpt,
     content: post.content,
+    tags: post.tags || '',
     image_url: post.imageUrl,
     author_id: post.author_id,
     category_id: post.category_id,
