@@ -67,7 +67,6 @@ const LeftSidebar: React.FC = () => {
   return (
     <aside className="w-[240px] hidden lg:flex flex-col h-screen sticky top-0 bg-white dark:bg-black border-r border-black/5 dark:border-white/5 p-4 overflow-y-auto custom-scrollbar shrink-0 theme-transition">
       <div className="mb-4">
-        {/* Changed from button with onOpenDonation to Link to home page */}
         <Link to="/" className="block mb-2 hover:opacity-80 transition-opacity">
           <img src={logoLight} alt="JAGOHP" className="h-12 w-auto dark:hidden" />
           <img src={logoDark} alt="JAGOHP" className="h-12 w-auto hidden dark:block" />
@@ -157,7 +156,6 @@ const RightSidebar: React.FC<{ onOpenDonation: () => void, isDark: boolean, togg
   const [trending, setTrending] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Data Simulasi Pangsa Pasar (Market Share) Indonesia 2024-2025
   const marketShareData = [
     { brand: 'Samsung', share: 22 },
     { brand: 'Oppo', share: 19 },
@@ -170,7 +168,6 @@ const RightSidebar: React.FC<{ onOpenDonation: () => void, isDark: boolean, togg
   useEffect(() => {
     const fetchTrending = async () => {
       setLoading(true);
-      // Change: Limit to top 3 items as requested
       const data = await getTrendingReviews(3);
       setTrending(data);
       setLoading(false);
@@ -181,7 +178,6 @@ const RightSidebar: React.FC<{ onOpenDonation: () => void, isDark: boolean, togg
   return (
     <aside className="w-[300px] hidden xl:flex flex-col h-screen sticky top-0 bg-white dark:bg-black border-l border-black/5 dark:border-white/5 p-5 space-y-7 overflow-y-auto custom-scrollbar shrink-0 theme-transition">
       <div className="space-y-4">
-        {/* Compact Google Login Button */}
         <button 
           onClick={() => alert("Google Login: Segera hadir untuk fitur komentar cerdas!")}
           className="w-full bg-[#4285F4] text-white rounded-xl px-4 py-2.5 flex items-center gap-3 group hover:bg-[#357ae8] transition-all shadow-sm theme-transition"
@@ -225,14 +221,12 @@ const RightSidebar: React.FC<{ onOpenDonation: () => void, isDark: boolean, togg
         </div>
       </div>
 
-      {/* GRAFIK PENJUALAN HP DI INDONESIA */}
       <div className="bg-black/5 dark:bg-white/5 rounded-2xl p-4 border border-black/5 dark:border-white/5 space-y-5 theme-transition">
         <div className="flex items-center justify-between">
            <h4 className="text-[10px] font-black text-black dark:text-white uppercase tracking-[0.2em] flex items-center gap-2">
               <svg className="w-3.5 h-3.5 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
               TOP BRAND DI INDONESIA
            </h4>
-           <span className="text-[9px] font-black text-gray-400 dark:text-gray-600 uppercase tracking-tighter"></span>
         </div>
         
         <div className="space-y-4">
@@ -257,7 +251,6 @@ const RightSidebar: React.FC<{ onOpenDonation: () => void, isDark: boolean, togg
         </div>
       </div>
 
-      {/* THEME TOGGLE & DUKUNG KAMI */}
       <div className="px-1 space-y-5">
         <button 
           onClick={toggleTheme}
@@ -304,7 +297,7 @@ const BottomNavbar: React.FC = () => {
 
   const userNavItems = [
     { name: 'LINIMASA', path: '/', icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg> },
-    { name: 'REVIEW', path: '/review', icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg> },
+    { name: 'REVIEW', path: '/review', icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg> },
     { name: 'COMPARE', path: '/compare', icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4"/></svg> },
     { name: 'MATCH', path: '/match', icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"/></svg> },
     { name: 'KATALOG', path: '/catalog', icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg> },
@@ -330,6 +323,7 @@ const AppContent: React.FC = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [showDonationModal, setShowDonationModal] = useState(false);
+  const [showAiNotice, setShowAiNotice] = useState(true);
   const [isDark, setIsDark] = useState(document.documentElement.classList.contains('dark'));
   const [search, setSearch] = useState('');
   const isAdminPath = location.pathname.startsWith('/admin');
@@ -362,6 +356,26 @@ const AppContent: React.FC = () => {
 
   return (
     <div className="bg-white dark:bg-black min-h-screen selection:bg-yellow-400/30 selection:text-black transition-colors duration-300">
+      {/* GLOBAL AI STATUS NOTICE */}
+      {showAiNotice && !isAdminPath && (
+        <div className="bg-yellow-400 text-black px-4 py-2 flex items-center justify-between gap-4 animate-in slide-in-from-top duration-500">
+          <div className="flex items-center gap-3 overflow-hidden">
+            <div className="bg-black text-yellow-400 p-1 rounded-lg shrink-0">
+               <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd"/></svg>
+            </div>
+            <p className="text-[9px] md:text-[10px] font-black uppercase italic tracking-widest leading-tight truncate">
+              Update: Fitur berbasis AI sedang nonaktif sementara. Akses Blog & Katalog tetap tersedia penuh!
+            </p>
+          </div>
+          <button 
+            onClick={() => setShowAiNotice(false)}
+            className="bg-black/10 hover:bg-black/20 p-1.5 rounded-full transition-colors shrink-0"
+          >
+            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M6 18L18 6M6 6l12 12"/></svg>
+          </button>
+        </div>
+      )}
+
       <div className={`${isAdminPath ? 'w-full' : 'max-w-[1250px] mx-auto border-x border-black/5 dark:border-white/5'} flex bg-white dark:bg-black min-h-screen theme-transition`}>
         {!isAdminPath && <LeftSidebar />}
         
