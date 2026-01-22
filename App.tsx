@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { HashRouter as Router, Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom';
 import Home from './pages/Home';
@@ -15,6 +16,7 @@ import AdminDashboard from './pages/AdminDashboard';
 import BlogEditor from './pages/BlogEditor';
 import TopTier from './pages/TopTier';
 import AdminTopTier from './pages/AdminTopTier';
+import AdminInsightTech from './pages/AdminInsightTech';
 import Catalog from './pages/Catalog';
 import { getTrendingReviews, getGadgetDictionary } from './services/geminiService';
 
@@ -152,9 +154,11 @@ const LeftSidebar: React.FC = () => {
 };
 
 // Sidebar Kanan (Trending & Market Share)
-const RightSidebar: React.FC<{ onOpenDonation: () => void, isDark: boolean, toggleTheme: () => void }> = ({ onOpenDonation, isDark, toggleTheme }) => {
+const RightSidebar: React.FC<{ onOpenDonation: () => void }> = ({ onOpenDonation }) => {
+  const navigate = useNavigate();
   const [trending, setTrending] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState('');
 
   const marketShareData = [
     { brand: 'Samsung', share: 22 },
@@ -175,11 +179,63 @@ const RightSidebar: React.FC<{ onOpenDonation: () => void, isDark: boolean, togg
     fetchTrending();
   }, []);
 
+  const handleSearchKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && search.trim()) {
+      navigate(`/blog?q=${encodeURIComponent(search.trim())}`);
+      setSearch('');
+    }
+  };
+
   return (
     <aside className="w-[300px] hidden xl:flex flex-col h-screen sticky top-0 bg-white dark:bg-black border-l border-black/5 dark:border-white/5 p-5 space-y-7 overflow-y-auto custom-scrollbar shrink-0 theme-transition">
-      {/* Hidden temporarily based on user request */}
       
-      {/* Section 1: TOP BRAND (Moved up) */}
+      {/* Section 0: PENCARIAN ARTIKEL */}
+      <div className="space-y-3">
+        <h4 className="text-[10px] font-black text-black dark:text-white uppercase tracking-[0.2em] flex items-center gap-2">
+           <svg className="w-3.5 h-3.5 text-yellow-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+           PENCARIAN
+        </h4>
+        <div className="relative group">
+          <input 
+            type="text" 
+            placeholder="Cari artikel..." 
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            onKeyDown={handleSearchKeyPress}
+            className="w-full bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/10 rounded-xl px-4 py-2.5 text-[11px] font-bold text-black dark:text-white outline-none focus:border-yellow-400/50 transition-all placeholder:text-[10px] placeholder:text-gray-400 dark:placeholder:text-gray-700"
+          />
+        </div>
+      </div>
+
+      {/* Section 1: TOP PENCARIAN */}
+      <div className="space-y-5">
+        <h4 className="text-[10px] font-black text-black dark:text-white uppercase tracking-[0.2em] flex items-center gap-2">
+           <svg className="w-3.5 h-3.5 text-yellow-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+           TERAKHIR PENCARIAN PENGGUNA
+        </h4>
+        <div className="space-y-3.5">
+           {loading ? (
+             <div className="space-y-3 animate-pulse">
+               {[1,2,3].map(i => (
+                 <div key={i} className="h-9 bg-black/5 dark:bg-white/5 rounded-xl"></div>
+               ))}
+             </div>
+           ) : trending.length > 0 ? (
+             trending.map((item) => (
+               <Link to={`/catalog?model=${encodeURIComponent(item.title)}`} key={item.rank} className="flex gap-4 group cursor-pointer items-center p-1.5 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 transition-all">
+                 <span className="text-xl font-black text-gray-200 dark:text-gray-800 italic group-hover:text-yellow-500 transition-colors w-6 leading-none text-center">{item.rank}</span>
+                 <div className="min-w-0">
+                    <h5 className="text-[11px] font-black text-black dark:text-white uppercase tracking-tighter group-hover:text-yellow-500 transition-colors truncate">{item.title}</h5>
+                 </div>
+               </Link>
+             ))
+           ) : (
+             <p className="text-[8px] text-gray-400 dark:text-gray-700 font-black uppercase text-center italic">Belum ada data</p>
+           )}
+        </div>
+      </div>
+
+      {/* Section 2: TOP BRAND */}
       <div className="bg-black/5 dark:bg-white/5 rounded-2xl p-4 border border-black/5 dark:border-white/5 space-y-5 theme-transition">
         <div className="flex items-center justify-between">
            <h4 className="text-[10px] font-black text-black dark:text-white uppercase tracking-[0.2em] flex items-center gap-2">
@@ -210,57 +266,10 @@ const RightSidebar: React.FC<{ onOpenDonation: () => void, isDark: boolean, togg
         </div>
       </div>
 
-      {/* Section 2: TOP PENCARIAN (Moved down) */}
-      <div className="space-y-5">
-        <h4 className="text-[10px] font-black text-black dark:text-white uppercase tracking-[0.2em] flex items-center gap-2">
-           <svg className="w-3.5 h-3.5 text-yellow-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
-           TOP PENCARIAN
-        </h4>
-        <div className="space-y-3.5">
-           {loading ? (
-             <div className="space-y-3 animate-pulse">
-               {[1,2,3].map(i => (
-                 <div key={i} className="h-9 bg-black/5 dark:bg-white/5 rounded-xl"></div>
-               ))}
-             </div>
-           ) : trending.length > 0 ? (
-             trending.map((item) => (
-               <Link to={`/catalog?model=${encodeURIComponent(item.title)}`} key={item.rank} className="flex gap-4 group cursor-pointer items-center p-1.5 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 transition-all">
-                 <span className="text-xl font-black text-gray-200 dark:text-gray-800 italic group-hover:text-yellow-500 transition-colors w-6 leading-none text-center">{item.rank}</span>
-                 <div className="min-w-0">
-                    <h5 className="text-[11px] font-black text-black dark:text-white uppercase leading-tight group-hover:text-yellow-500 transition-colors truncate">{item.title}</h5>
-                 </div>
-               </Link>
-             ))
-           ) : (
-             <p className="text-[8px] text-gray-400 dark:text-gray-700 font-black uppercase text-center italic">Belum ada data</p>
-           )}
-        </div>
-      </div>
-
-      <div className="px-1 space-y-5">
-        <button 
-          onClick={toggleTheme}
-          className="w-full flex items-center gap-3 group transition-all"
-        >
-          <div className="w-8 h-8 rounded-lg bg-black/5 dark:bg-white/5 flex items-center justify-center border border-black/5 dark:border-white/10 group-hover:border-yellow-400/50 transition-all">
-            {isDark ? (
-              <svg className="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 24 24"><path d="M12 3c.132 0 .263 0 .393.007a9.982 9.982 0 00-.393 19.986c.132 0 .263 0 .393-.007A9.982 9.982 0 0012 3z"/></svg>
-            ) : (
-              <svg className="w-4 h-4 text-black" fill="currentColor" viewBox="0 0 24 24"><path d="M12 7a5 5 0 100 10 5 5 0 000-10zM2 13h2a1 1 0 100-2H2a1 1 0 100 2zm18 0h2a1 1 0 100-2h-2a1 1 0 100 2zM11 2v2a1 1 0 102 0V2a1 1 0 10-2 0zm0 18v2a1 1 0 102 0v-2a1 1 0 10-2 0zM5.99 4.58a1 1 0 10-1.41 1.41l1.06 1.06a1 1 0 101.41-1.41L5.99 4.58zm12.37 12.37a1 1 0 10-1.41 1.41l1.06 1.06a1 1 0 101.41-1.41l-1.06-1.06zm1.06-12.37a1 1 0 10-1.41-1.41l-1.06 1.06a1 1 0 101.41 1.41l1.06-1.06zM5.99 19.42a1 1 0 101.41-1.41l-1.06-1.06a1 1 0 10-1.41 1.41l1.06 1.06z"/></svg>
-            )}
-          </div>
-          <div className="flex flex-col text-left">
-            <span className="text-[9px] font-black uppercase tracking-widest text-gray-500 group-hover:text-black dark:group-hover:text-white transition-colors">
-              GANTI TEMA
-            </span>
-            <span className="text-[7px] font-black text-gray-300 dark:text-gray-700 uppercase tracking-tighter">KE MODE {isDark ? 'TERANG' : 'GELAP'}</span>
-          </div>
-        </button>
-
+      <div className="px-1 space-y-4">
         <button 
           onClick={onOpenDonation}
-          className="text-[10px] font-black text-black dark:text-white uppercase tracking-[0.2em] flex items-center gap-2 hover:text-yellow-500 transition-colors cursor-pointer group w-full text-left outline-none pt-3 border-t border-black/5 dark:border-white/5"
+          className="text-[10px] font-black text-black dark:text-white uppercase tracking-[0.2em] flex items-center gap-2 hover:text-yellow-500 transition-colors cursor-pointer group w-full text-left outline-none pt-1"
         >
            <svg className="w-3.5 h-3.5 text-yellow-500 transition-transform group-hover:scale-125" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
            DUKUNG KAMI
@@ -308,11 +317,9 @@ const BottomNavbar: React.FC = () => {
 
 const AppContent: React.FC = () => {
   const location = useLocation();
-  const navigate = useNavigate();
   const [showDonationModal, setShowDonationModal] = useState(false);
   const [showAiNotice, setShowAiNotice] = useState(true);
   const [isDark, setIsDark] = useState(document.documentElement.classList.contains('dark'));
-  const [search, setSearch] = useState('');
   const isAdminPath = location.pathname.startsWith('/admin');
 
   const toggleTheme = () => {
@@ -324,13 +331,6 @@ const AppContent: React.FC = () => {
     } else {
       document.documentElement.classList.remove('dark');
       localStorage.setItem('theme', 'light');
-    }
-  };
-
-  const handleSearchKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && search.trim()) {
-      navigate(`/blog?q=${encodeURIComponent(search.trim())}`);
-      setSearch('');
     }
   };
 
@@ -399,7 +399,7 @@ const AppContent: React.FC = () => {
                 </div>
               </div>
               
-              {/* Sisi Kanan: Pencarian, Actions */}
+              {/* Sisi Kanan: Theme Toggle & Actions */}
               <div className="flex items-center justify-end gap-3 md:gap-4 h-full">
                 {/* Mobile Navigation Links */}
                 <div className="lg:hidden flex items-center gap-4">
@@ -418,22 +418,7 @@ const AppContent: React.FC = () => {
                   })}
                 </div>
 
-                {/* Global Search Header (Placeholder 10px) */}
-                <div className="hidden md:flex relative group w-48 xl:w-64">
-                  <input 
-                    type="text" 
-                    placeholder="Pencarian Artikel..." 
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    onKeyDown={handleSearchKeyPress}
-                    className="w-full bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/10 rounded-xl px-9 py-2 text-[10px] font-bold text-black dark:text-white outline-none focus:border-yellow-400/50 transition-all placeholder:text-[10px] placeholder:text-gray-400 dark:placeholder:text-gray-700"
-                  />
-                  <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-3 h-3 text-gray-400 group-focus-within:text-yellow-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="3" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                  </svg>
-                </div>
-
-                <div className="lg:hidden flex items-center gap-2">
+                <div className="flex items-center gap-2">
                   <button 
                     onClick={toggleTheme}
                     className="p-1.5 rounded-lg bg-black/5 dark:bg-white/5 border border-black/5 dark:border-white/10 transition-all active:scale-90"
@@ -445,7 +430,6 @@ const AppContent: React.FC = () => {
                       <svg className="w-3.5 h-3.5 text-black" fill="currentColor" viewBox="0 0 24 24"><path d="M12 7a5 5 0 100 10 5 5 0 000-10zM2 13h2a1 1 0 100-2H2a1 1 0 100 2zm18 0h2a1 1 0 100-2h-2a1 1 0 100 2zM11 2v2a1 1 0 102 0V2a1 1 0 10-2 0zm0 18v2a1 1 0 102 0v-2a1 1 0 10-2 0zM5.99 4.58a1 1 0 10-1.41 1.41l1.06 1.06a1 1 0 101.41-1.41L5.99 4.58zm12.37 12.37a1 1 0 10-1.41 1.41l1.06 1.06a1 1 0 101.41-1.41l-1.06-1.06zm1.06-12.37a1 1 0 10-1.41-1.41l-1.06 1.06a1 1 0 101.41 1.41l1.06-1.06zM5.99 19.42a1 1 0 101.41-1.41l-1.06-1.06a1 1 0 10-1.41 1.41l1.06 1.06z"/></svg>
                     )}
                   </button>
-                  {/* Google Login Mobile Hidden temporarily based on user request */}
                 </div>
               </div>
             </nav>
@@ -467,6 +451,7 @@ const AppContent: React.FC = () => {
               <Route path="/privacy" element={<PrivacyPolicy />} />
               <Route path="/terms" element={<TermsCondition />} />
               <Route path="/admin" element={<AdminDashboard />} />
+              <Route path="/admin/insight-tech" element={<AdminInsightTech />} />
               <Route path="/admin/top-tier" element={<AdminTopTier />} />
               <Route path="/admin/editor" element={<BlogEditor />} />
               <Route path="/admin/editor/:id" element={<BlogEditor />} />
@@ -474,7 +459,7 @@ const AppContent: React.FC = () => {
           </main>
         </div>
 
-        {!isAdminPath && <RightSidebar onOpenDonation={() => setShowDonationModal(true)} isDark={isDark} toggleTheme={toggleTheme} />}
+        {!isAdminPath && <RightSidebar onOpenDonation={() => setShowDonationModal(true)} />}
       </div>
       {!isAdminPath && <BottomNavbar />}
 

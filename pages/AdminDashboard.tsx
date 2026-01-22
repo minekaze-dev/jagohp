@@ -95,6 +95,9 @@ const AdminDashboard: React.FC = () => {
           <p className="text-gray-500 text-[10px] font-black uppercase tracking-[0.4em]">Database Status: <span className="text-emerald-500">Connected to Supabase</span></p>
         </div>
         <div className="flex flex-wrap gap-2 w-full md:w-auto">
+          <button onClick={() => navigate('/admin/insight-tech')} className="flex-1 md:flex-none bg-yellow-400/10 border border-yellow-400/20 text-yellow-500 px-5 py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-yellow-400 hover:text-black transition-all shadow-lg active:scale-95">
+            Insight Tech Mod
+          </button>
           <button onClick={() => navigate('/admin/top-tier')} className="flex-1 md:flex-none bg-white/5 border border-white/10 text-white px-5 py-3.5 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-white/10 transition-all shadow-lg active:scale-95">
             Manage Top Tier
           </button>

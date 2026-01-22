@@ -1,3 +1,4 @@
+
 import { GoogleGenAI, Type } from "@google/genai";
 import { PhoneReview, ComparisonResult, RecommendationResponse, TopTierResponse, CatalogItem } from "../types";
 import { supabase, generateSlug } from "./blogService";
@@ -13,27 +14,32 @@ const REAL_WORLD_DATA_INSTRUCTION = `
 `;
 
 /**
- * Helper untuk membersihkan output JSON dari model jika tidak menggunakan schema secara penuh
+ * Mengambil 6 istilah teknis gadget dari Database (Bukan langsung AI)
  */
-const parseAiJson = (text: string) => {
+export const getGadgetDictionary = async (): Promise<{term: string, definition: string}[]> => {
   try {
-    const cleaned = text.replace(/```json/g, '').replace(/```/g, '').trim();
-    return JSON.parse(cleaned);
+    const { data, error } = await supabase
+      .from('gadget_dictionary')
+      .select('term, definition')
+      .order('created_at', { ascending: true });
+
+    if (error) throw error;
+    return data || [];
   } catch (e) {
-    console.error("Gagal mem-parse JSON AI:", e);
-    return null;
+    console.error("Database Dictionary Error:", e);
+    return [];
   }
 };
 
 /**
- * Mengambil 6 istilah teknis gadget (Kamus Gadget) dari AI
+ * Fungsi Admin: Meminta AI meriset jargon baru dan menyimpannya ke Database
  */
-export const getGadgetDictionary = async (): Promise<{term: string, definition: string}[]> => {
+export const regenerateDictionary = async (): Promise<boolean> => {
   try {
     const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
-      contents: "Berikan 6 istilah/jargon teknis smartphone yang sedang tren atau esensial. Berikan penjelasan singkat namun profesional (max 10 kata) dalam Bahasa Indonesia.",
+      contents: "Berikan 6 istilah/jargon teknis smartphone terbaru tahun 2025-2026. Berikan penjelasan singkat namun profesional (max 10 kata) dalam Bahasa Indonesia.",
       config: {
         responseMimeType: "application/json",
         responseSchema: {
@@ -49,10 +55,22 @@ export const getGadgetDictionary = async (): Promise<{term: string, definition: 
         }
       }
     });
-    return JSON.parse(response.text);
+
+    const newTerms = JSON.parse(response.text);
+    
+    if (Array.isArray(newTerms) && newTerms.length > 0) {
+      // Hapus data lama
+      await supabase.from('gadget_dictionary').delete().neq('term', 'KEEP_TABLE_ALIVE');
+      
+      // Masukkan data baru
+      const { error } = await supabase.from('gadget_dictionary').insert(newTerms);
+      if (error) throw error;
+      return true;
+    }
+    return false;
   } catch (e) {
-    console.error("Dictionary error:", e);
-    return [];
+    console.error("Regenerate Dictionary Error:", e);
+    return false;
   }
 };
 
