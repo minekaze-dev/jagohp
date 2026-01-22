@@ -43,7 +43,7 @@ const SmartReview: React.FC = () => {
         setError('Data tidak ditemukan.');
       }
     } catch (err) {
-      setError('Gagal memuat review. Pastikan API Key valid.');
+      setError('Gagal memuat review. Pastikan API Key Groq valid.');
     } finally {
       setLoading(false);
     }
@@ -64,7 +64,7 @@ const SmartReview: React.FC = () => {
           <span className="text-yellow-400">Smart</span> Review
         </h1>
         <p className="text-gray-500 dark:text-gray-400 text-sm md:text-base font-medium italic">
-          Analisis spesifikasi akurat menggunakan mesin AI terbaru.
+          Analisis spesifikasi akurat menggunakan Groq Llama 3 Engine.
         </p>
         
         {!review && !loading && (
@@ -97,7 +97,7 @@ const SmartReview: React.FC = () => {
       {loading && (
         <div className="text-center py-20 animate-pulse">
           <div className="w-12 h-12 border-4 border-yellow-400 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-400 text-[10px] font-black uppercase tracking-widest">AI sedang menganalisis...</p>
+          <p className="text-gray-400 text-[10px] font-black uppercase tracking-widest">Groq sedang menganalisis...</p>
         </div>
       )}
 

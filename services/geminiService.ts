@@ -3,7 +3,7 @@ import { PhoneReview, ComparisonResult, RecommendationResponse, TopTierResponse,
 import { supabase, generateSlug } from "./blogService";
 
 const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
-const MODEL_NAME = "llama-3.3-70b-versatile";
+const MODEL_NAME = "llama3-8b-8192"; // (lebih stabil)
 
 const SYSTEM_INSTRUCTION = `
   Anda adalah Ahli Gadget Senior dari JAGOHP. 
@@ -11,37 +11,46 @@ const SYSTEM_INSTRUCTION = `
   Gunakan standar benchmark terbaru (AnTuTu V11, DXOMark).
   Prioritaskan status rilis resmi di pasar Indonesia.
   Bahasa: Indonesia profesional (Lugas & Informatif).
-  Jika meminta JSON, berikan JSON murni tanpa markdown.
+  Selalu berikan output dalam format JSON murni yang valid sesuai permintaan.
 `;
 
 /**
- * Helper untuk memanggil Groq API
+ * Helper Inti untuk memanggil Groq API (FINAL FIX)
  */
-const callGroq = async (prompt: string, system: string = SYSTEM_INSTRUCTION, isJson: boolean = true) => {
+const callGroq = async (
+  prompt: string,
+  system: string = SYSTEM_INSTRUCTION,
+  isJson: boolean = true
+) => {
   const response = await fetch(GROQ_API_URL, {
     method: "POST",
     headers: {
-      "Authorization": `Bearer ${process.env.GROQ_API_KEY}`,
+      Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
       "Content-Type": "application/json"
     },
     body: JSON.stringify({
       model: MODEL_NAME,
       messages: [
-        { role: "system", content: system + (isJson ? " Berikan hasil dalam format JSON murni." : "") },
+        {
+          role: "system",
+          content: system + (isJson
+            ? " Jawab HANYA dalam JSON valid. Jangan tambahkan teks apa pun di luar JSON."
+            : "")
+        },
         { role: "user", content: prompt }
       ],
-      response_format: isJson ? { type: "json_object" } : undefined,
-      temperature: 0.2
+      temperature: 0.1,
+      max_tokens: 1200
     })
   });
 
   if (!response.ok) {
-    const errorData = await response.json();
-    throw new Error(errorData.error?.message || "Groq API Error");
+    const errorText = await response.text();
+    throw new Error(errorText || "Groq API Connection Failed");
   }
 
   const data = await response.json();
-  return data.choices[0].message.content;
+  return data.choices?.[0]?.message?.content || "";
 };
 
 /**
@@ -49,7 +58,7 @@ const callGroq = async (prompt: string, system: string = SYSTEM_INSTRUCTION, isJ
  */
 export const getGadgetDictionary = async (): Promise<{term: string, definition: string}[]> => {
   try {
-    const text = await callGroq("Berikan 6 jargon teknis smartphone terbaru beserta definisinya (max 10 kata).");
+    const text = await callGroq("Berikan 6 jargon teknis smartphone terbaru beserta definisinya (max 10 kata). Gunakan format array of objects: [{term, definition}]");
     const parsed = JSON.parse(text);
     return Array.isArray(parsed) ? parsed : (parsed.jargon || parsed.terms || []);
   } catch (e) {
@@ -129,7 +138,7 @@ export const getAllCatalogItems = async (): Promise<CatalogItem[]> => {
 };
 
 /**
- * Smart Review Engine
+ * Smart Review Engine menggunakan Groq
  */
 export const getSmartReview = async (phoneName: string): Promise<{review: PhoneReview, sources: any[]}> => {
   const slug = generateSlug(phoneName);
@@ -149,7 +158,7 @@ export const getSmartReview = async (phoneName: string): Promise<{review: PhoneR
     console.error("Database check failed:", err);
   }
 
-  const text = await callGroq(`Lakukan riset teknis mendalam untuk: ${phoneName}. Berikan ulasan spesifikasi, performa gaming, dan kamera dalam format JSON sesuai interface PhoneReview.`);
+  const text = await callGroq(`Lakukan riset teknis mendalam untuk smartphone: ${phoneName}. Berikan ulasan performa, kamera, dan spesifikasi lengkap dalam JSON sesuai interface PhoneReview.`);
   const parsedReview: PhoneReview = JSON.parse(text);
 
   if (parsedReview && parsedReview.name) {
@@ -167,32 +176,33 @@ export const getSmartReview = async (phoneName: string): Promise<{review: PhoneR
 };
 
 /**
- * Compare Engine
+ * Compare Engine menggunakan Groq
  */
 export const getComparison = async (phones: string[]): Promise<ComparisonResult> => {
-  const text = await callGroq(`Bandingkan secara objektif: ${phones.join(", ")}. Berikan kesimpulan dan pemenang di tiap sektor dalam JSON.`);
+  const text = await callGroq(`Bandingkan secara objektif: ${phones.join(", ")}. Berikan pemenang untuk tiap kategori spesifikasi dalam format JSON.`);
   return JSON.parse(text);
 };
 
 /**
- * Phone Match Engine
+ * Phone Match Engine menggunakan Groq
  */
 export const getMatch = async (criteria: any): Promise<RecommendationResponse> => {
-  const text = await callGroq(`Cari HP terbaik untuk: ${criteria.activities?.join(", ")}, Budget: ${criteria.budget}, Prioritas Kamera: ${criteria.cameraPrio}. Berikan JSON.`);
+  const text = await callGroq(`Cari smartphone terbaik untuk: ${criteria.activities?.join(", ")}, Budget: ${criteria.budget}, Prioritas Kamera: ${criteria.cameraPrio}. Berikan output JSON.`);
   return JSON.parse(text);
 };
 
 /**
- * Top Tier Rankings
+ * Top Tier Rankings menggunakan Groq
  */
 export const getTopTierRankings = async (category: string): Promise<TopTierResponse> => {
-  const text = await callGroq(`Siapa smartphone #1 mutlak saat ini untuk kategori: ${category}? Berikan alasan dan spesifikasi utamanya dalam JSON.`);
+  const text = await callGroq(`Siapa smartphone #1 mutlak saat ini untuk kategori: ${category}? Berikan output JSON.`);
   return JSON.parse(text);
 };
 
 /**
- * Chat helper for JAGOBOT
+ * Chat helper for JAGOBOT menggunakan Groq
  */
 export const chatWithAI = async (message: string, history: any[]) => {
+  // Chat menggunakan mode non-JSON agar lebih natural
   return await callGroq(message, "Anda adalah JAGOBOT, asisten gadget pintar dari JAGOHP. Jawab dengan cerdas, santai tapi profesional. Panggil user dengan 'Kak'.", false);
 };
