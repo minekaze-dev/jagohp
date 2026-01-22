@@ -1,66 +1,55 @@
-
+import { GoogleGenAI, Type } from "@google/genai";
 import { PhoneReview, ComparisonResult, RecommendationResponse, TopTierResponse, CatalogItem } from "../types";
 import { supabase, generateSlug } from "./blogService";
 
-const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
-const MODEL_NAME = "llama3-8b-8192"; // (lebih stabil)
-
-const SYSTEM_INSTRUCTION = `
-  Anda adalah Ahli Gadget Senior dari JAGOHP. 
-  Tugas Anda memberikan analisis teknis smartphone yang sangat akurat, tajam, dan objektif.
-  Gunakan standar benchmark terbaru (AnTuTu V11, DXOMark).
-  Prioritaskan status rilis resmi di pasar Indonesia.
-  Bahasa: Indonesia profesional (Lugas & Informatif).
-  Selalu berikan output dalam format JSON murni yang valid sesuai permintaan.
+const REAL_WORLD_DATA_INSTRUCTION = `
+  PENTING: Anda adalah Ahli Reviewer Gadget Senior dan Perancang Katalog Smartphone Profesional.
+  PENGETAHUAN: Gunakan data teknis akurat (AnTuTu V11, DXOMark, serta spesifikasi resmi).
+  AKURASI STATUS: Prioritaskan status RESMI di Indonesia. Jika sudah rilis, berikan data retail resmi.
+  FORMAT TANGGAL RILIS: Gunakan format 'Nama Bulan Tahun' (Contoh: 'Maret 2025').
+  BAHASA: WAJIB menggunakan Bahasa Indonesia yang profesional, lugas, tajam, namun mudah dipahami.
+  NETRALITAS: Fokus pada spesifikasi teknis dan ulasan kualitatif yang jujur.
+  KEWAJIBAN: Setiap field ulasan (seperti processorReview, cameraReview, dll) HARUS berisi analisis singkat (5-10 kata), dilarang memberikan string kosong atau hanya tanda kutip.
 `;
 
 /**
- * Helper Inti untuk memanggil Groq API (FINAL FIX)
+ * Helper untuk membersihkan output JSON dari model jika tidak menggunakan schema secara penuh
  */
-const callGroq = async (
-  prompt: string,
-  system: string = SYSTEM_INSTRUCTION,
-  isJson: boolean = true
-) => {
-  const response = await fetch(GROQ_API_URL, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-      model: MODEL_NAME,
-      messages: [
-        {
-          role: "system",
-          content: system + (isJson
-            ? " Jawab HANYA dalam JSON valid. Jangan tambahkan teks apa pun di luar JSON."
-            : "")
-        },
-        { role: "user", content: prompt }
-      ],
-      temperature: 0.1,
-      max_tokens: 1200
-    })
-  });
-
-  if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(errorText || "Groq API Connection Failed");
+const parseAiJson = (text: string) => {
+  try {
+    const cleaned = text.replace(/```json/g, '').replace(/```/g, '').trim();
+    return JSON.parse(cleaned);
+  } catch (e) {
+    console.error("Gagal mem-parse JSON AI:", e);
+    return null;
   }
-
-  const data = await response.json();
-  return data.choices?.[0]?.message?.content || "";
 };
 
 /**
- * Mendapatkan Kamus Gadget untuk Sidebar
+ * Mengambil 6 istilah teknis gadget (Kamus Gadget) dari AI
  */
 export const getGadgetDictionary = async (): Promise<{term: string, definition: string}[]> => {
   try {
-    const text = await callGroq("Berikan 6 jargon teknis smartphone terbaru beserta definisinya (max 10 kata). Gunakan format array of objects: [{term, definition}]");
-    const parsed = JSON.parse(text);
-    return Array.isArray(parsed) ? parsed : (parsed.jargon || parsed.terms || []);
+    const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+    const response = await ai.models.generateContent({
+      model: 'gemini-3-flash-preview',
+      contents: "Berikan 6 istilah/jargon teknis smartphone yang sedang tren atau esensial. Berikan penjelasan singkat namun profesional (max 10 kata) dalam Bahasa Indonesia.",
+      config: {
+        responseMimeType: "application/json",
+        responseSchema: {
+          type: Type.ARRAY,
+          items: {
+            type: Type.OBJECT,
+            properties: {
+              term: { type: Type.STRING },
+              definition: { type: Type.STRING }
+            },
+            required: ['term', 'definition']
+          }
+        }
+      }
+    });
+    return JSON.parse(response.text);
   } catch (e) {
     console.error("Dictionary error:", e);
     return [];
@@ -68,7 +57,7 @@ export const getGadgetDictionary = async (): Promise<{term: string, definition: 
 };
 
 /**
- * Mendapatkan Trending dari Database
+ * Mengambil data smartphone yang paling populer/sering diulas (Trending)
  */
 export const getTrendingReviews = async (limit: number = 3): Promise<any[]> => {
   const { data, error } = await supabase
@@ -86,7 +75,7 @@ export const getTrendingReviews = async (limit: number = 3): Promise<any[]> => {
 };
 
 /**
- * Mendapatkan Semua Item untuk Katalog
+ * Mengambil semua data ulasan untuk katalog
  */
 export const getAllCatalogItems = async (): Promise<CatalogItem[]> => {
   const { data: dbReviews, error } = await supabase
@@ -137,9 +126,47 @@ export const getAllCatalogItems = async (): Promise<CatalogItem[]> => {
   }).filter(item => item !== null) as CatalogItem[];
 };
 
-/**
- * Smart Review Engine menggunakan Groq
- */
+export const getTopTierRankings = async (category: string): Promise<TopTierResponse> => {
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const response = await ai.models.generateContent({
+    model: 'gemini-3-pro-preview',
+    contents: `${REAL_WORLD_DATA_INSTRUCTION} Berikan smartphone terbaik mutlak (#1) untuk kategori: ${category}.`,
+    config: {
+      responseMimeType: "application/json",
+      responseSchema: {
+        type: Type.OBJECT,
+        properties: {
+          category: { type: Type.STRING },
+          description: { type: Type.STRING },
+          phones: {
+            type: Type.ARRAY,
+            items: {
+              type: Type.OBJECT,
+              properties: {
+                rank: { type: Type.NUMBER },
+                name: { type: Type.STRING },
+                reason: { type: Type.STRING },
+                price: { type: Type.STRING },
+                specs: {
+                  type: Type.OBJECT,
+                  properties: {
+                    processor: { type: Type.STRING },
+                    screen: { type: Type.STRING },
+                    camera: { type: Type.STRING },
+                    battery: { type: Type.STRING },
+                    ramStorage: { type: Type.STRING }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  });
+  return JSON.parse(response.text);
+};
+
 export const getSmartReview = async (phoneName: string): Promise<{review: PhoneReview, sources: any[]}> => {
   const slug = generateSlug(phoneName);
   
@@ -158,9 +185,96 @@ export const getSmartReview = async (phoneName: string): Promise<{review: PhoneR
     console.error("Database check failed:", err);
   }
 
-  const text = await callGroq(`Lakukan riset teknis mendalam untuk smartphone: ${phoneName}. Berikan ulasan performa, kamera, dan spesifikasi lengkap dalam JSON sesuai interface PhoneReview.`);
-  const parsedReview: PhoneReview = JSON.parse(text);
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const response = await ai.models.generateContent({
+    model: 'gemini-3-pro-preview',
+    contents: `${REAL_WORLD_DATA_INSTRUCTION} Lakukan riset teknis mendalam untuk smartphone: ${phoneName}. Pastikan untuk data benchmark menggunakan estimasi skor AnTuTu V11.`,
+    config: {
+      responseMimeType: "application/json",
+      responseSchema: {
+        type: Type.OBJECT,
+        properties: {
+          name: { type: Type.STRING, description: "Nama lengkap smartphone" },
+          highlight: { type: Type.STRING, description: "Satu kalimat kesimpulan utama" },
+          specs: {
+            type: Type.OBJECT,
+            properties: {
+              processor: { type: Type.STRING, description: "Nama chipset spesifik" },
+              processorReview: { type: Type.STRING, description: "Ulasan singkat performa chipset (5-10 kata)" },
+              ram: { type: Type.STRING, description: "Kapasitas RAM" },
+              ramReview: { type: Type.STRING, description: "Ulasan manajemen RAM" },
+              storage: { type: Type.STRING, description: "Kapasitas & tipe internal storage" },
+              storageReview: { type: Type.STRING, description: "Ulasan kecepatan storage" },
+              battery: { type: Type.STRING, description: "Kapasitas mAh & speed charging" },
+              batteryReview: { type: Type.STRING, description: "Ulasan daya tahan & charging" },
+              screen: { type: Type.STRING, description: "Ukuran, panel, refresh rate" },
+              screenReview: { type: Type.STRING, description: "Ulasan kualitas visual layar" },
+              body: { type: Type.STRING, description: "Material & proteksi body" },
+              bodyReview: { type: Type.STRING, description: "Ulasan build quality & ergonomi" },
+              mainCamera: { type: Type.STRING, description: "Spek kamera utama" },
+              mainCameraReview: { type: Type.STRING, description: "Ulasan kualitas foto kamera belakang" },
+              selfieCamera: { type: Type.STRING, description: "Spek kamera depan" },
+              selfieCameraReview: { type: Type.STRING, description: "Ulasan kualitas foto selfie" },
+              sound: { type: Type.STRING, description: "Tipe speaker & audio jack" },
+              soundReview: { type: Type.STRING, description: "Ulasan kualitas audio" },
+              os: { type: Type.STRING, description: "Versi Android/iOS & UI" },
+              osReview: { type: Type.STRING, description: "Ulasan stabilitas software" },
+              network: { type: Type.STRING, description: "Dukungan 4G/5G" },
+              networkReview: { type: Type.STRING, description: "Ulasan stabilitas sinyal" },
+              connectivity: { type: Type.STRING, description: "NFC, Wi-Fi, Bluetooth" },
+              connectivityReview: { type: Type.STRING, description: "Ulasan kelengkapan konektivitas" },
+              releaseDate: { type: Type.STRING, description: "Bulan dan Tahun Rilis" },
+              releaseReview: { type: Type.STRING, description: "Ulasan relevansi saat ini" },
+              availabilityStatus: { type: Type.STRING, description: "Resmi Indonesia, Global, atau China" },
+              price: { type: Type.STRING, description: "Estimasi harga terbaru" }
+            },
+            required: ['processor', 'processorReview', 'ram', 'ramReview', 'battery', 'batteryReview', 'screen', 'screenReview', 'price', 'mainCameraReview', 'selfieCameraReview', 'osReview']
+          },
+          performance: {
+            type: Type.OBJECT,
+            properties: {
+              antutu: { type: Type.STRING, description: "Skor estimasi AnTuTu V11" },
+              description: { type: Type.STRING, description: "Analisis performa berdasarkan skor AnTuTu" },
+              rivals: {
+                type: Type.ARRAY,
+                items: {
+                  type: Type.OBJECT,
+                  properties: { name: { type: Type.STRING }, score: { type: Type.STRING } }
+                }
+              }
+            },
+            required: ['antutu', 'description']
+          },
+          gamingPerformance: {
+            type: Type.ARRAY,
+            items: {
+              type: Type.OBJECT,
+              properties: {
+                game: { type: Type.STRING },
+                setting: { type: Type.STRING },
+                experience: { type: Type.STRING }
+              }
+            }
+          },
+          overallGamingSummary: { type: Type.STRING, description: "Kesimpulan pengalaman gaming menyeluruh" },
+          camera: {
+            type: Type.OBJECT,
+            properties: {
+              score: { type: Type.STRING, description: "Estimasi skor DXOMark" },
+              dxoMarkClass: { type: Type.STRING, description: "Kasta kamera (Top, Great, Standard)" },
+              description: { type: Type.STRING, description: "Analisis kemampuan fotografi/videografi" }
+            }
+          },
+          pros: { type: Type.ARRAY, items: { type: Type.STRING } },
+          cons: { type: Type.ARRAY, items: { type: Type.STRING } },
+          targetAudience: { type: Type.STRING, description: "Rekomendasi pengguna yang cocok" }
+        },
+        required: ['name', 'highlight', 'specs', 'performance', 'pros', 'cons', 'targetAudience', 'overallGamingSummary']
+      }
+    }
+  });
 
+  const parsedReview = JSON.parse(response.text);
   if (parsedReview && parsedReview.name) {
     supabase.from('smart_reviews').upsert([{
       slug: slug,
@@ -168,41 +282,148 @@ export const getSmartReview = async (phoneName: string): Promise<{review: PhoneR
       review_data: parsedReview,
       updated_at: new Date().toISOString()
     }], { onConflict: 'slug' }).then(({ error }) => {
-      if (error) console.error("DB Sync Error:", error.message);
+      if (error) console.error("JAGOHP Engine Error:", error.message);
     });
   }
 
   return { review: parsedReview, sources: [] };
 };
 
-/**
- * Compare Engine menggunakan Groq
- */
 export const getComparison = async (phones: string[]): Promise<ComparisonResult> => {
-  const text = await callGroq(`Bandingkan secara objektif: ${phones.join(", ")}. Berikan pemenang untuk tiap kategori spesifikasi dalam format JSON.`);
-  return JSON.parse(text);
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const response = await ai.models.generateContent({
+    model: 'gemini-3-pro-preview',
+    contents: `${REAL_WORLD_DATA_INSTRUCTION} Bandingkan secara objektif: ${phones.join(", ")}. Gunakan benchmark AnTuTu V11 untuk penilaian performa.`,
+    config: {
+      responseMimeType: "application/json",
+      responseSchema: {
+        type: Type.OBJECT,
+        properties: {
+          conclusion: { type: Type.STRING },
+          recommendation: { type: Type.STRING },
+          tableData: {
+            type: Type.ARRAY,
+            items: {
+              type: Type.OBJECT,
+              properties: {
+                feature: { type: Type.STRING },
+                phone1: { type: Type.STRING },
+                phone2: { type: Type.STRING },
+                phone3: { type: Type.STRING },
+                winnerIndex: { type: Type.NUMBER }
+              }
+            }
+          },
+          performanceScores: {
+            type: Type.OBJECT,
+            properties: {
+              phone1: {
+                type: Type.OBJECT,
+                properties: {
+                  chipset: { type: Type.NUMBER },
+                  memory: { type: Type.NUMBER },
+                  camera: { type: Type.NUMBER },
+                  gaming: { type: Type.NUMBER },
+                  battery: { type: Type.NUMBER },
+                  charging: { type: Type.NUMBER }
+                }
+              },
+              phone2: {
+                type: Type.OBJECT,
+                properties: {
+                  chipset: { type: Type.NUMBER },
+                  memory: { type: Type.NUMBER },
+                  camera: { type: Type.NUMBER },
+                  gaming: { type: Type.NUMBER },
+                  battery: { type: Type.NUMBER },
+                  charging: { type: Type.NUMBER }
+                }
+              },
+              phone3: {
+                type: Type.OBJECT,
+                properties: {
+                  chipset: { type: Type.NUMBER },
+                  memory: { type: Type.NUMBER },
+                  camera: { type: Type.NUMBER },
+                  gaming: { type: Type.NUMBER },
+                  battery: { type: Type.NUMBER },
+                  charging: { type: Type.NUMBER }
+                }
+              }
+            }
+          }
+        },
+        required: ['conclusion', 'recommendation', 'tableData', 'performanceScores']
+      }
+    }
+  });
+  return JSON.parse(response.text);
 };
 
-/**
- * Phone Match Engine menggunakan Groq
- */
 export const getMatch = async (criteria: any): Promise<RecommendationResponse> => {
-  const text = await callGroq(`Cari smartphone terbaik untuk: ${criteria.activities?.join(", ")}, Budget: ${criteria.budget}, Prioritas Kamera: ${criteria.cameraPrio}. Berikan output JSON.`);
-  return JSON.parse(text);
-};
-
-/**
- * Top Tier Rankings menggunakan Groq
- */
-export const getTopTierRankings = async (category: string): Promise<TopTierResponse> => {
-  const text = await callGroq(`Siapa smartphone #1 mutlak saat ini untuk kategori: ${category}? Berikan output JSON.`);
-  return JSON.parse(text);
-};
-
-/**
- * Chat helper for JAGOBOT menggunakan Groq
- */
-export const chatWithAI = async (message: string, history: any[]) => {
-  // Chat menggunakan mode non-JSON agar lebih natural
-  return await callGroq(message, "Anda adalah JAGOBOT, asisten gadget pintar dari JAGOHP. Jawab dengan cerdas, santai tapi profesional. Panggil user dengan 'Kak'.", false);
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  const response = await ai.models.generateContent({
+    model: 'gemini-3-pro-preview',
+    contents: `${REAL_WORLD_DATA_INSTRUCTION} Cari smartphone terbaik untuk aktivitas: ${criteria.activities?.join(", ")}, Prioritas Kamera: ${criteria.cameraPrio}, Budget: ${criteria.budget}. Tambahan: ${criteria.extra || 'Tidak ada'}. Gunakan data performa AnTuTu V11.`,
+    config: {
+      responseMimeType: "application/json",
+      responseSchema: {
+        type: Type.OBJECT,
+        properties: {
+          primary: {
+            type: Type.OBJECT,
+            properties: {
+              name: { type: Type.STRING },
+              reason: { type: Type.STRING },
+              price: { type: Type.STRING },
+              specs: {
+                type: Type.OBJECT,
+                properties: {
+                  processor: { type: Type.STRING },
+                  ram: { type: Type.STRING },
+                  storage: { type: Type.STRING },
+                  battery: { type: Type.STRING },
+                  charging: { type: Type.STRING },
+                  screen: { type: Type.STRING },
+                  cameraSummary: { type: Type.STRING },
+                  network: { type: Type.STRING },
+                  connectivity: { type: Type.STRING },
+                  releaseDate: { type: Type.STRING }
+                }
+              },
+              performance: { type: Type.OBJECT, properties: { antutu: { type: Type.STRING } } },
+              camera: { type: Type.OBJECT, properties: { score: { type: Type.STRING } } }
+            }
+          },
+          alternatives: {
+            type: Type.ARRAY,
+            items: {
+              type: Type.OBJECT,
+              properties: {
+                name: { type: Type.STRING },
+                reason: { type: Type.STRING },
+                price: { type: Type.STRING },
+                specs: {
+                  type: Type.OBJECT,
+                  properties: {
+                    processor: { type: Type.STRING },
+                    ram: { type: Type.STRING },
+                    storage: { type: Type.STRING },
+                    battery: { type: Type.STRING },
+                    charging: { type: Type.STRING },
+                    screen: { type: Type.STRING },
+                    cameraSummary: { type: Type.STRING }
+                  }
+                },
+                performance: { type: Type.OBJECT, properties: { antutu: { type: Type.STRING } } },
+                camera: { type: Type.OBJECT, properties: { score: { type: Type.STRING } } }
+              }
+            }
+          }
+        },
+        required: ['primary', 'alternatives']
+      }
+    }
+  });
+  return JSON.parse(response.text);
 };

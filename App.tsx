@@ -179,33 +179,7 @@ const RightSidebar: React.FC<{ onOpenDonation: () => void, isDark: boolean, togg
     <aside className="w-[300px] hidden xl:flex flex-col h-screen sticky top-0 bg-white dark:bg-black border-l border-black/5 dark:border-white/5 p-5 space-y-7 overflow-y-auto custom-scrollbar shrink-0 theme-transition">
       {/* Hidden temporarily based on user request */}
       
-      <div className="space-y-5">
-        <h4 className="text-[10px] font-black text-black dark:text-white uppercase tracking-[0.2em] flex items-center gap-2">
-           <svg className="w-3.5 h-3.5 text-yellow-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
-           TOP PENCARIAN
-        </h4>
-        <div className="space-y-3.5">
-           {loading ? (
-             <div className="space-y-3 animate-pulse">
-               {[1,2,3].map(i => (
-                 <div key={i} className="h-9 bg-black/5 dark:bg-white/5 rounded-xl"></div>
-               ))}
-             </div>
-           ) : trending.length > 0 ? (
-             trending.map((item) => (
-               <Link to={`/catalog?model=${encodeURIComponent(item.title)}`} key={item.rank} className="flex gap-4 group cursor-pointer items-center p-1.5 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 transition-all">
-                 <span className="text-xl font-black text-gray-200 dark:text-gray-800 italic group-hover:text-yellow-500 transition-colors w-6 leading-none text-center">{item.rank}</span>
-                 <div className="min-w-0">
-                    <h5 className="text-[11px] font-black text-black dark:text-white uppercase leading-tight group-hover:text-yellow-500 transition-colors truncate">{item.title}</h5>
-                 </div>
-               </Link>
-             ))
-           ) : (
-             <p className="text-[8px] text-gray-400 dark:text-gray-700 font-black uppercase text-center italic">Belum ada data</p>
-           )}
-        </div>
-      </div>
-
+      {/* Section 1: TOP BRAND (Moved up) */}
       <div className="bg-black/5 dark:bg-white/5 rounded-2xl p-4 border border-black/5 dark:border-white/5 space-y-5 theme-transition">
         <div className="flex items-center justify-between">
            <h4 className="text-[10px] font-black text-black dark:text-white uppercase tracking-[0.2em] flex items-center gap-2">
@@ -233,6 +207,34 @@ const RightSidebar: React.FC<{ onOpenDonation: () => void, isDark: boolean, togg
         
         <div className="pt-2 border-t border-black/5 dark:border-white/5">
           <p className="text-[9px] text-gray-400 dark:text-gray-700 font-medium leading-snug">Sumber: www.topbrand-award.com</p>
+        </div>
+      </div>
+
+      {/* Section 2: TOP PENCARIAN (Moved down) */}
+      <div className="space-y-5">
+        <h4 className="text-[10px] font-black text-black dark:text-white uppercase tracking-[0.2em] flex items-center gap-2">
+           <svg className="w-3.5 h-3.5 text-yellow-500" fill="currentColor" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+           TOP PENCARIAN
+        </h4>
+        <div className="space-y-3.5">
+           {loading ? (
+             <div className="space-y-3 animate-pulse">
+               {[1,2,3].map(i => (
+                 <div key={i} className="h-9 bg-black/5 dark:bg-white/5 rounded-xl"></div>
+               ))}
+             </div>
+           ) : trending.length > 0 ? (
+             trending.map((item) => (
+               <Link to={`/catalog?model=${encodeURIComponent(item.title)}`} key={item.rank} className="flex gap-4 group cursor-pointer items-center p-1.5 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 transition-all">
+                 <span className="text-xl font-black text-gray-200 dark:text-gray-800 italic group-hover:text-yellow-500 transition-colors w-6 leading-none text-center">{item.rank}</span>
+                 <div className="min-w-0">
+                    <h5 className="text-[11px] font-black text-black dark:text-white uppercase leading-tight group-hover:text-yellow-500 transition-colors truncate">{item.title}</h5>
+                 </div>
+               </Link>
+             ))
+           ) : (
+             <p className="text-[8px] text-gray-400 dark:text-gray-700 font-black uppercase text-center italic">Belum ada data</p>
+           )}
         </div>
       </div>
 
